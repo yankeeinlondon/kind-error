@@ -12,20 +12,20 @@
 
 2. Throw an error of this type:
 
-  ```ts
-  throw InvalidRequest("oh no!");
-  ```
+     ```ts
+     throw InvalidRequest("oh no!");
+     ```
 
-  you may optionally adding additional "context" to the error when you throw it:
+     you may optionally adding additional "context" to the error when you throw it:
 
-  ```ts
-  throw InvalidRequest("oh no!", { params: [ "foo", "bar"]});
-  ```
+     ```ts
+     throw InvalidRequest("oh no!", { params: [ "foo", "bar"]});
+     ```
 
 In this example the person catching the error would find `params` and `lib` set on
 the error's "context" property.
 
-### Other benefits
+### Benefits Summary
 
 1. Context
 
