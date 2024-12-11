@@ -1,12 +1,12 @@
-import {
-  PascalCase,
-  KebabCase,
-  Narrowable,
-  MergeObjects,
-  StripChars,
+import type { StackFrame } from "error-stack-parser-es";
+import type {
   Dictionary,
+  KebabCase,
+  MergeObjects,
+  Narrowable,
+  PascalCase,
+  StripChars,
 } from "inferred-types/types";
-import { StackFrame } from "error-stack-parser-es";
 
 /**
  * **KindError**
@@ -19,13 +19,15 @@ export interface KindError<
 > extends Error {
   __kind: "KindError";
   name: PascalCase<TKind>;
-  kind: KebabCase<StripChars<TKind, "<" | ">" | "[" | "]" | "(" | ")">>;
+  kind: KebabCase<TKind>;
   file?: string;
   line?: number;
   col?: number;
   context: TContext;
   stackTrace: StackFrame[];
 }
+
+export type PascalKind<T extends string> = PascalCase<StripChars<T, "<" | ">" | "[" | "]" | "(" | ")">>;
 
 /**
  * **KindErrorDefn**`<K,C>`
@@ -40,4 +42,4 @@ export type KindErrorDefn<
 > = <TContext extends Record<string, C>, C extends Narrowable>(
   msg: string,
   context?: TContext,
-) => KindError<TKind, MergeObjects<TBase, TContext>>;
+) => KindError<PascalKind<TKind>, MergeObjects<TBase, TContext>>;

@@ -2,21 +2,36 @@
   "name": "kind-error",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "type": "module",
   "scripts": {
     "test": "vitest",
-    "build": "tsup format 'esm,cjs' --dts --sourceMap",
-    "lint": "eslint src tests",
+    "build": "tsup",
+    "lint": "eslint --flag unstable_ts_config src tests",
     "release": "bumpp"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "keywords": [
+    "error handling",
+    "typescript"
+  ],
+  "author": "Ken Snyder <ken@ken.net>",
+  "license": "MIT",
   "devDependencies": {
+    "@antfu/eslint-config": "^3.11.2",
     "@type-challenges/utils": "^0.1.1",
     "@types/node": "^20.17.10",
     "bumpp": "^9.9.0",
+    "eslint": "^9.16.0",
+    "eslint-plugin-format": "^0.1.3",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"

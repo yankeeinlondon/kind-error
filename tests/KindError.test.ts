@@ -1,14 +1,14 @@
-import { Equal, Expect } from "@type-challenges/utils";
+import type { Equal, Expect } from "@type-challenges/utils";
+import type { EmptyObject, Narrowable } from "inferred-types";
+import type { KindError, KindErrorDefn } from "../src";
 import { describe, expect, it } from "vitest";
-import { Narrowable } from "inferred-types";
 import { createKindError } from "../src/kindError";
-import { KindError, KindErrorDefn } from "../src";
 
 // Note: while type tests clearly fail visible inspection, they pass from Vitest
 // standpoint so always be sure to run `tsc --noEmit` over your test files to
 // gain validation that no new type vulnerabilities have cropped up.
 
-describe("KindError", () => {
+describe("kindError", () => {
   it("no base context", () => {
     const FooBar = createKindError("foo-bar");
     const err = FooBar("oh my!");
@@ -19,15 +19,14 @@ describe("KindError", () => {
 
     expect(err.context).toEqual({});
 
-    // @ts-ignore
-    type cases = [
+    type _cases = [
       Expect<
         Equal<
           typeof FooBar,
           KindErrorDefn<"foo-bar", Record<string, Narrowable>>
         >
       >,
-      Expect<Equal<typeof err, KindError<"foo-bar", {}>>>,
+      Expect<Equal<typeof err, KindError<"FooBar", EmptyObject>>>,
       Expect<Equal<(typeof err)["kind"], "foo-bar">>,
       Expect<Equal<(typeof err)["name"], "FooBar">>,
     ];
@@ -43,10 +42,9 @@ describe("KindError", () => {
 
     expect(fooBar.context).toEqual({ foo: 42, bar: 55 });
 
-    // @ts-ignore
-    type cases = [
-      Expect<Equal<typeof err, KindErrorDefn<"foo-bar", { foo: 42 }>>>,
-      Expect<Equal<typeof fooBar, KindError<"foo-bar", { foo: 42; bar: 55 }>>>,
+    type _cases = [
+      Expect<Equal<typeof err, KindErrorDefn<"Foobar", { foo: 42 }>>>,
+      Expect<Equal<typeof fooBar, KindError<"FooBar", { foo: 42; bar: 55 }>>>,
       Expect<Equal<(typeof fooBar)["kind"], "foo-bar">>,
       Expect<Equal<(typeof fooBar)["name"], "FooBar">>,
     ];
@@ -62,10 +60,9 @@ describe("KindError", () => {
 
     expect(fooBar.context).toEqual({ foo: 1, bar: 55 });
 
-    // @ts-ignore
-    type cases = [
-      Expect<Equal<typeof err, KindErrorDefn<"foo-bar", { foo: 42 }>>>,
-      Expect<Equal<typeof fooBar, KindError<"foo-bar", { foo: 1; bar: 55 }>>>,
+    type _cases = [
+      Expect<Equal<typeof err, KindErrorDefn<"FooBar", { foo: 42 }>>>,
+      Expect<Equal<typeof fooBar, KindError<"FooBar", { foo: 1; bar: 55 }>>>,
       Expect<Equal<(typeof fooBar)["kind"], "foo-bar">>,
       Expect<Equal<(typeof fooBar)["name"], "FooBar">>,
     ];
@@ -75,10 +72,14 @@ describe("KindError", () => {
     const err = createKindError("FooBar<Baz>");
     const fooBarBaz = err("well, well");
 
-    expect(fooBarBaz.name).toEqual("FooBar<Baz>");
+    expect(fooBarBaz.kind).toBe("foo-bar-baz");
+    expect(fooBarBaz.name).toBe("FooBarBaz");
+
+    expect(fooBarBaz.name).toEqual("FooBarBaz");
     expect(fooBarBaz.kind).toEqual("foo-bar-baz");
 
-    // @ts-ignore
-    type cases = [Expect<Equal<typeof fooBarBaz, KindError<"FooBar<Baz>">>>];
+    type _cases = [
+      Expect<Equal<typeof fooBarBaz, KindError<"FooBarBaz", EmptyObject>>>, //
+    ];
   });
 });

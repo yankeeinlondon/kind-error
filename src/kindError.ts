@@ -1,18 +1,17 @@
-import { stripChars, toKebabCase, toPascalCase } from "inferred-types/runtime";
-
-import {
+import type {
   EmptyObject,
   Handle,
   KebabCase,
   MergeObjects,
   Narrowable,
   PascalCase,
-  StripChars,
 } from "inferred-types/types";
 
+import type { KindError, KindErrorDefn, PascalKind } from "./types";
+
 import { parse } from "error-stack-parser-es/lite";
+import { stripChars, toKebabCase, toPascalCase } from "inferred-types/runtime";
 import { relative } from "pathe";
-import { KindError, KindErrorDefn } from "./types";
 
 const IGNORABLES = ["@vitest/runner", "node:"];
 
@@ -48,33 +47,37 @@ export function createKindError<
   TBaseContext extends Record<string, BC>,
   BC extends Narrowable = Narrowable,
 >(
-  kind: TKind,
+  kindName: TKind,
   baseContext: TBaseContext = {} as EmptyObject as TBaseContext,
-): KindErrorDefn<TKind, TBaseContext> {
+): KindErrorDefn<PascalKind<TKind>, TBaseContext> {
+  type SafeKind = PascalKind<TKind>;
+
+  const kind = toKebabCase(
+    stripChars(kindName, "<", ">", "[", "]", "(", ")"),
+  ) as KebabCase<SafeKind>;
+
   return <
     TErrContext extends Record<string, C> = EmptyObject,
     C extends Narrowable = Narrowable,
   >(
     msg: string,
     context: TErrContext = {} as EmptyObject as TErrContext,
-  ): KindError<TKind, MergeObjects<TBaseContext, TErrContext>> => {
+  ): KindError<PascalKind<TKind>, MergeObjects<TBaseContext, TErrContext>> => {
     const err = new Error(msg) as Partial<
       KindError<
-        typeof kind,
+        SafeKind,
         Handle<TBaseContext, undefined, EmptyObject, "equals">
       >
     >;
     const stackTrace = parse(err as Error)
-      .filter((i) => !IGNORABLES.some((has) => i.file && i.file.includes(has)))
-      .map((i) => ({
+      .filter(i => !IGNORABLES.some(has => i.file && i.file.includes(has)))
+      .map(i => ({
         ...i,
-        file: i.file ? relative(process.cwd(), i.file) : undefined,
+        file: i.file ? relative(".", i.file) : undefined,
       }));
 
-    err.name = toPascalCase(kind) as PascalCase<TKind>;
-    err.kind = toKebabCase(
-      stripChars(kind, "<", ">", "[", "]", "(", ")"),
-    ) as KebabCase<StripChars<TKind, "<" | ">" | "[" | "]" | "(" | ")">>;
+    err.name = toPascalCase(kind) as unknown as PascalCase<SafeKind>;
+    err.kind = kind;
     err.file = stackTrace[0].file;
     err.line = stackTrace[0].line;
     err.col = stackTrace[0].col;
@@ -86,7 +89,7 @@ export function createKindError<
     };
 
     return err as unknown as KindError<
-      TKind,
+      SafeKind,
       MergeObjects<TBaseContext, TErrContext>
     >;
   };
