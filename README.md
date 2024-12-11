@@ -6,9 +6,9 @@
 
 1. Create an Error _type_ with first call to `createKindError`:
 
-  ```ts
-  const InvalidRequest = createDindError("invalid-request", { lib: "foobar" });
-  ```
+   ```ts
+   const InvalidRequest = createDindError("invalid-request", { lib: "foobar" });
+   ```
 
 2. Throw an error of this type:
 
