@@ -1,0 +1,29 @@
+{
+  "name": "kind-error",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "vitest",
+    "build": "tsup format 'esm,cjs' --dts --sourceMap",
+    "lint": "eslint src tests",
+    "release": "bumpp"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@type-challenges/utils": "^0.1.1",
+    "@types/node": "^20.17.10",
+    "bumpp": "^9.9.0",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "dependencies": {
+    "error-stack-parser-es": "^0.1.5",
+    "inferred-types": "^0.53.2",
+    "pathe": "^1.1.2"
+  }
+}
