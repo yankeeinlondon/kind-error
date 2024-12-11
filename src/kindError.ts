@@ -16,7 +16,7 @@ import { relative } from "pathe";
 const IGNORABLES = ["@vitest/runner", "node:"];
 
 /**
- * **kindError**`(kind, baseContext) → (msg, ctx) → KindError`
+ * **createKindError**`(kind, baseContext) → (msg, ctx) → KindError`
  *
  * A higher order function who's utility is to create a type and context aware
  * error message. The first call defines:
