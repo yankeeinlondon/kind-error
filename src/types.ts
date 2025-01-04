@@ -58,7 +58,7 @@ export type KindError<TKind, TContext> = TKind extends string
   ? TContext extends Dictionary<string, Narrowable>
     ? BaseKindError & {
       name: PascalKind<TKind>;
-      kind: TKind;
+      kind: KebabKind<TKind>;
       context: TContext;
     }
     : never
@@ -66,23 +66,37 @@ export type KindError<TKind, TContext> = TKind extends string
 
 export type DefaultKindError = BaseKindError;
 
-export type InferKindErrorType<T> = T extends {
-  kind: infer K;
-  context: infer C;
-}
-  ? [K, C]
-  : never;
-
-export type MakeKindError<T extends [string, Record<string, Narrowable>]> =
-  KindError<T[0], T[1]>;
-
 export interface KindErrorType__Props<
   TKind extends string,
   TBase extends Dictionary<string, Narrowable>,
 > {
+  readonly __kind: "KindErrorType";
+  /** the _kind_ of the resultant KindError */
+  kind: KebabKind<TKind>;
+
+  /** the _type_ of the resulting error */
+  errorType: KindError<TKind, TBase>;
+
+  /**
+   * Allows the addition of context key/value pairs before using it
+   * to create a `KindError`.
+   */
   rebase: <T extends Dictionary<string, N>, N extends Narrowable>(
     context: T,
   ) => KindErrorType<TKind, MergeObjects<TBase, T>>;
+  /**
+   * **proxy(err)**
+   *
+   * Receives an error and if it's a `KindError` it will simply pass it through, if it is
+   * _not_ a `KindError` it will add the `underlying` property to context and place the
+   * error there as well as adopt that error's message property.
+   */
+  proxy: <E extends Error>(err: E) => E extends BaseKindError ? E : KindError<TKind, TBase & Record<"underlying", E>>;
+
+  /**
+   * Type guard for this particular _kind_ of `KindError`
+   */
+  is: (val: unknown) => val is KindError<TKind, TBase>;
 }
 
 export type KindErrorType__Fn<
@@ -102,4 +116,4 @@ export type KindErrorType<
   TKind extends string,
   TBase extends Dictionary<string, Narrowable>,
 > = KindErrorType__Fn<TKind, TBase> &
-KindErrorType__Props<TKind, TBase> & { kind: "KindErrorType" };
+KindErrorType__Props<TKind, TBase>;

@@ -39,7 +39,19 @@ const IR2 = InvalidRequest.rebase({
 })
 ```
 
-### Benefits Summary
+### Proxying Errors
+
+The `KindErrorType` provides a convenient `.proxy(err)` method which will take in any error type.
+
+- if the error received is a `KindError` then it is simply passed/proxied through
+- if the error is _not_ a `KindError` then it will be wrapped as a KindError by adding the underlying error as a context property called `underlying`. The new error message will also proxy the underlying error's message.
+
+## Type Guards
+
+There is a general type guard provided as `isKindError()` which you can import and use to validate
+that a given error _is_ a **KindError**. Furthermore, if you want to check for a specific _variant_ of a `KindError` you can use the `.is(val)` method off of the `KindErrorType`.
+
+## Benefits Summary
 
 1. Context
 

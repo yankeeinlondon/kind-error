@@ -1,16 +1,17 @@
 import type { Dictionary, EmptyObject, KebabCase, MergeObjects, Narrowable } from "inferred-types";
 
-import type { DefineKindError, KindErrorType, PascalKind } from "./types";
+import type { DefineKindError, KindError, KindErrorType, KindErrorType__Props, PascalKind } from "./types";
 
 import { parse } from "error-stack-parser-es/lite";
 import {
-  createFnWithProps,
+  createFnWithPropsExplicit,
   mergeObjects,
   stripChars,
   toKebabCase,
   toPascalCase,
 } from "inferred-types";
 import { relative } from "pathe";
+import { isKindError } from "./isKindError";
 
 const IGNORABLES = ["@vitest/runner", "node:"];
 
@@ -75,6 +76,7 @@ export function createKindError<
     err.col = stackTrace[0].col;
     err.stackTrace = stackTrace;
     err.__kind = "KindError";
+    err.__errorType = Symbol("KindError");
     err.context = {
       ...baseContext,
       ...(context || {}),
@@ -88,7 +90,9 @@ export function createKindError<
   };
 
   const props = {
-    kind: "KindErrorType",
+    __kind: "KindErrorType",
+    kind,
+    errorType: null as unknown as KindError<TKind, TBase>,
     rebase: <
       T extends Dictionary<string, N>,
       N extends Narrowable,
@@ -99,9 +103,19 @@ export function createKindError<
         MergeObjects<TBase, T>
       >;
     },
-  };
+    proxy(err) {
+      const error = isKindError(err) ? err : fn(err.message, { underlying: err });
+      return error;
+    },
+    is(val) {
+      return isKindError(val) && (val as any).kind === toKebabCase(kindName);
+    },
+  } as KindErrorType__Props<
+    PascalKind<TKind>,
+    TBase
+  >;
 
-  return createFnWithProps(typeFn, props) as KindErrorType<
+  return createFnWithPropsExplicit(typeFn, props) as unknown as KindErrorType<
     PascalKind<TKind>,
     TBase
   >;
