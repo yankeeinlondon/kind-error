@@ -50,10 +50,9 @@ describe("kindError", () => {
     expect(err1a.__kind).toEqual("KindError");
     expect(err1a.context).toEqual({ bar: true });
     expect(err2a.context).toEqual({ bar: true });
-    
+
     expect(err1b.context).toEqual({ foo: 1, bar: true });
     expect(err2b.context).toEqual({ foo: 1, bar: true });
-
 
     // @ts-ignore
     type _cases = [
