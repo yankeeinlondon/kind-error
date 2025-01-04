@@ -18,13 +18,18 @@ export type KebabKind<T extends string> = KebabCase<
   StripChars<T, "<" | ">" | "[" | "]" | "(" | ")">
 >;
 
-export interface DefineKindError<SafeKind extends string, TBaseContext extends Record<string, Narrowable>> {
-  <
-    TErrContext extends Record<string, C>,
-    C extends Narrowable,
-  >(msg: string, context: TErrContext): KindError<SafeKind, MergeObjects<TBaseContext, TErrContext>>;
+export interface DefineKindError<
+  SafeKind extends string,
+  TBaseContext extends Record<string, Narrowable>,
+> {
+  <TErrContext extends Record<string, C>, C extends Narrowable>(
+    msg: string,
+    context: TErrContext,
+  ): KindError<SafeKind, MergeObjects<TBaseContext, TErrContext>>;
 
-  (msg: string): KindError<
+  (
+    msg: string,
+  ): KindError<
     SafeKind,
     IsEqual<TBaseContext, Record<string, Narrowable>> extends true
       ? EmptyObject
@@ -32,24 +37,44 @@ export interface DefineKindError<SafeKind extends string, TBaseContext extends R
   >;
 }
 
+export interface BaseKindError extends Error {
+  readonly __kind: "KindError";
+  readonly __errorType: unique symbol;
+  name: string;
+  kind: string;
+  file?: string;
+  line?: number;
+  col?: number;
+  context: Dictionary<string, Narrowable>;
+  stackTrace: StackFrame[];
+}
+
 /**
  * **KindError**
  *
  * An error generated via the `kindError()` runtime utility.
  */
-export interface KindError<
-  TKind extends string = string,
-  TContext extends Dictionary<string, Narrowable> = Dictionary<string, Narrowable>,
-> extends Error {
-  __kind: "KindError";
-  name: PascalKind<TKind>;
-  kind: KebabKind<TKind>;
-  file?: string;
-  line?: number;
-  col?: number;
-  context: TContext;
-  stackTrace: StackFrame[];
+export type KindError<TKind, TContext> = TKind extends string
+  ? TContext extends Dictionary<string, Narrowable>
+    ? BaseKindError & {
+      name: PascalKind<TKind>;
+      kind: TKind;
+      context: TContext;
+    }
+    : never
+  : never;
+
+export type DefaultKindError = BaseKindError;
+
+export type InferKindErrorType<T> = T extends {
+  kind: infer K;
+  context: infer C;
 }
+  ? [K, C]
+  : never;
+
+export type MakeKindError<T extends [string, Record<string, Narrowable>]> =
+  KindError<T[0], T[1]>;
 
 export interface KindErrorType__Props<
   TKind extends string,
