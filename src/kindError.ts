@@ -1,21 +1,15 @@
-import type { Dictionary } from "inferred-types";
+import type { Dictionary, EmptyObject, KebabCase, MergeObjects, Narrowable } from "inferred-types";
 
-import type {
-  EmptyObject,
-  KebabCase,
-  MergeObjects,
-  Narrowable
-} from "inferred-types";
-import { 
-  stripChars, 
-  toKebabCase, 
-  toPascalCase, 
-  createFnWithProps, 
-  mergeObjects 
-} from "inferred-types";
+import type { DefineKindError, KindErrorType, PascalKind } from "./types";
 
-import type { DefineKindError,  KindErrorType, PascalKind } from "./types";
 import { parse } from "error-stack-parser-es/lite";
+import {
+  createFnWithProps,
+  mergeObjects,
+  stripChars,
+  toKebabCase,
+  toPascalCase,
+} from "inferred-types";
 import { relative } from "pathe";
 
 const IGNORABLES = ["@vitest/runner", "node:"];
@@ -55,17 +49,16 @@ export function createKindError<
   kindName: TKind,
   baseContext: TBase = {} as EmptyObject as TBase,
 ): KindErrorType<
-  PascalKind<TKind>, 
-  TBase
-> {
-
+    PascalKind<TKind>,
+    TBase
+  > {
   const kind = toKebabCase(
     stripChars(kindName, "<", ">", "[", "]", "(", ")"),
   ) as KebabCase<PascalKind<TKind>>;
 
   const fn = <TErrContext extends Record<string, N>, N extends Narrowable>(
     msg: string,
-    context?: TErrContext
+    context?: TErrContext,
   ) => {
     const err = new Error(msg) as any;
     const stackTrace = parse(err as Error)
@@ -84,10 +77,10 @@ export function createKindError<
     err.__kind = "KindError";
     err.context = {
       ...baseContext,
-      ...(context || {})
+      ...(context || {}),
     };
 
-    return err
+    return err;
   };
 
   const typeFn: DefineKindError<PascalKind<TKind>, TBase> = (msg: string, context?: Record<string, Narrowable>) => {
@@ -102,16 +95,14 @@ export function createKindError<
     >(context: T) => {
       const merged = mergeObjects(baseContext, context);
       return createKindError(kindName, merged) as unknown as KindErrorType<
-        TKind, 
+        TKind,
         MergeObjects<TBase, T>
       >;
     },
   };
 
   return createFnWithProps(typeFn, props) as KindErrorType<
-    PascalKind<TKind>, 
+    PascalKind<TKind>,
     TBase
   >;
 }
-
-

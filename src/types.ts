@@ -10,14 +10,14 @@ import type {
   StripChars,
 } from "inferred-types";
 
-export interface DefineKindError<SafeKind extends string, TBaseContext extends Record<string,Narrowable>> {
+export interface DefineKindError<SafeKind extends string, TBaseContext extends Record<string, Narrowable>> {
   <
     TErrContext extends Record<string, C>,
     C extends Narrowable,
   >(msg: string, context: TErrContext): KindError<SafeKind, MergeObjects<TBaseContext, TErrContext>>;
 
   (msg: string): KindError<
-    SafeKind, 
+    SafeKind,
     IsEqual<TBaseContext, Record<string, Narrowable>> extends true
       ? EmptyObject
       : TBaseContext
@@ -31,7 +31,7 @@ export interface DefineKindError<SafeKind extends string, TBaseContext extends R
  */
 export interface KindError<
   TKind extends string = string,
-  TContext extends Dictionary<string, Narrowable> = Dictionary<string, Narrowable>
+  TContext extends Dictionary<string, Narrowable> = Dictionary<string, Narrowable>,
 > extends Error {
   __kind: "KindError";
   name: PascalCase<TKind>;
@@ -59,7 +59,7 @@ export interface KindErrorType__Props<
 export type KindErrorType__Fn<
   TKind extends string,
   TBase extends Dictionary<string, Narrowable>,
-> = DefineKindError<PascalKind<TKind>, TBase>
+> = DefineKindError<PascalKind<TKind>, TBase>;
 
 /**
  * **KindErrorType**`<K,C>`
@@ -73,4 +73,4 @@ export type KindErrorType<
   TKind extends string,
   TBase extends Dictionary<string, Narrowable>,
 > = KindErrorType__Fn<TKind, TBase> &
-  KindErrorType__Props<TKind, TBase> & { kind: "KindErrorType" };
+KindErrorType__Props<TKind, TBase> & { kind: "KindErrorType" };
