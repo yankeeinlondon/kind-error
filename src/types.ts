@@ -10,6 +10,14 @@ import type {
   StripChars,
 } from "inferred-types";
 
+export type PascalKind<T extends string> = PascalCase<
+  StripChars<T, "<" | ">" | "[" | "]" | "(" | ")">
+>;
+
+export type KebabKind<T extends string> = KebabCase<
+  StripChars<T, "<" | ">" | "[" | "]" | "(" | ")">
+>;
+
 export interface DefineKindError<SafeKind extends string, TBaseContext extends Record<string, Narrowable>> {
   <
     TErrContext extends Record<string, C>,
@@ -34,18 +42,14 @@ export interface KindError<
   TContext extends Dictionary<string, Narrowable> = Dictionary<string, Narrowable>,
 > extends Error {
   __kind: "KindError";
-  name: PascalCase<TKind>;
-  kind: KebabCase<TKind>;
+  name: PascalKind<TKind>;
+  kind: KebabKind<TKind>;
   file?: string;
   line?: number;
   col?: number;
   context: TContext;
   stackTrace: StackFrame[];
 }
-
-export type PascalKind<T extends string> = PascalCase<
-  StripChars<T, "<" | ">" | "[" | "]" | "(" | ")">
->;
 
 export interface KindErrorType__Props<
   TKind extends string,
