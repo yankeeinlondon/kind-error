@@ -1,16 +1,21 @@
+import type { Dictionary } from "inferred-types";
+
 import type {
   EmptyObject,
-  Handle,
   KebabCase,
   MergeObjects,
-  Narrowable,
-  PascalCase,
-} from "inferred-types/types";
+  Narrowable
+} from "inferred-types";
+import { 
+  stripChars, 
+  toKebabCase, 
+  toPascalCase, 
+  createFnWithProps, 
+  mergeObjects 
+} from "inferred-types";
 
-import type { KindError, KindErrorDefn, PascalKind } from "./types";
-
+import type { DefineKindError,  KindErrorType, PascalKind } from "./types";
 import { parse } from "error-stack-parser-es/lite";
-import { stripChars, toKebabCase, toPascalCase } from "inferred-types/runtime";
 import { relative } from "pathe";
 
 const IGNORABLES = ["@vitest/runner", "node:"];
@@ -44,31 +49,25 @@ const IGNORABLES = ["@vitest/runner", "node:"];
  */
 export function createKindError<
   TKind extends string,
-  TBaseContext extends Record<string, BC>,
-  BC extends Narrowable = Narrowable,
+  TBase extends Record<string, BC>,
+  BC extends Narrowable,
 >(
   kindName: TKind,
-  baseContext: TBaseContext = {} as EmptyObject as TBaseContext,
-): KindErrorDefn<PascalKind<TKind>, TBaseContext> {
-  type SafeKind = PascalKind<TKind>;
+  baseContext: TBase = {} as EmptyObject as TBase,
+): KindErrorType<
+  PascalKind<TKind>, 
+  TBase
+> {
 
   const kind = toKebabCase(
     stripChars(kindName, "<", ">", "[", "]", "(", ")"),
-  ) as KebabCase<SafeKind>;
+  ) as KebabCase<PascalKind<TKind>>;
 
-  return <
-    TErrContext extends Record<string, C> = EmptyObject,
-    C extends Narrowable = Narrowable,
-  >(
+  const fn = <TErrContext extends Record<string, N>, N extends Narrowable>(
     msg: string,
-    context: TErrContext = {} as EmptyObject as TErrContext,
-  ): KindError<PascalKind<TKind>, MergeObjects<TBaseContext, TErrContext>> => {
-    const err = new Error(msg) as Partial<
-      KindError<
-        SafeKind,
-        Handle<TBaseContext, undefined, EmptyObject, "equals">
-      >
-    >;
+    context?: TErrContext
+  ) => {
+    const err = new Error(msg) as any;
     const stackTrace = parse(err as Error)
       .filter(i => !IGNORABLES.some(has => i.file && i.file.includes(has)))
       .map(i => ({
@@ -76,7 +75,7 @@ export function createKindError<
         file: i.file ? relative(".", i.file) : undefined,
       }));
 
-    err.name = toPascalCase(kind) as unknown as PascalCase<SafeKind>;
+    err.name = toPascalCase(kind);
     err.kind = kind;
     err.file = stackTrace[0].file;
     err.line = stackTrace[0].line;
@@ -85,12 +84,34 @@ export function createKindError<
     err.__kind = "KindError";
     err.context = {
       ...baseContext,
-      ...context,
+      ...(context || {})
     };
 
-    return err as unknown as KindError<
-      SafeKind,
-      MergeObjects<TBaseContext, TErrContext>
-    >;
+    return err
   };
+
+  const typeFn: DefineKindError<PascalKind<TKind>, TBase> = (msg: string, context?: Record<string, Narrowable>) => {
+    return fn(msg, context);
+  };
+
+  const props = {
+    kind: "KindErrorType",
+    rebase: <
+      T extends Dictionary<string, N>,
+      N extends Narrowable,
+    >(context: T) => {
+      const merged = mergeObjects(baseContext, context);
+      return createKindError(kindName, merged) as unknown as KindErrorType<
+        TKind, 
+        MergeObjects<TBase, T>
+      >;
+    },
+  };
+
+  return createFnWithProps(typeFn, props) as KindErrorType<
+    PascalKind<TKind>, 
+    TBase
+  >;
 }
+
+

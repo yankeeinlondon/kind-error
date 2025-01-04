@@ -25,6 +25,20 @@
 In this example the person catching the error would find `params` and `lib` set on
 the error's "context" property.
 
+### Rebasing an Error prior to throwing
+
+After you've defined an error type like `InvalidRequest` from above, but before we generate the
+error, we can "rebase" it with additional context.
+
+```ts
+const InvalidRequest = createKindError("invalid-request", { lib: "foobar" });
+// ...
+
+const IR2 = InvalidRequest.rebase({
+   handler: "bar"
+})
+```
+
 ### Benefits Summary
 
 1. Context

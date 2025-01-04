@@ -26,11 +26,11 @@
   "author": "Ken Snyder <ken@ken.net>",
   "license": "MIT",
   "devDependencies": {
-    "@antfu/eslint-config": "^3.11.2",
+    "@antfu/eslint-config": "^3.12.1",
     "@type-challenges/utils": "^0.1.1",
-    "@types/node": "^20.17.10",
-    "bumpp": "^9.9.0",
-    "eslint": "^9.16.0",
+    "@types/node": "^20.17.11",
+    "bumpp": "^9.9.2",
+    "eslint": "^9.17.0",
     "eslint-plugin-format": "^0.1.3",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "error-stack-parser-es": "^0.1.5",
-    "inferred-types": "^0.53.2",
-    "pathe": "^1.1.2"
+    "inferred-types": "^0.55.8",
+    "pathe": "^2.0.0"
   }
 }
