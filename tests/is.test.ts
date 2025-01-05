@@ -37,10 +37,6 @@ describe("kindErrorType.is()", () => {
     expect(f3).toBe(false);
     expect(f4).toBe(false);
 
-    // @ts-ignore
-    type cases = [
-      /** type tests */
-    ];
   });
 
   it("union type isolated", () => {

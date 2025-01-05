@@ -42,11 +42,26 @@ export interface BaseKindError extends Error {
   readonly __errorType: unique symbol;
   name: string;
   kind: string;
+  /** file name (if available) */
   file?: string;
+  /** line number (if available) */
   line?: number;
+  /** column (if available) */
   col?: number;
+  /** function name (if available) */
+  fn?: string;
   context: Dictionary<string, Narrowable>;
   stackTrace: StackFrame[];
+  /**
+   * returns a well formatted and colored output intended for the
+   * terminal.
+   */
+  asConsoleMessage: () => string;
+  /**
+   * An array of messages which can be pushed to the browser's
+   * console to represent the error.
+   */
+  asBrowserMessages: () => unknown[];
 }
 
 /**
