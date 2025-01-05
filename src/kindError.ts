@@ -2,6 +2,7 @@ import type { Dictionary, EmptyObject, KebabCase, MergeObjects, Narrowable } fro
 
 import type { DefineKindError, KindError, KindErrorType, KindErrorType__Props, PascalKind } from "./types";
 
+import chalk from "chalk";
 import { parse } from "error-stack-parser-es/lite";
 import {
   createFnWithPropsExplicit,
@@ -12,7 +13,6 @@ import {
 } from "inferred-types";
 import { relative } from "pathe";
 import { isKindError } from "./isKindError";
-import chalk from "chalk";
 
 const IGNORABLES = ["@vitest/runner", "node:"];
 
@@ -63,12 +63,10 @@ export function createKindError<
     context?: TErrContext,
   ) => {
     const err = new Error(msg) as any;
-    const stackTrace = parse(err as Error).slice(1)
-      .filter(i => !IGNORABLES.some(has => i.file && i.file.includes(has)))
-      .map(i => ({
-        ...i,
-        file: i.file ? relative(".", i.file) : undefined,
-      }));
+    const stackTrace = parse(err as Error).slice(1).filter(i => !IGNORABLES.some(has => i.file && i.file.includes(has))).map(i => ({
+      ...i,
+      file: i.file ? relative(".", i.file) : undefined,
+    }));
 
     err.name = toPascalCase(kind);
     err.kind = kind;
@@ -84,27 +82,27 @@ export function createKindError<
       ...(context || {}),
     };
     err.asConsoleMessage = () => {
-      const func = err.fn 
-        ? ` inside the function ${chalk.bold(err.fn)}`
+      const func = err.fn
+        ? ` inside the function ${`${chalk.bold(err.fn)}()`}`
         : "";
       const fileInfo = err.file && err.line
-        ? `\n\n${chalk.italic("in ")}file ${chalk.bold.blue(err.file)} at line ${chalk.bold(err.line)}`
+        ? `\n\n${chalk.italic("in ")}file ${chalk.bold.blue(err.file)} at line ${chalk.bold(err.line)}${func}`
         : "";
 
       const stack = stackTrace.slice(1).length > 0
-        ? "\n" + stackTrace.slice(1).map(l => `    - ${chalk.blue(l.file)}:${l.line}:${l.col}${l.function ? ` in ${chalk.bold(l.function + "()")}` : ""}`).join("\n")
+        ? `\n${stackTrace.slice(1).map(l => `    - ${chalk.blue(l.file)}:${l.line}:${l.col}${l.function ? ` in ${chalk.bold(`${l.function}()`)}` : ""}`).join("\n")}`
         : "";
 
       const context = Object.keys(err.context).length > 0
-      ? "\n\nContext:\n" + Object.keys(err.context).map(
-        key => `\n  ${chalk.bold.green(key)+ ": "}${JSON.stringify(err.context[key])}`
-      )
-      : ""
+        ? `\n\nContext:\n${Object.keys(err.context).map(
+          key => `\n  ${`${chalk.bold.green(key)}: `}${JSON.stringify(err.context[key])}`,
+        )}`
+        : "";
 
-      return `\n${chalk.bold.red(toPascalCase(kind) + " Error: ")}${msg}${fileInfo}${stack}${context}`
-    }
+      return `\n${chalk.bold.red(`${toPascalCase(kind)} Error: `)}${msg}${fileInfo}${stack}${context}`;
+    };
     err.asBrowserMessages = () => {
-      const func = err.fn 
+      const func = err.fn
         ? ` inside the function ${err.fn}()`
         : "";
       const fileInfo = err.file && err.line
@@ -112,20 +110,20 @@ export function createKindError<
         : undefined;
 
       const stack = stackTrace.slice(1).length > 0
-        ? [ "Stack:", stackTrace.slice(1) ]
+        ? ["Stack:", stackTrace.slice(1)]
         : undefined;
 
       const context = Object.keys(err.context).length > 0
-      ? [ "Context:", err.context ]
-      : undefined
+        ? ["Context:", err.context]
+        : undefined;
 
       return [
         ["Message:", msg],
         fileInfo,
         stack,
-        context
-      ].filter(i => i)
-    }
+        context,
+      ].filter(i => i);
+    };
 
     return err;
   };

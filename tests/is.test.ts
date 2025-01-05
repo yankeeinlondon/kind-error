@@ -36,7 +36,6 @@ describe("kindErrorType.is()", () => {
     expect(f2).toBe(false);
     expect(f3).toBe(false);
     expect(f4).toBe(false);
-
   });
 
   it("union type isolated", () => {

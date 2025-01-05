@@ -8,9 +8,11 @@
   "type": "module",
   "scripts": {
     "test": "vitest",
+    "test:ci": "vitest run",
     "build": "tsup",
     "lint": "eslint --flag unstable_ts_config src tests",
-    "release": "bumpp"
+    "release": "bumpp",
+    "prepare": "husky"
   },
   "exports": {
     ".": {
