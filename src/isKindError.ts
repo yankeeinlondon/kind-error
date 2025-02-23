@@ -1,12 +1,12 @@
+import type { Dictionary, Narrowable } from "inferred-types";
 import type { KindError } from "./types";
-import { isObject } from "inferred-types";
 
 export function isError(val: unknown): val is Error {
-  return isObject(val);
+  return val instanceof Error;
 }
 
 type KindErrorOf<T> = T extends { kind: infer K; context: infer C }
-  ? T & KindError<K, C>
+  ? T & KindError<K & string, C & Dictionary<string, Narrowable>>
   : never;
 
 /**

@@ -10,7 +10,7 @@
     "test": "vitest",
     "test:ci": "vitest run",
     "build": "tsup",
-    "lint": "eslint --flag unstable_ts_config src tests",
+    "lint": "eslint src tests",
     "release": "bumpp",
     "prepare": "husky"
   },
@@ -28,23 +28,23 @@
   "author": "Ken Snyder <ken@ken.net>",
   "license": "MIT",
   "devDependencies": {
-    "@antfu/eslint-config": "^3.12.1",
+    "@antfu/eslint-config": "^4.3.0",
     "@type-challenges/utils": "^0.1.1",
-    "@types/node": "^20.17.11",
-    "bumpp": "^9.9.2",
-    "eslint": "^9.17.0",
-    "eslint-plugin-format": "^0.1.3",
+    "@types/node": "^22.13.5",
+    "bumpp": "^10.0.3",
+    "eslint": "^9.21.0",
+    "eslint-plugin-format": "^1.0.1",
     "husky": "^9.1.7",
     "jiti": "^2.4.2",
     "npm-run-all": "^4.1.5",
-    "tsup": "^8.3.5",
-    "typescript": "^5.7.2",
-    "vitest": "^2.1.8"
+    "tsup": "^8.3.6",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.6"
   },
   "dependencies": {
     "chalk": "^5.4.1",
-    "error-stack-parser-es": "^0.1.5",
-    "inferred-types": "^0.55.8",
-    "pathe": "^2.0.0"
+    "error-stack-parser-es": "^1.0.5",
+    "inferred-types": "^0.55.23",
+    "pathe": "^2.0.3"
   }
 }

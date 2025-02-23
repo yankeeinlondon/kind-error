@@ -1,6 +1,20 @@
-import type { Dictionary, EmptyObject, KebabCase, MergeObjects, Narrowable } from "inferred-types";
+import type {
+  Dictionary,
+  EmptyObject,
+  KebabCase,
+  MergeObjects,
+  Narrowable,
+} from "inferred-types";
 
-import type { DefineKindError, KindError, KindErrorType, KindErrorType__Props, PascalKind } from "./types";
+import type {
+  DefineKindError,
+  KindError,
+  KindErrorType,
+  KindErrorType__Props,
+  PascalKind,
+} from "./types";
+
+import { inspect } from "node:util";
 
 import chalk from "chalk";
 import { parse } from "error-stack-parser-es/lite";
@@ -14,7 +28,7 @@ import {
 import { relative } from "pathe";
 import { isKindError } from "./isKindError";
 
-const IGNORABLES = ["@vitest/runner", "node:"];
+const IGNORABLES = ["@vitest/runner", "node:", "native"];
 
 /**
  * **createKindError**`(kind, baseContext) → (msg, ctx) → KindError`
@@ -63,7 +77,9 @@ export function createKindError<
     context?: TErrContext,
   ) => {
     const err = new Error(msg) as any;
-    const stackTrace = parse(err as Error).slice(1).filter(i => !IGNORABLES.some(has => i.file && i.file.includes(has))).map(i => ({
+    const stackTrace = parse(err as Error).slice(1).filter(
+      i => !IGNORABLES.some(has => i.file && i.file.includes(has)),
+    ).map(i => ({
       ...i,
       file: i.file ? relative(".", i.file) : undefined,
     }));
@@ -81,7 +97,7 @@ export function createKindError<
       ...baseContext,
       ...(context || {}),
     };
-    err.asConsoleMessage = () => {
+    err.toString = () => {
       const func = err.fn
         ? ` inside the function ${`${chalk.bold(err.fn)}()`}`
         : "";
@@ -101,7 +117,17 @@ export function createKindError<
 
       return `\n${chalk.bold.red(`${toPascalCase(kind)} Error: `)}${msg}${fileInfo}${stack}${context}`;
     };
-    err.asBrowserMessages = () => {
+    err.toJSON = () => JSON.stringify({
+      name: err.name,
+      kind: err.kind,
+      msg: err.msg,
+      context: err.context,
+      stack: err.stackTrace,
+    });
+    err[inspect.custom] = (_depth: number, _options: unknown) => {
+      return err.toString();
+    };
+    err.asBrowserMessage = () => {
       const func = err.fn
         ? ` inside the function ${err.fn}()`
         : "";

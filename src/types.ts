@@ -69,15 +69,14 @@ export interface BaseKindError extends Error {
  *
  * An error generated via the `kindError()` runtime utility.
  */
-export type KindError<TKind, TContext> = TKind extends string
-  ? TContext extends Dictionary<string, Narrowable>
-    ? BaseKindError & {
-      name: PascalKind<TKind>;
-      kind: KebabKind<TKind>;
-      context: TContext;
-    }
-    : never
-  : never;
+export type KindError<
+  TKind extends string = string,
+  TContext extends Dictionary<string, Narrowable> = Dictionary<string, Narrowable>,
+> = BaseKindError & {
+  name: PascalKind<TKind>;
+  kind: KebabKind<TKind>;
+  context: TContext;
+};
 
 export type DefaultKindError = BaseKindError;
 
@@ -128,7 +127,7 @@ export type KindErrorType__Fn<
  * - call `.rebase(context)` to provide additional context key/values prior to using it.
  */
 export type KindErrorType<
-  TKind extends string,
-  TBase extends Dictionary<string, Narrowable>,
-> = KindErrorType__Fn<TKind, TBase> &
-KindErrorType__Props<TKind, TBase>;
+  TKind extends string = string,
+  TBase extends Dictionary<string, Narrowable> = Dictionary<string, Narrowable>,
+> = DefineKindError<PascalKind<TKind>, TBase> &
+  KindErrorType__Props<TKind, TBase>;
