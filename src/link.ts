@@ -1,3 +1,5 @@
+import { resolve } from "pathe";
+
 /**
  * **link**`(text, link)`
  *
@@ -13,6 +15,12 @@
  */
 export function link(text: string, link: string) {
   return `\x1B]8;;${link}\x1B\\${text}\x1B]8;;\x1B\\`;
+}
+
+export function fileLink(text?: string) {
+    if(text) {
+        return link(text, resolve(text));
+    }
 }
 
 // https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF

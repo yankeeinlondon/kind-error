@@ -6,6 +6,10 @@ import type {
   Narrowable,
 } from "inferred-types";
 
+import {
+    resolve
+} from "pathe";
+
 import type {
   DefineKindError,
   KindError,
@@ -27,6 +31,7 @@ import {
 } from "inferred-types";
 import { relative } from "pathe";
 import { isKindError } from "./isKindError";
+import { fileLink, link } from "./link";
 
 const IGNORABLES = ["@vitest/runner", "node:", "native"];
 
@@ -102,11 +107,11 @@ export function createKindError<
         ? ` inside the function ${`${chalk.bold(err.fn)}()`}`
         : "";
       const fileInfo = err.file && err.line
-        ? `\n\n${chalk.italic("in ")}file ${chalk.bold.blue(err.file)} at line ${chalk.bold(err.line)}${func}`
+        ? `\n\n${chalk.italic("in ")}file ${chalk.bold.blue(link(err.file, resolve(err.file)))} at line ${chalk.bold(err.line)}${func}`
         : "";
 
       const stack = stackTrace.slice(1).length > 0
-        ? `\n${stackTrace.slice(1).map(l => `    - ${chalk.blue(l.file)}:${l.line}:${l.col}${l.function ? ` in ${chalk.bold(`${l.function}()`)}` : ""}`).join("\n")}`
+        ? `\n${stackTrace.slice(1).map(l => `    - ${chalk.blue(fileLink(l.file))}:${l.line}:${l.col}${l.function ? ` in ${chalk.bold(`${l.function}()`)}` : ""}`).join("\n")}`
         : "";
 
       const context = Object.keys(err.context).length > 0
