@@ -91,10 +91,10 @@ export function createKindError<
 
     err.name = toPascalCase(kind);
     err.kind = kind;
-    err.file = stackTrace[0]?.file;
-    err.line = stackTrace[0]?.line;
-    err.col = stackTrace[0]?.col;
-    err.fn = stackTrace[0]?.function;
+    err.file = stackTrace ? stackTrace[0]?.file : "";
+    err.line = stackTrace ? stackTrace[0]?.line : undefined;
+    err.col = stackTrace ? stackTrace[0]?.col : undefined;
+    err.fn = stackTrace ? stackTrace[0]?.function : undefined;
     err.stackTrace = stackTrace;
     err.__kind = "KindError";
     err.__errorType = Symbol("KindError");
