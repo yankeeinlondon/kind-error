@@ -6,10 +6,6 @@ import type {
   Narrowable,
 } from "inferred-types";
 
-import {
-    resolve
-} from "pathe";
-
 import type {
   DefineKindError,
   KindError,
@@ -21,6 +17,7 @@ import type {
 import { inspect } from "node:util";
 
 import chalk from "chalk";
+
 import { parse } from "error-stack-parser-es/lite";
 import {
   createFnWithPropsExplicit,
@@ -29,7 +26,10 @@ import {
   toKebabCase,
   toPascalCase,
 } from "inferred-types";
-import { relative } from "pathe";
+import {
+  relative,
+  resolve,
+} from "pathe";
 import { isKindError } from "./isKindError";
 import { fileLink, link } from "./link";
 
