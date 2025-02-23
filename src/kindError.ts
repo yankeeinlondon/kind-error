@@ -91,10 +91,10 @@ export function createKindError<
 
     err.name = toPascalCase(kind);
     err.kind = kind;
-    err.file = stackTrace[0].file;
-    err.line = stackTrace[0].line;
-    err.col = stackTrace[0].col;
-    err.fn = stackTrace[0].function;
+    err.file = stackTrace[0]?.file;
+    err.line = stackTrace[0]?.line;
+    err.col = stackTrace[0]?.col;
+    err.fn = stackTrace[0]?.function;
     err.stackTrace = stackTrace;
     err.__kind = "KindError";
     err.__errorType = Symbol("KindError");
@@ -111,7 +111,7 @@ export function createKindError<
         : "";
 
       const stack = stackTrace.slice(1).length > 0
-        ? `\n${stackTrace.slice(1).map(l => `    - ${chalk.blue(fileLink(l.file))}:${l.line}:${l.col}${l.function ? ` in ${chalk.bold(`${l.function}()`)}` : ""}`).join("\n")}`
+        ? `\n${stackTrace.slice(1).map(l => `    - ${chalk.blue(fileLink(l?.file))}:${l?.line}:${l?.col}${l?.function ? ` in ${chalk.bold(`${l?.function}()`)}` : ""}`).join("\n")}`
         : "";
 
       const context = Object.keys(err.context).length > 0
