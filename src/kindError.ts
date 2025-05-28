@@ -1,39 +1,36 @@
 import type {
-  Dictionary,
   EmptyObject,
-  KebabCase,
   MergeObjects,
   Narrowable,
 } from "inferred-types";
 
 import type {
-  DefineKindError,
   KindError,
+  KindErrorSubTypeProp,
   KindErrorType,
+  KindErrorType__Fn,
   KindErrorType__Props,
-  PascalName,
-} from "./types";
+  KindErrorTypeName,
+  KindErrorTypeProp,
+} from "src/types";
 
 import { inspect } from "node:util";
-
 import chalk from "chalk";
-
-import { parse } from "error-stack-parser-es/lite";
 import {
-  createFnWithPropsExplicit,
-  mergeObjects,
   stripChars,
   toKebabCase,
   toPascalCase,
 } from "inferred-types";
 import {
-  relative,
-  resolve,
-} from "pathe";
-import { isKindError } from "./isKindError";
-import { fileLink, link } from "./link";
+  KindErrorSymbol,
 
-const IGNORABLES = ["@vitest/runner", "node:", "native"];
+} from "src/types";
+import { toJsonFn, toStringFn } from "./instance";
+import { isFn, proxyFn, rebaseFn } from "./static";
+import { createFnWithPropsExplicit, renameFunction, toStackTrace } from "./utils";
+import {
+  createStackTrace,
+} from "./utils/error-proxies";
 
 /**
  * **createKindError**`(kind, baseContext) → (msg, ctx) → KindError`
@@ -70,71 +67,78 @@ export function createKindError<
   kindName: TKind,
   baseContext: TBase = {} as EmptyObject as TBase,
 ): KindErrorType<
-    PascalName<TKind>,
+    TKind,
     TBase
   > {
-  const kind = toKebabCase(
-    stripChars(kindName, "<", ">", "[", "]", "(", ")"),
-  ) as KebabCase<PascalName<TKind>>;
+  /** the "kind" property for the error */
+  const kind = kindName.split("/")
+    .map(i => toKebabCase(
+      stripChars(i, "<", ">", "[", "]", "(", ")"),
+    ))
+    .join("/") as KindError<TKind, TBase>["kind"];
 
-  const fn = <TErrContext extends Record<string, N>, N extends Narrowable>(
-    msg: string,
-    context?: TErrContext,
+  /** the "name" property for the error */
+  const errorName = toPascalCase(
+    kind.replace("/", "-"),
+  ) as KindErrorType<TKind>["errorName"];
+
+  /** the "type" and "subType" properties */
+  const [type, subType] = kind
+    .split("/") as [
+    KindErrorTypeProp<TKind>,
+    KindErrorSubTypeProp<TKind>,
+  ];
+
+  /**
+   * The error constructor function
+   */
+  const fn = <
+    TErrContext extends Record<string, N>,
+    N extends Narrowable,
+  >(
+    message: string,
+    ctx: TErrContext = {} as EmptyObject as TErrContext,
   ) => {
-    const err = new Error(msg) as any;
-    const stackTrace = parse(err as Error).slice(1).filter(
-      i => !IGNORABLES.some(has => i.file && i.file.includes(has)),
-    ).map(i => ({
-      ...i,
-      file: i.file ? relative(".", i.file) : undefined,
-    }));
-    const [type, subType] = kind.split('/');
+    const context = {
+      ...baseContext,
+      ...(ctx || {}),
+    } as MergeObjects<TBase, TErrContext>;
 
-    err.name = toPascalCase(kind);
+    const err = new Error(message) as unknown as MergeObjects<TBase, TErrContext> extends Record<string, Narrowable>
+      ? KindError<
+        TKind,
+        MergeObjects<TBase, TErrContext>
+      > & Error
+      : never;
+
+    const stackTrace = createStackTrace(err);
+    const file = stackTrace ? stackTrace[0]?.file || "" : "";
+    const line = stackTrace ? stackTrace[0]?.line : undefined;
+    const col = stackTrace ? stackTrace[0]?.col : undefined;
+    const fn = stackTrace ? stackTrace[0]?.function : undefined;
+
+    err[KindErrorSymbol] = "KindError";
+    err.name = errorName;
+    err.message = message;
     err.kind = kind;
     err.type = type;
     err.subType = subType;
-    err.file = stackTrace ? stackTrace[0]?.file : "";
-    err.line = stackTrace ? stackTrace[0]?.line : undefined;
-    err.col = stackTrace ? stackTrace[0]?.col : undefined;
-    err.fn = stackTrace ? stackTrace[0]?.function : undefined;
-    err.stackTrace = stackTrace;
-    err.__kind = "KindError";
-    err.__errorType = Symbol("KindError");
-    err.context = {
-      ...baseContext,
-      ...(context || {}),
-    };
-    err.toString = () => {
-      const func = err.fn
-        ? ` inside the function ${`${chalk.bold(err.fn)}()`}`
-        : "";
-      const fileInfo = err.file && err.line
-        ? `\n\n${chalk.italic("in ")}file ${chalk.bold.blue(link(err.file, resolve(err.file)))} at line ${chalk.bold(err.line)}${func}`
-        : "";
+    err.file = file;
+    err.fn = fn;
+    err.line = line;
+    err.col = col;
+    err.context = context;
+    err.stackTrace = () => stackTrace;
+    err.stack = toStackTrace(message, stackTrace);
 
-      const stack = stackTrace.slice(1).length > 0
-        ? `\n${stackTrace.slice(1).map(l => `    - ${chalk.blue(fileLink(l?.file))}:${l?.line}:${l?.col}${l?.function ? ` in ${chalk.bold(`${l?.function}()`)}` : ""}`).join("\n")}`
-        : "";
+    err.toString = toStringFn(err as any);
 
-      const context = Object.keys(err.context).length > 0
-        ? `\n\nContext:\n${Object.keys(err.context).map(
-          key => `\n  ${`${chalk.bold.green(key)}: `}${JSON.stringify(err.context[key])}`,
-        )}`
-        : "";
+    err.toJSON = toJsonFn(err as any);
 
-      return `\n${chalk.bold.red(`${toPascalCase(kind)} Error: `)}${msg}${fileInfo}${stack}${context}`;
-    };
-    err.toJSON = () => JSON.stringify({
-      name: err.name,
-      kind: err.kind,
-      msg: err.msg,
-      context: err.context,
-      stack: err.stackTrace,
-    });
     err[inspect.custom] = (_depth: number, _options: unknown) => {
       return err.toString();
     };
+
     err.asBrowserMessage = () => {
       const func = err.fn
         ? ` inside the function ${err.fn}()`
@@ -152,7 +156,7 @@ export function createKindError<
         : undefined;
 
       return [
-        ["Message:", msg],
+        ["Message:", message],
         fileInfo,
         stack,
         context,
@@ -162,38 +166,64 @@ export function createKindError<
     return err;
   };
 
-  const typeFn: DefineKindError<PascalName<TKind>, TBase> = (msg: string, context?: Record<string, Narrowable>) => {
+  /**
+   * The function portion of the error type
+   */
+  const kindErrorConstructor = createFnWithPropsExplicit((
+    msg: string,
+    context?: Record<string, Narrowable>,
+  ) => {
     return fn(msg, context);
-  };
+  }, { name: errorName });
 
+  const constructor = renameFunction(
+    fn,
+    `${errorName}ErrorType` as KindErrorTypeName<TKind>,
+  ) as KindErrorType__Fn<TKind, TBase>;
+
+  const proxy = proxyFn(kind, errorName, baseContext);
+  const rebase = rebaseFn(kind, baseContext);
+  const is = isFn(kindName);
+
+  /**
+   * The properties of the error type
+   */
   const props = {
-    __kind: "KindErrorType",
+    [KindErrorSymbol]: "KindErrorType",
     kind,
-    errorType: null as unknown as KindError<TKind, TBase>,
-    rebase: <
-      T extends Dictionary<string, N>,
-      N extends Narrowable,
-    >(context: T) => {
-      const merged = mergeObjects(baseContext, context);
-      return createKindError(kindName, merged) as unknown as KindErrorType<
-        TKind,
-        MergeObjects<TBase, T>
-      >;
+    type,
+    subType,
+    errorName,
+    proxy,
+    context: baseContext,
+    rebase,
+    is,
+    toJSON() {
+      return {
+        __kind: "KindErrorType",
+        name: `${errorName}ErrorType`,
+        kind,
+        type,
+        context: baseContext,
+        subType,
+        errorName,
+      };
     },
-    proxy(err) {
-      const error = isKindError(err) ? err : fn(err.message, { underlying: err });
-      return error;
+    toString() {
+      return `KindErrorType::${errorName}(${type}/${subType})`;
     },
-    is(val) {
-      return isKindError(val) && (val as any).kind === toKebabCase(kindName);
+    toConsole() {
+      return `KindErrorType::${chalk.bold.yellow(errorName)}(${type}${chalk.dim("/")}${subType})`;
     },
-  } as KindErrorType__Props<
-    PascalName<TKind>,
+  } as unknown as KindErrorType__Props<
+    TKind,
     TBase
   >;
 
-  return createFnWithPropsExplicit(typeFn, props) as unknown as KindErrorType<
-    PascalName<TKind>,
-    TBase
-  >;
+  const err = createFnWithPropsExplicit(
+    constructor,
+    props,
+  ) as unknown as KindErrorType<TKind, TBase>;
+
+  return err as KindErrorType<TKind, TBase>;
 }

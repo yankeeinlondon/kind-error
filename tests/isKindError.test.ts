@@ -1,6 +1,6 @@
 import type { Equal, Expect, ExpectTrue } from "@type-challenges/utils";
 import type { Dictionary, EmptyObject, Narrowable } from "inferred-types";
-import type { KindError, KindErrorType } from "src";
+import type { KindError } from "src";
 import { createKindError, isKindError } from "src";
 import { describe, expect, it } from "vitest";
 
@@ -18,7 +18,7 @@ describe("isKindError(val)", () => {
     const t3 = Invalid("not this again!", { foo: true, bar: 2 });
     const t4 = BadJuju("not this again!", { foo: true, bar: 2 });
 
-    expect(isKindError(t1)).toBe(true);
+    expect(isKindError(t1), typeof t1).toBe(true);
     expect(isKindError(t2)).toBe(true);
     expect(isKindError(t3)).toBe(true);
     expect(isKindError(t4)).toBe(true);
@@ -29,7 +29,7 @@ describe("isKindError(val)", () => {
     expect(t4).toBeInstanceOf(Error);
 
     type cases = [
-      ExpectTrue<typeof t1 extends KindErrorType ? true : false>,
+      ExpectTrue<typeof t1 extends KindError<"Invalid"> ? true : false>,
     ];
   });
 

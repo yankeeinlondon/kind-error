@@ -1,39 +1,28 @@
 import { } from "@type-challenges/utils";
 import { describe, it } from "vitest";
 
-describe("Proxing a value or error", () => {
-
-  it("Proxying an error without a stack", () => {
-    
-    
+describe("proxing a value or error", () => {
+  it("proxying an error without a stack", () => {
     type cases = [
       /** type tests */
     ];
   });
 
-  it("Proxying an error with a stack", () => {
-    
-    
+  it("proxying an error with a stack", () => {
     type cases = [
       /** type tests */
     ];
   });
 
-
-  it("Proxying a key/value object", () => {
-    
-    
+  it("proxying a key/value object", () => {
     type cases = [
       /** type tests */
     ];
   });
 
-  it("Proxying an existing KindError results in passthrough", () => {
-    
-    
+  it("proxying an existing KindError results in passthrough", () => {
     type cases = [
       /** type tests */
     ];
   });
-
 });

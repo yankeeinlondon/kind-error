@@ -27,7 +27,7 @@ describe("kindErrorType.is()", () => {
     const f3 = Invalid.is(j1);
     const f4 = Invalid.is(j2);
 
-    expect(t1, `Invalid type has kind "${Invalid.kind}", i1 has kind of "${i1.kind}"`).toBe(true);
+    expect(t1, `Invalid type has kind "${Invalid?.kind}", i1 has kind of "${i1.kind}"`).toBe(true);
     expect(t2).toBe(true);
     expect(t3, `j1 kind "${j1.kind}"`).toBe(true);
     expect(t4).toBe(true);
