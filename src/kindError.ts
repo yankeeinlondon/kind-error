@@ -166,16 +166,6 @@ export function createKindError<
     return err;
   };
 
-  /**
-   * The function portion of the error type
-   */
-  const kindErrorConstructor = createFnWithPropsExplicit((
-    msg: string,
-    context?: Record<string, Narrowable>,
-  ) => {
-    return fn(msg, context);
-  }, { name: errorName });
-
   const constructor = renameFunction(
     fn,
     `${errorName}ErrorType` as KindErrorTypeName<TKind>,

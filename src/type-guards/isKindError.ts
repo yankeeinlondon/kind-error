@@ -12,9 +12,9 @@ type KindErrorOf<
   U extends string | undefined,
 > = T extends { kind: infer K; context: infer C }
   ? U extends string
-    ? IsEqual<U,K> extends true
-        ? T & KindError<K & string, C & Dictionary<string, Narrowable>>
-        : never
+    ? IsEqual<U, K> extends true
+      ? T & KindError<K & string, C & Dictionary<string, Narrowable>>
+      : never
     : T & KindError<K & string, C & Dictionary<string, Narrowable>>
   : never;
 
