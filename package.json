@@ -11,7 +11,7 @@
     "test:ci": "vitest run",
     "build": "tsdown --dts",
     "watch": "tsdown --dts --watch",
-    "lint": "eslint src",
+    "lint": "eslint src --fix",
     "release": "bumpp",
     "prepare": "husky"
   },

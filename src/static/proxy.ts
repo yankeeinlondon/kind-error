@@ -1,5 +1,5 @@
-import type { Dictionary, Narrowable } from "inferred-types";
-import type { ErrorResponse, KindErrorType__Props } from "src/types";
+import type { Narrowable } from "inferred-types";
+import type { KindErrorType__Props } from "src/types";
 import { isObject } from "inferred-types";
 import { isError, isErrorResponse, isKindError } from "src/type-guards";
 import { errorFromError, errorFromObject, errorFromResponse, errorFromRest } from "src/utils/error-proxies";
@@ -18,7 +18,7 @@ export function proxyFn<
   name: TKindName,
   context: TBase,
 ) {
-  return <E extends Error | Dictionary | ErrorResponse>(
+  return <E>(
     err: E,
   ) => {
     const error = isKindError(err)

@@ -1,7 +1,7 @@
 import type { Dictionary, Narrowable } from "inferred-types";
 import type { ErrorResponse, JsError, KindError, KindStackItem } from "../types";
 import { parse } from "error-stack-parser-es/lite";
-import { isString, isUndefined } from "inferred-types";
+import { hasIndexOf, isObject, isString, isUndefined } from "inferred-types";
 import { relative } from "pathe";
 import { createKindError } from "src/kindError";
 import { isError } from "src/type-guards/index";
@@ -127,17 +127,32 @@ export function errorFromObject<
   return error(message);
 }
 
+/**
+ * proxies from an error being represented in an unknown
+ * structure (as `Error`, `Response`, etc. have already
+ * been tried)
+ */
 export function errorFromRest<
   TKind extends string,
   TCtx extends Record<string, N>,
-  TRest extends Narrowable,
+  TRest,
   N extends Narrowable,
 >(
   kind: TKind,
   ctx: TCtx,
   rest: TRest,
 ) {
-  const message = isString(rest) ? rest : "Unknown";
+  const message = isString(rest)
+    ? rest
+    : isObject(rest)
+      ? hasIndexOf(rest, "error") && typeof rest.error === "string"
+        ? rest.error
+        : hasIndexOf(rest, "msg") && typeof rest.msg === "string"
+          ? rest.msg
+          : hasIndexOf(rest, "message") && typeof rest.message === "string"
+            ? rest.message
+            : "Unknown"
+      : "Unknown";
 
   const error = createKindError(
     kind,
