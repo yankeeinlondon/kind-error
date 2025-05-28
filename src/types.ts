@@ -231,7 +231,7 @@ export type KindErrorType__Props<
    *    - `[ "message", "msg", "cause", "error", "err"  ]`
    *
    */
-  proxy: <E extends Error>(err: E) => E extends KindError
+  proxy: <E>(err: E) => E extends KindError
     ? E
     : KindError<
       TKind,
