@@ -26,7 +26,7 @@ describe("kindError", () => {
       Expect<
         Equal<
           typeof FooBar,
-          KindErrorType<"foo-bar", Record<string, Narrowable>>
+          KindErrorType<"FooBar", Record<string, Narrowable>>
         >
       >,
       Expect<Equal<typeof err, KindError<"FooBar", EmptyObject>>>,

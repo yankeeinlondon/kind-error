@@ -11,7 +11,7 @@ import type {
   KindError,
   KindErrorType,
   KindErrorType__Props,
-  PascalKind,
+  PascalName,
 } from "./types";
 
 import { inspect } from "node:util";
@@ -70,12 +70,12 @@ export function createKindError<
   kindName: TKind,
   baseContext: TBase = {} as EmptyObject as TBase,
 ): KindErrorType<
-    PascalKind<TKind>,
+    PascalName<TKind>,
     TBase
   > {
   const kind = toKebabCase(
     stripChars(kindName, "<", ">", "[", "]", "(", ")"),
-  ) as KebabCase<PascalKind<TKind>>;
+  ) as KebabCase<PascalName<TKind>>;
 
   const fn = <TErrContext extends Record<string, N>, N extends Narrowable>(
     msg: string,
@@ -88,9 +88,12 @@ export function createKindError<
       ...i,
       file: i.file ? relative(".", i.file) : undefined,
     }));
+    const [type, subType] = kind.split('/');
 
     err.name = toPascalCase(kind);
     err.kind = kind;
+    err.type = type;
+    err.subType = subType;
     err.file = stackTrace ? stackTrace[0]?.file : "";
     err.line = stackTrace ? stackTrace[0]?.line : undefined;
     err.col = stackTrace ? stackTrace[0]?.col : undefined;
@@ -159,7 +162,7 @@ export function createKindError<
     return err;
   };
 
-  const typeFn: DefineKindError<PascalKind<TKind>, TBase> = (msg: string, context?: Record<string, Narrowable>) => {
+  const typeFn: DefineKindError<PascalName<TKind>, TBase> = (msg: string, context?: Record<string, Narrowable>) => {
     return fn(msg, context);
   };
 
@@ -185,12 +188,12 @@ export function createKindError<
       return isKindError(val) && (val as any).kind === toKebabCase(kindName);
     },
   } as KindErrorType__Props<
-    PascalKind<TKind>,
+    PascalName<TKind>,
     TBase
   >;
 
   return createFnWithPropsExplicit(typeFn, props) as unknown as KindErrorType<
-    PascalKind<TKind>,
+    PascalName<TKind>,
     TBase
   >;
 }
