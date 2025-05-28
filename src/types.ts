@@ -13,7 +13,7 @@ import type {
 } from "inferred-types";
 import type { inspect } from "node:util";
 
-export const KindErrorSymbol = Symbol("kind");
+export const KindErrorSymbol = "__kind";
 
 export type PascalKind<T extends string> = PascalCase<
   StripChars<T, "<" | ">" | "[" | "]" | "(" | ")">
