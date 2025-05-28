@@ -1,7 +1,7 @@
 import type {
   Concat,
+  Contains,
   Dictionary,
-  ExpandDictionary,
   Join,
   KebabCase,
   MergeObjects,
@@ -186,12 +186,16 @@ export type KindErrorType__Props<
 > = {
   [KindErrorSymbol]: "KindErrorType";
   /** the _kind_ of the resultant KindError */
-  kind: KindErrorKind<TKind> & string;
+  kind: KindErrorKind<TKind> extends string
+    ? KindErrorKind<TKind>
+    : never;
   /** the "name" the resulting errors will have */
-  errorName: KindErrorName<TKind> & string;
+  errorName: KindErrorName<TKind> extends string
+    ? KindErrorName<TKind>
+    : never;
 
-  type: KindErrorTypeProp<TKind> & string;
-  subType: KindErrorSubTypeProp<TKind>;
+  type: string;
+  subType: Contains<TKind, "/"> extends true ? string : undefined;
 
   context: TBase;
 
@@ -256,7 +260,6 @@ export type KindErrorType__Props<
 export type KindErrorType<
   TKind extends string = string,
   TBase extends Dictionary<string, Narrowable> = Dictionary<string, Narrowable>,
-> = ExpandDictionary<
+> =
   KindErrorType__Fn<TKind, TBase>
-  & KindErrorType__Props<TKind, TBase>
->;
+  & KindErrorType__Props<TKind, TBase>;
