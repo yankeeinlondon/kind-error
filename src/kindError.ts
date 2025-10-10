@@ -67,9 +67,9 @@ export function createKindError<
   kindName: TKind,
   baseContext: TBase = {} as EmptyObject as TBase,
 ): KindErrorType<
-    TKind,
-    TBase
-  > {
+  TKind,
+  TBase
+> {
   /** the "kind" property for the error */
   const kind = kindName.split("/")
     .map(i => toKebabCase(

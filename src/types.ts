@@ -260,6 +260,6 @@ export type KindErrorType__Props<
 export type KindErrorType<
   TKind extends string = string,
   TBase extends Dictionary<string, Narrowable> = Dictionary<string, Narrowable>,
-> =
-  KindErrorType__Fn<TKind, TBase>
+>
+  = KindErrorType__Fn<TKind, TBase>
   & KindErrorType__Props<TKind, TBase>;
