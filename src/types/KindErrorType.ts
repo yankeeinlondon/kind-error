@@ -1,4 +1,5 @@
 import { 
+    As,
     Dictionary, 
     EmptyObject,  
     ExpandRecursively, 
@@ -12,7 +13,7 @@ import {
     AsKindSubType, 
     AsKindType, 
     HasRequiredVariants,
-    ErrorResponse, 
+    FetchError, 
     KindErrorName
 } from "~/types";
 
@@ -26,18 +27,21 @@ export type KindErrorSignature<
     TContext extends Dictionary<string>
 > = HasRequiredVariants<TContext> extends true
 ? <TMsg extends string, TCtx extends AsContext<TContext>>(msg: TMsg, ctx: TCtx) => (
-    KindError<TName, TMsg> & { context: MergeObjects<TContext,TCtx>; message: TMsg }
+    KindError<TName, TMsg, MergeObjects<TContext,TCtx>>
 )
 : IsEqual<AsContext<TContext>, EmptyObject> extends true
-    ? <TMsg extends string>(msg: TMsg) => (
-        KindError<TName> & { context: TContext, message: TMsg }
-    )
-    : <TMsg extends string, TCtx extends AsContext<TContext>>(msg: TMsg, ctx?: TCtx) => (
-    KindError<TName> & { 
-        context: IsDefined<TCtx> extends true? MergeObjects<TContext,TCtx> : TContext; 
-        message: TMsg 
-    }
-);
+    ? <TMsg extends string>(msg: TMsg) => KindError<TName, TMsg, TContext>
+    : <
+        TMsg extends string, 
+        TCtx extends AsContext<TContext> | undefined
+    >(msg: TMsg, ctx?: TCtx) => 
+        KindError<
+            TName, 
+            TMsg, 
+            undefined extends TCtx 
+                ? TContext 
+                : MergeObjects<TContext, As<TCtx, Dictionary<string>>>
+        >;
 
 /**
  * **KindErrorType**`<TName,TContext>`
@@ -92,7 +96,7 @@ export type KindErrorType<
     proxy: <E, M extends string | undefined>(err: E, msg?: M) => E extends KindError
         ? E
         : ExpandRecursively<
-            KindError<TName> & Record<"underlying", Error | Dictionary | ErrorResponse>
+            KindError<TName> & Record<"underlying", Error | Dictionary | FetchError>
         > & Error;
 
     /**

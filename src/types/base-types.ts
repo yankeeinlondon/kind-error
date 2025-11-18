@@ -6,7 +6,7 @@ import {
     TypedFunction 
 } from "inferred-types";
 import type { 
-    ErrorResponse,
+    FetchError,
     KindErrorName, 
     KindErrorSubTypeProp, 
     KindErrorSymbol, 
@@ -77,7 +77,7 @@ export type KindErrorType__Props<
       TKind,
       TBase & Record<
         "underlying",
-        Error | Dictionary | ErrorResponse
+        Error | Dictionary | FetchError
       >
     >;
 

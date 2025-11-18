@@ -1,7 +1,7 @@
 import type { Narrowable } from "inferred-types/types";
 import type { KindErrorType__Props } from "~/types";
 import { isObject } from "inferred-types/runtime";
-import { isError, isErrorResponse, isKindError } from "~/type-guards";
+import { isError, isFetchError, isKindError } from "~/type-guards";
 import { errorFromError, errorFromObject, errorFromResponse, errorFromRest } from "~/utils/error-proxies";
 
 // TODO: refactor for new types
@@ -27,7 +27,7 @@ export function proxyFn<
       ? err
       : isError(err)
         ? errorFromError(kind, context, err)
-        : isErrorResponse(err)
+        : isFetchError(err)
           ? errorFromResponse(name, context, err)
           : isObject(err)
             ? errorFromObject(name, context, err)

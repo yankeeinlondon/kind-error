@@ -5,9 +5,9 @@ import {
     EmptyObject, 
     ExpandRecursively, 
     FromInputToken, 
-    FromInputToken__Tuple, 
     HasRequiredProps, 
     InputToken, 
+    IsEqual, 
     IsLiteralLike, 
     IsUnion, 
     IsWideObject, 
@@ -80,12 +80,37 @@ export type AsKindSubType<T extends string> = As<
     string | undefined        
 >;
 
-
-export type IsNonVariant<T> = IsLiteralLike<T> extends true
-? IsUnion<T> extends true
+/**
+ * **IsNonVariant**`<T>`
+ * 
+ * Tests whether the type `T` is non-variant (aka, it can only have ONE value/type).
+ */
+export type IsNonVariant<T> = 
+string extends T
+? boolean
+: IsUnion<T> extends true
     ? false
-        : true
-: false;
+: T extends InputToken
+    ? FromInputToken<T> extends Error
+        // do not treat as token
+        ? IsLiteralLike<T> extends true
+            ? IsUnion<T> extends true
+                ? false
+                    : true
+        : false
+    // treat as token
+    : FromInputToken<T> extends infer Token
+        ? IsLiteralLike<Token> extends true
+            ? IsUnion<Token> extends true
+                ? false
+                : true
+            : false
+        :false
+: IsLiteralLike<T> extends true
+            ? IsUnion<T> extends true
+                ? false
+                    : true
+        : false;
 
 
 export type StripNonVariantValues<
@@ -164,11 +189,11 @@ export type ParseContext<
  * any **required** variant keys that must be defined when creating 
  * the `KindError`.
  */
-export type HasRequiredVariants<T extends Dictionary<string>> = AsContext<T> extends infer Context extends Dictionary<string>
+export type HasRequiredVariants<
+    T extends Dictionary<string>
+> = AsContext<T> extends infer Context extends Dictionary<string>
     ? HasRequiredProps<Context>
-    : never
-
-;
+    : never;
 
 
 
@@ -187,3 +212,34 @@ export type AsContext<
 > = DetectOptionalValues<
     StripNonVariantValues<TCtx>
 >;
+
+/**
+ * **RemoveVariants**`<T>`
+ * 
+ * Type utility which takes a `KindErrorType`'s schema context and removes all key/values
+ * which are not actually "default values" but instead represent a type variant. 
+ * 
+ * - This utility helps us to produce a valid key/value of static literals which were
+ *   defined in the type and will be merged into the context properties defined in the 
+ *   instantiation of the `ErrorType`.
+ * - Because we mutate the `KindErrorType`'s schema to represent something more meaningful
+ *   to the caller in the type system (the _runtime_ still has token definitions) this utility
+ *   will in effect remove all key/values which are typed as unions as these are all _variant_.
+ */
+export type RemoveVariants<
+    T extends Dictionary<string>,
+    K extends readonly (string & keyof T)[] = StringKeys<T>,
+    R extends Dictionary<string> = EmptyObject
+> = IsEqual<T,EmptyObject> extends true
+? EmptyObject
+: IsEqual<T, Dictionary<string>> extends true
+? EmptyObject
+: K extends [
+    infer Head extends string & keyof T,
+    ...infer Rest extends readonly (string & keyof T)[]
+]
+    ? IsUnion<T[Head]> extends true
+        ? RemoveVariants<T,Rest,R>
+        : RemoveVariants<T,Rest,R & Record<Head, T[Head]>>
+: ExpandRecursively<R>
+;

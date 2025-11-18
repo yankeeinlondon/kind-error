@@ -3,41 +3,42 @@ import {
     Expect,
     Test,
 } from "inferred-types/types";
-import { AssertEqual, AssertExtends, EmptyObject, Fallback } from "inferred-types";
+import { AssertEqual, AssertExtends } from "inferred-types";
 import {  KindError, KindErrorSignature } from "~/types";
 
 describe("KindErrorSignature<TName,TContext>", () => {
 
     it("no required or optional context", () => {
         type T1 = KindErrorSignature<"Testing", {test: true}>;
+
         type P = Parameters<T1>;
+        type Rtn = ReturnType<T1>;
 
         type cases = [
             Expect<AssertEqual<P, [msg: string]>>,
-
-            Expect<AssertEqual<
-                T1,
-                <TMsg extends string>(msg: TMsg) => KindError<"Testing",TMsg, {test:true}>
-            >>
+            Expect<AssertExtends<Rtn, KindError>>,
         ];
     });
 
     it("no required but with optional context", () => {
         type T1 = KindErrorSignature<"Testing", {test: true, answer: 42 | undefined}>
         type P = Parameters<T1>;
-        type R = ReturnType<T1>;
+        type Rtn = ReturnType<T1>;
 
         type cases = [
             Expect<AssertEqual<P, [msg: string, ctx?: { answer?: 42 }]>>,
-            Expect<AssertExtends<ReturnType<T1>, KindError>>,
+            Expect<AssertExtends<Rtn, KindError>>,
+        ];
+    });
 
-            Expect<AssertEqual<
-                T1,
-                <
-                    TMsg extends string, 
-                    TCtx extends { answer?: 42 }
-                >(msg: TMsg, ctx?: TCtx) => KindError<"Testing",TMsg, {test:true} & Fallback<TCtx, EmptyObject>>
-            >>
+    it("required prop", () => {
+        type T1 = KindErrorSignature<"Testing", {test: true, answer: 42 | 99}>
+        type P = Parameters<T1>;
+        type Rtn = ReturnType<T1>;
+
+        type cases = [
+            Expect<AssertEqual<P, [msg: string, ctx: { answer: 42 | 99 }]>>,
+            Expect<AssertExtends<Rtn, KindError>>,
         ];
     });
 

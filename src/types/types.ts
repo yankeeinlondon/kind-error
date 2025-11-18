@@ -1,14 +1,9 @@
 import type {
   Concat,
-  Contains,
-  Dictionary,
-  Join,
   KebabCase,
-  MergeObjects,
-  Narrowable,
   Split,
 } from "inferred-types/types";
-import { KindErrorType } from "./base-types";
+import { PascalName } from "~/types";
 
 export const KindErrorSymbol = "__kind";
 
@@ -79,12 +74,12 @@ export type JsError = Error & {
 };
 
 /**
- * an _unsuccessful_ response from the native **fetch** method.
+ * an _failed_ network response from the native **fetch** method.
  */
-export type ErrorResponse = Response & {
+export type FetchError = Response & {
   ok: false;
 };
 
-export type SuccessfulResponse = Response & {
+export type FetchSuccess = Response & {
   ok: true;
 };

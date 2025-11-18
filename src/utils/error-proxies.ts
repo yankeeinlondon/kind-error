@@ -1,5 +1,5 @@
 import type { Dictionary, Narrowable } from "inferred-types/types";
-import type { ErrorResponse, JsError, KindError, KindStackItem } from "../types";
+import type { FetchError, JsError, KindError, KindStackItem } from "../types";
 import { parse } from "error-stack-parser-es/lite";
 import { hasIndexOf, isObject, isString, isUndefined } from "inferred-types/runtime";
 import { relative } from "pathe";
@@ -57,7 +57,7 @@ export function errorFromError<
 export function errorFromResponse<
   TKind extends string,
   TCtx extends Record<string, N>,
-  TErr extends ErrorResponse,
+  TErr extends FetchError,
   N extends Narrowable,
 >(
   kind: TKind,

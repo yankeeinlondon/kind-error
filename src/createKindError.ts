@@ -39,8 +39,8 @@ export function createKindError<
     name: TName,
     context: TContext = {} as EmptyObject as TContext
 ): Rtn<TName,TContext>  {
-    if (/\<>[]\(\)/.test(name)) {
-        return err("invalid-name") as Rtn<TName,TContext>
+    if (/[<>\[\]\(\)]/.test(name)) {
+        return err("invalid-name", `The name for a KindError must not include any of the following characters: "<", ">", "[", "]", "(", ")"`) as Rtn<TName,TContext>
     }
     const props = {
         __kind: "KindErrorType",
@@ -73,29 +73,35 @@ export function createKindError<
 
 
     const fn = <
-        TMsg extends string, 
+        TMsg extends string,
         TCtx extends Dictionary<string>
     >(
-        msg: TMsg, 
+        msg: TMsg,
         ctx?: TCtx
     ) => {
-        const stackTrace = getStackTrace();
-
-        return {
-            __kind: "KindError",
-            kind: name,
-            type: asKindType(name),
-            subType: asKindSubType(name),
-            msg,
+        const mergedContext = {
             ...context,
             ...(ctx || {}),
-            stackTrace,
-            toString() {
-                return toStringFn(msg, { ...context, ...ctx }, stackTrace)
-            }
-        }
+        } as MergeObjects<TContext, TCtx>;
+
+        const err = new Error(msg) as any;
+
+        const stackTrace = getStackTrace();
+        
+        err.__kind = "KindError";
+        err.kind = name;
+        err.type = asKindType(name);
+        err.subType = asKindSubType(name);
+        err.name = toPascalCase(name);
+        err.message = msg;
+        err.stackTrace = () => stackTrace;
+        err.stack = err.stack || "";
+        err.context = mergedContext;
+        
+        err.toString = toStringFn(msg, mergedContext, stackTrace);
+
+        return err;
     }
 
     return createFnWithProps(fn, props) as unknown as Rtn<TName,TContext>
 }
-
