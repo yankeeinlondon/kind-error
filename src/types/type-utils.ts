@@ -86,9 +86,7 @@ export type AsKindSubType<T extends string> = As<
  * Tests whether the type `T` is non-variant (aka, it can only have ONE value/type).
  */
 export type IsNonVariant<T> = 
-string extends T
-? boolean
-: IsUnion<T> extends true
+IsUnion<T> extends true
     ? false
 : T extends InputToken
     ? FromInputToken<T> extends Error
@@ -96,7 +94,7 @@ string extends T
         ? IsLiteralLike<T> extends true
             ? IsUnion<T> extends true
                 ? false
-                    : true
+                : true
         : false
     // treat as token
     : FromInputToken<T> extends infer Token
@@ -104,8 +102,9 @@ string extends T
             ? IsUnion<Token> extends true
                 ? false
                 : true
-            : false
+            : true
         :false
+// not input token
 : IsLiteralLike<T> extends true
             ? IsUnion<T> extends true
                 ? false
@@ -113,6 +112,49 @@ string extends T
         : false;
 
 
+/**
+ * tests whether the schema `T` has any literal values which are not variants,
+ * in it's key/value definition.
+ */
+export type HasNonVariant<
+    T extends Dictionary<string>,
+    K extends readonly (string & keyof T)[] = StringKeys<T>
+> = [Dictionary<string>] extends [T]
+? false
+: IsEqual<T, EmptyObject> extends true
+? false
+: K extends [
+    infer Head extends string & keyof T,
+    ...infer Rest extends readonly (string & keyof T)[]
+]
+    ? IsNonVariant<T[Head]> extends true
+        ? true
+        : HasNonVariant<T,Rest>
+: false;
+
+
+export type NonVariants<
+    T extends Dictionary<string>,
+    K extends readonly (keyof T & string)[] = StringKeys<T>,
+    R extends Dictionary<string> = EmptyObject
+> = IsEqual<T, Dictionary<string>> extends true
+? EmptyObject
+: IsEqual<T, EmptyObject> extends true
+? EmptyObject
+: K extends [
+    infer Head extends keyof T & string,
+    ...infer Rest extends readonly (keyof T & string)[]
+]
+    ? IsNonVariant<T[Head]> extends true
+        ? NonVariants<T,Rest,R & Record<Head, T[Head]>>
+        : NonVariants<T,Rest,R>
+: ExpandRecursively<R>
+;
+
+
+/**
+ * strips all non-variant key/value pairs from the KindErrorType's context.
+ */
 export type StripNonVariantValues<
     T extends Dictionary<string>,
     K extends readonly (keyof T & string)[] = StringKeys<T>,

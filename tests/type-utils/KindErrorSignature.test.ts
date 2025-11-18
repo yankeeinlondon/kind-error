@@ -16,7 +16,7 @@ describe("KindErrorSignature<TName,TContext>", () => {
 
         type cases = [
             Expect<AssertEqual<P, [msg: string]>>,
-            Expect<AssertExtends<Rtn, KindError>>,
+            Expect<Rtn extends KindError ? true : false>,
         ];
     });
 

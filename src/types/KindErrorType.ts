@@ -3,7 +3,6 @@ import {
     Dictionary, 
     EmptyObject,  
     ExpandRecursively, 
-    IsDefined, 
     IsEqual, 
     MergeObjects 
 } from "inferred-types";
@@ -18,30 +17,41 @@ import {
 } from "~/types";
 
 /**
- * Determines the appropriate function signature for the KindErrorType's 
- * function call. Variance is determined by the number of required and 
+ * Determines the appropriate function signature for the KindErrorType's
+ * function call. Variance is determined by the number of required and
  * optional parameter defined in the context/schema of the error type.
  */
 export type KindErrorSignature<
     TName extends string,
     TContext extends Dictionary<string>
-> = HasRequiredVariants<TContext> extends true
-? <TMsg extends string, TCtx extends AsContext<TContext>>(msg: TMsg, ctx: TCtx) => (
-    KindError<TName, TMsg, MergeObjects<TContext,TCtx>>
-)
-: IsEqual<AsContext<TContext>, EmptyObject> extends true
+> = IsEqual<AsContext<TContext>, EmptyObject> extends true
     ? <TMsg extends string>(msg: TMsg) => KindError<TName, TMsg, TContext>
-    : <
+: IsEqual<TContext, Dictionary<string>> extends true
+    ? <TMsg extends string, TCtx extends Record<string,unknown>>(msg: TMsg, ctx?: TCtx) => KindError<
+        TName, 
+        TMsg, 
+        TContext
+    >
+: HasRequiredVariants<TContext> extends true
+    ? <
         TMsg extends string, 
-        TCtx extends AsContext<TContext> | undefined
-    >(msg: TMsg, ctx?: TCtx) => 
+        TCtx extends AsContext<TContext>
+    >(msg: TMsg, ctx: TCtx) =>
         KindError<
             TName, 
             TMsg, 
-            undefined extends TCtx 
-                ? TContext 
-                : MergeObjects<TContext, As<TCtx, Dictionary<string>>>
-        >;
+            MergeObjects<TContext, TCtx>
+        >
+: <
+    TMsg extends string, 
+    TCtx extends AsContext<TContext>
+>(msg: TMsg, ctx?: TCtx) => KindError<
+    TName, 
+    TMsg, 
+    undefined extends TCtx 
+        ? TContext 
+        : MergeObjects<TContext, As<TCtx, Dictionary<string>>>
+>;
 
 /**
  * **KindErrorType**`<TName,TContext>`

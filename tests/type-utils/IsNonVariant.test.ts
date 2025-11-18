@@ -10,9 +10,9 @@ import { AssertTrue } from "inferred-types";
 describe("IsNonVariant<T>", () => {
 
     it("wide tokens", () => {
-        type F1 = IsNonVariant<"string">;
-        type F2 = IsNonVariant<"number">;
-        type F3 = IsNonVariant<"boolean">;
+        type F1 = IsNonVariant<string>;
+        type F2 = IsNonVariant<number>;
+        type F3 = IsNonVariant<boolean>;
 
         type cases = [
             Expect<AssertFalse<F1>>,
@@ -24,11 +24,13 @@ describe("IsNonVariant<T>", () => {
     
     it("literal tokens", () => {
         type T1 = IsNonVariant<`"foo"`>;
+        type T1b = IsNonVariant<"foo">;
         type T2 = IsNonVariant<`42`>;
         type T3 = IsNonVariant<`null`>;
     
         type cases = [
             Expect<AssertTrue<T1>>,
+            Expect<AssertTrue<T1b>>,
             Expect<AssertTrue<T2>>,
             Expect<AssertTrue<T3>>,
         ];
