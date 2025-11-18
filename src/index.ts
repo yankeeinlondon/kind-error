@@ -1,3 +1,3 @@
-export * from "./kindError";
+export * from "./types/index";
 export * from "./type-guards/index";
-export * from "./types";
+export * from "./createKindError";

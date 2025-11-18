@@ -1,4 +1,4 @@
-import type { TypedFunction } from "inferred-types";
+import type { TypedFunction } from "inferred-types/types";
 
 export function renameFunction<T extends TypedFunction, N extends string>(
   fn: T,

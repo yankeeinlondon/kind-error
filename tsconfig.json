@@ -13,9 +13,12 @@
     "noUnusedLocals": false,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
-    "baseUrl": ".",
     "outDir": "bin",
-    "tsBuildInfoFile": ".tsbuildinfo"
+    "tsBuildInfoFile": ".tsbuildinfo",
+    "paths": {
+        "~": ["./src/index.ts"],
+        "~/*": ["./src/*"]
+    }
   },
   "include": ["src", "tests", "examples"],
   "exclude": ["bin", "node_modules"]

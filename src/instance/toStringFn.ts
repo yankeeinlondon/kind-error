@@ -1,14 +1,21 @@
-import type { Dictionary, Narrowable } from "inferred-types";
-import type { KindError, Stringifiable } from "src/types";
+import type { Dictionary, Narrowable } from "inferred-types/types";
+import type { KindError, Stringifyable } from "~/types";
 import chalk from "chalk";
-import { Never } from "inferred-types";
+import { Never } from "inferred-types/constants";
 import { resolve } from "pathe";
-import { fileLink, link } from "src/link";
-import { isStringifiable } from "src/type-guards";
+import { fileLink, link } from "~/link";
+import { isStringifyable } from "~/type-guards";
 
+
+// TODO: refactor call signature
+
+/**
+ * creates the `toString()` function for a `KindError`
+ */
 export function toStringFn<
-  T extends KindError<K, C>,
+  T extends KindError<K, M, C>,
   K extends string,
+  M extends string,
   C extends Record<string, N>,
   N extends Narrowable,
 >(
@@ -34,11 +41,11 @@ export function toStringFn<
           const context = err.context as Dictionary;
           const value = (
             key in context
-              ? isStringifiable(context[key])
+              ? isStringifyable(context[key])
                 ? context[key]
                 : Never
               : null
-          ) as Stringifiable;
+          ) as Stringifyable;
 
           return `\n  ${`${chalk.bold.green(key)}: `}${JSON.stringify(value)}`;
         },

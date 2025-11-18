@@ -21,6 +21,7 @@ export function fileLink(text?: string) {
   if (text) {
     return link(text, resolve(text));
   }
+  return ""
 }
 
 // https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF

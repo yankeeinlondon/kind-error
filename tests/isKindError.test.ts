@@ -1,7 +1,7 @@
 import type { Equal, Expect, ExpectTrue } from "@type-challenges/utils";
 import type { Dictionary, EmptyObject, Narrowable } from "inferred-types";
-import type { KindError } from "src";
-import { createKindError, isKindError } from "src";
+import type { KindError } from "~";
+import { createKindError, isKindError } from "~";
 import { describe, expect, it } from "vitest";
 
 // Note: while type tests clearly fail visible inspection, they pass from Vitest

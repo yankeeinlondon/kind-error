@@ -1,8 +1,10 @@
-import type { Narrowable } from "inferred-types";
-import type { KindErrorType__Props } from "src/types";
-import { isObject } from "inferred-types";
-import { isError, isErrorResponse, isKindError } from "src/type-guards";
-import { errorFromError, errorFromObject, errorFromResponse, errorFromRest } from "src/utils/error-proxies";
+import type { Narrowable } from "inferred-types/types";
+import type { KindErrorType__Props } from "~/types";
+import { isObject } from "inferred-types/runtime";
+import { isError, isErrorResponse, isKindError } from "~/type-guards";
+import { errorFromError, errorFromObject, errorFromResponse, errorFromRest } from "~/utils/error-proxies";
+
+// TODO: refactor for new types
 
 /**
  * Higher order function which produces the `proxy` method

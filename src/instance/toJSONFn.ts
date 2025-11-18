@@ -1,4 +1,4 @@
-import type { KindError } from "src/types";
+import type { KindError } from "~/types";
 
 export function toJsonFn<T extends KindError<any, any>>(
   err: T,

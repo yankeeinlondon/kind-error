@@ -1,6 +1,6 @@
-import type { KindError } from "src/types";
-import { toKebabCase } from "inferred-types";
-import { isKindError } from "src/type-guards";
+import type { KindError } from "~/types";
+import { toKebabCase } from "inferred-types/runtime";
+import { isKindError } from "~/type-guards";
 
 /**
  * Higher order function which provides the type-guard to

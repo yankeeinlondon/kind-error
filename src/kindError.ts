@@ -2,7 +2,7 @@ import type {
   EmptyObject,
   MergeObjects,
   Narrowable,
-} from "inferred-types";
+} from "inferred-types/types";
 
 import type {
   KindError,
@@ -20,14 +20,14 @@ import {
   stripChars,
   toKebabCase,
   toPascalCase,
-} from "inferred-types";
+} from "inferred-types/runtime";
 import {
   KindErrorSymbol,
 
 } from "src/types";
 import { toJsonFn, toStringFn } from "./instance";
 import { isFn, proxyFn, rebaseFn } from "./static";
-import { createFnWithPropsExplicit, renameFunction, toStackTrace } from "./utils";
+import { createFnWithPropsExplicit, renameFunction, toStackString } from "./utils";
 import {
   createStackTrace,
 } from "./utils/error-proxies";
@@ -58,8 +58,8 @@ import {
  * BadJuju("oh my god!");
  * BadJuju("oh my god!", { flavor: "strawberry"})
  * ```
- */
-export function createKindError<
+ */ 
+function createKindError<
   TKind extends string,
   TBase extends Record<string, BC>,
   BC extends Narrowable,
@@ -129,7 +129,7 @@ export function createKindError<
     err.col = col;
     err.context = context;
     err.stackTrace = () => stackTrace;
-    err.stack = toStackTrace(message, stackTrace);
+    err.stack = toStackString(message, stackTrace);
 
     err.toString = toStringFn(err as any);
 

@@ -3,19 +3,19 @@ import type {
     EmptyObject,
     Extends,
     Narrowable,
-} from "inferred-types";
+} from "inferred-types/types";
 import type {
     KindError,
     KindErrorType,
     KindErrorTypeName,
-} from "../src";
+} from "~";
 import { describe, expect, it } from "vitest";
 import {
     createKindError,
     isError,
     isKindError,
 
-} from "../src";
+} from "~";
 
 // Note: while type tests clearly fail visible inspection, they pass from Vitest
 // standpoint so always be sure to run `tsc --noEmit` over your test files to

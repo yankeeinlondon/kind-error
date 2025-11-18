@@ -1,5 +1,5 @@
-import type { ErrorResponse } from "src/types";
-import { isObject } from "inferred-types";
+import type { ErrorResponse } from "~/types";
+import { isObject } from "inferred-types/runtime";
 
 /**
  * tests that the `val` passed in is a failed `Response` object

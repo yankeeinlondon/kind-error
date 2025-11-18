@@ -1,13 +1,15 @@
+// TODO: remove this when ready; will be replaced with `partial` function
+
 import type {
   MergeObjects,
   Narrowable,
-} from "inferred-types";
-import type { KindErrorType } from "src/types";
+} from "inferred-types/types";
+import type { KindErrorType } from "~/types";
 import {
   isEmpty,
   mergeObjects,
-} from "inferred-types";
-import { createKindError } from "src/kindError";
+} from "inferred-types/runtime";
+import { createKindError } from "~";
 
 export function rebaseFn<
   TKind extends string,

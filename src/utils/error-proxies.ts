@@ -1,10 +1,10 @@
-import type { Dictionary, Narrowable } from "inferred-types";
+import type { Dictionary, Narrowable } from "inferred-types/types";
 import type { ErrorResponse, JsError, KindError, KindStackItem } from "../types";
 import { parse } from "error-stack-parser-es/lite";
-import { hasIndexOf, isObject, isString, isUndefined } from "inferred-types";
+import { hasIndexOf, isObject, isString, isUndefined } from "inferred-types/runtime";
 import { relative } from "pathe";
-import { createKindError } from "src/kindError";
-import { isError } from "src/type-guards/index";
+import { createKindError } from "~";
+import { isError } from "~";
 
 const IGNORABLES = ["@vitest/runner", "node:", "native"];
 
