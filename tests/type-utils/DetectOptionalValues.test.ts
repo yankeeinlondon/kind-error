@@ -3,7 +3,7 @@ import {
     Expect,
     Test,
 } from "inferred-types/types";
-import { DetectOptionalValues } from "src/types";
+import { DetectOptionalValues } from "~/types";
 import { AssertEqual, Dictionary, EmptyObject } from "inferred-types";
 
 describe("DetectOptionalValues", () => {

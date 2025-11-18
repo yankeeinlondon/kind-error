@@ -1,5 +1,5 @@
 import { describe, it } from "vitest";
-import { HasRequiredVariants } from "src";
+import { HasRequiredVariants } from "~";
 import { Expect, AssertFalse, AssertTrue, EmptyObject } from "inferred-types";
 
 describe("HasRequiredVariants<TContext>", () => {

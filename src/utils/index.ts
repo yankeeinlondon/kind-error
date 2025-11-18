@@ -1,3 +1,4 @@
+export * from "./asError"
 export * from "./asKindSubtype";
 export * from "./asKindType";
 export * from "./error-proxies";

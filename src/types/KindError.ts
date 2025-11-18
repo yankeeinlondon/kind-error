@@ -2,8 +2,7 @@ import {
     As, 
     Dictionary,  
     ExpandRecursively,  
-    PascalCase, 
-    RemoveIndexKeys 
+    PascalCase,
 } from 'inferred-types';
 import { AsKindSubType, AsKindType, KindStackItem } from '~/types';
 
@@ -30,21 +29,20 @@ export type KindErrorShape = {
 export type KindError<
     TName extends string = string,
     TMsg extends string = string,
-    TCtx extends Dictionary<string> = Dictionary<string>
+    TCtx extends Record<string, unknown> = Dictionary<string>
 > = As<
-    RemoveIndexKeys<
-        ExpandRecursively<{
-            __kind: "KindError";
-            name: PascalCase<AsKindType<TName>>;
-            kind: TName;
-            type: AsKindType<TName>;
-            subType: AsKindSubType<TName>;
-            message: TMsg;
-            stack?: string;
-            stackTrace: KindStackItem[];
+    ExpandRecursively<{
+        __kind: "KindError";
+        name: PascalCase<AsKindType<TName>>;
+        kind: TName;
+        type: AsKindType<TName>;
+        subType: AsKindSubType<TName>;
+        message: TMsg;
+        stack?: string;
+        stackTrace: KindStackItem[];
 
-            toString(): string;
-        } & TCtx>> & Error,
+        toString(): string;
+    } & TCtx> & Error,
     KindErrorShape
 >;
 

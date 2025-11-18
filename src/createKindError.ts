@@ -7,7 +7,6 @@ import {
     err, 
     type Err,
     MergeObjects,
-    OnlyFnProps,
     toPascalCase
 } from 'inferred-types';
 import {  AsContext, KindError, KindErrorType, ParseContext } from '~/types';

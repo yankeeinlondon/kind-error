@@ -2,7 +2,7 @@ import { describe, it } from "vitest";
 import {
     Expect,
 } from "inferred-types/types";
-import { AsContext } from "src/types";
+import { AsContext } from "~/types";
 import { AssertEqual, EmptyObject } from "inferred-types";
 
 describe("AsContext<Ctx>", () => {

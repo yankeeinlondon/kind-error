@@ -1,10 +1,10 @@
 import { describe, it } from "vitest";
 import {
     Expect,
-    Test,
+    AssertEqual, 
+    EmptyObject,
 } from "inferred-types/types";
-import { StripNonVariantValues } from "src/types";
-import { AssertEqual, EmptyObject } from "inferred-types";
+import { StripNonVariantValues } from "~/types";
 
 describe("StripNonVariantValues<T>", () => {
 

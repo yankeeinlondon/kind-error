@@ -3,8 +3,8 @@ import {
     Expect,
     Test,
 } from "inferred-types/types";
-import {  KindError, KindErrorSignature } from "~/types";
 import { AssertEqual, AssertExtends, EmptyObject, Fallback } from "inferred-types";
+import {  KindError, KindErrorSignature } from "~/types";
 
 describe("KindErrorSignature<TName,TContext>", () => {
 

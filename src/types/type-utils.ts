@@ -55,7 +55,9 @@ export type KebabKind<T extends string> = KebabCase<
 /**
  * converts the kind **name** into the **type** properties string literal
  */
-export type AsKindType<T extends string> = RetainUntil<T,"/">;
+export type AsKindType<T extends string> = string extends T
+    ? string
+: RetainUntil<T,"/">;
 
 type PrepUnion<
     T extends string
@@ -68,11 +70,13 @@ type PrepUnion<
 export type AsKindSubType<T extends string> = As<
     string extends T
     ? string | undefined
-    : RetainAfter<T,"/"> extends ""
-        ? undefined
-        : Contains<RetainAfter<T,"/">, "|"> extends true
-            ? PrepUnion<RetainAfter<T,"/">>
-            : RetainAfter<T,"/">,
+    : RetainAfter<T,"/"> extends infer SubType extends string
+        ? SubType extends ""
+            ? undefined
+        : Contains<SubType, "|"> extends true
+            ? PrepUnion<SubType>
+            : SubType
+    : never,
     string | undefined        
 >;
 
@@ -82,8 +86,6 @@ export type IsNonVariant<T> = IsLiteralLike<T> extends true
     ? false
         : true
 : false;
-
-
 
 
 export type StripNonVariantValues<
