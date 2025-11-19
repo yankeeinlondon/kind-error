@@ -14,7 +14,7 @@ import {
     KindErrorShape, 
     KindErrorType 
 } from "~";
-import { AssertExtends } from "inferred-types";
+import { AssertExtends, EmptyObject } from "inferred-types";
 
 describe("Defining Error Types", () => {
 
@@ -93,7 +93,7 @@ describe("Defining Error Types", () => {
             type Rtn = ReturnType<Kind>;
 
             type cases = [
-                Expect<AssertEqual<Params, [msg: string]>>,
+                Expect<AssertEqual<Params, [msg: string, ctx?: EmptyObject]>>,
                 Expect<AssertEqual<
                     Kind,
                     KindErrorType<"my-error", { test: true }>

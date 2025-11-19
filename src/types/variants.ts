@@ -35,7 +35,7 @@ IsUnion<T> extends true
             ? IsUnion<Token> extends true
                 ? false
                 : true
-            : true
+            : false
         :false
 // not input token
 : IsLiteralLike<T> extends true
