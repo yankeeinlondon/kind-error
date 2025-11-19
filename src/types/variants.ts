@@ -41,8 +41,20 @@ export type HasNonVariant<
  * key/value as part of it's schema.
  */
 export type HasVariant<
-    T extends Record<string, unknown>
-> = Not<HasNonVariant<T>>;
+    T extends Record<string, unknown>,
+    K extends readonly (string & keyof T)[] = StringKeys<T>
+> = IsEqual<T, Record<string, unknown>> extends true
+? true
+: IsEqual<T, EmptyObject> extends true
+? false
+: K extends [
+    infer Head extends string & keyof T,
+    ...infer Rest extends readonly (string & keyof T)[]
+]
+    ? IsNonVariant<T[Head]> extends true
+        ? HasNonVariant<T,Rest>
+        : true
+: false;
 
 /**
  * **IsNonVariant**`<T>`
@@ -75,6 +87,12 @@ IsUnion<T> extends true
                     : true
         : false;
 
+/**
+ * **IsVariant**`<T>`
+ * 
+ * Tests whether the type `T` is variant type (aka, the type has more than one variant).
+ */
+export type IsVariant<T> = Not<IsNonVariant<T>>;
 
 /**
  * **NonVariants**`<T>`

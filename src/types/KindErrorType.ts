@@ -26,7 +26,7 @@ import { KindErrorSignature } from "./KindErrorSignature";
  *     this error type _into_ an actual `KindError`.
  */
 export type KindErrorType<
-    TName extends string,
+    TName extends string = string,
     TContext extends Record<string, unknown> = Record<string, unknown>
 > = {
     /** unique identifier of a `KindErrorType` */

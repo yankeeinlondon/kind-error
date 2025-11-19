@@ -30,18 +30,20 @@ export type KindError<
     TName extends string = string,
     TMsg extends string = string,
     TCtx extends Record<string, unknown> = Record<string, unknown>
-> = (ExpandRecursively<{
-    __kind: "KindError";
-    name: PascalCase<AsKindType<TName>>;
-    kind: TName;
-    type: AsKindType<TName>;
-    subType: AsKindSubType<TName>;
-    message: TMsg;
-    stack?: string;
-    stackTrace: KindStackItem[];
+> = (
+    ExpandRecursively<{
+        __kind: "KindError";
+        name: PascalCase<AsKindType<TName>>;
+        kind: TName;
+        type: AsKindType<TName>;
+        subType: AsKindSubType<TName>;
+        message: TMsg;
+        stack?: string;
+        stackTrace: KindStackItem[];
 
-    toString(): string;
-} & TCtx> & Error) extends infer KErr
+        toString(): string;
+    } & TCtx
+> & Error) extends infer KErr extends KindErrorShape
     ? KErr
     : never;
 

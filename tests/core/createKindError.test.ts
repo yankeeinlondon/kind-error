@@ -4,7 +4,16 @@ import {
     Expect,
     AssertError
 } from "inferred-types/types";
-import { createKindError, HasNonVariant, KindError, KindErrorShape, KindErrorType } from "~";
+import { 
+    AsContextShape,
+    createKindError, 
+    HasRequiredVariants, 
+    HasVariant, 
+    isKindErrorType, 
+    KindError, 
+    KindErrorShape, 
+    KindErrorType 
+} from "~";
 import { AssertExtends } from "inferred-types";
 
 describe("Defining Error Types", () => {
@@ -43,6 +52,8 @@ describe("Defining Error Types", () => {
             expect(typeof MyError.partial).toBe("function");
             expect(typeof MyError.proxy).toBe("function");
             expect(MyError.context).toEqual({});
+
+            expect(isKindErrorType(MyError)).toBe(true);
 
             type Params = Parameters<typeof MyError>;
             type Rtn = ReturnType<typeof MyError>;
@@ -101,6 +112,20 @@ describe("Defining Error Types", () => {
                 test: true,
                 foo: "string | undefined"
             });
+
+            type X1 = HasVariant<{
+                test: true,
+                foo: "string | undefined"
+            }>
+
+            type X2 = HasRequiredVariants<{
+                test: true,
+                foo: "string | undefined"
+            }>
+            type Shape = AsContextShape<{
+                test: true,
+                foo: "string | undefined"
+            }>
 
             expect(typeof MyError).toBe("function");
             expect(MyError.__kind).toBe("KindErrorType");

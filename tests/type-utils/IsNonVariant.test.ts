@@ -27,12 +27,14 @@ describe("IsNonVariant<T>", () => {
         type T1b = IsNonVariant<"foo">;
         type T2 = IsNonVariant<`42`>;
         type T3 = IsNonVariant<`null`>;
+        type T4 = IsNonVariant<42>;
     
         type cases = [
             Expect<AssertTrue<T1>>,
             Expect<AssertTrue<T1b>>,
             Expect<AssertTrue<T2>>,
             Expect<AssertTrue<T3>>,
+            Expect<AssertTrue<T4>>,
         ];
     });
 
@@ -41,10 +43,12 @@ describe("IsNonVariant<T>", () => {
     it("union tokens", () => {
         type F1 = IsNonVariant<`"foo" | "bar"`>;
         type F2 = IsNonVariant<`"foo" | 42`>;
+        type F3 = IsNonVariant<42 | undefined>;
     
         type cases = [
             Expect<AssertFalse<F1>>,
             Expect<AssertFalse<F2>>,
+            Expect<AssertFalse<F3>>,
         ];
     });
 

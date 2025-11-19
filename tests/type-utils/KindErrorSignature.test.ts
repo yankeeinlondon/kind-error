@@ -38,10 +38,27 @@ describe("KindErrorSignature<TName,TContext>", () => {
         ];
     });
 
+    
+    it("test", () => {
+        type T = KindErrorSignature<"testing", {
+                test: true,
+                foo: "string | undefined"
+            }>;
+
+        type P = Parameters<T>;
+        type Rtn = ReturnType<T>;
+    
+        type cases = [
+            Expect<AssertEqual<P, [msg: string, ctx?: { foo?: string }]>>,
+        ];
+    });
+    
+
     it("no required but with optional context", () => {
-        type T1 = KindErrorSignature<"Testing", {test: true, answer: 42 | undefined}>
-        type P = Parameters<T1>;
-        type Rtn = ReturnType<T1>;
+        type T = KindErrorSignature<"testing", {test: true, answer: 42 | undefined}>
+
+        type P = Parameters<T>;
+        type Rtn = ReturnType<T>;
 
         type cases = [
             Expect<AssertEqual<P, [msg: string, ctx?: { answer?: 42 }]>>,
