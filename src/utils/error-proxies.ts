@@ -1,5 +1,5 @@
 import type { Dictionary, Narrowable } from "inferred-types/types";
-import type { FetchError, JsError, KindError, KindStackItem } from "../types";
+import type { FetchError, JsError, KindError, KindErrorType, KindStackItem } from "../types";
 import { parse } from "error-stack-parser-es/lite";
 import { hasIndexOf, isObject, isString, isUndefined } from "inferred-types/runtime";
 import { relative } from "pathe";
@@ -40,17 +40,19 @@ export function errorFromError<
     underlying: err,
   };
 
-  const error = createKindError(
+  const factory = createKindError(
     kind,
     context,
-  )(err.message) as unknown as KindError<TKind, TCtx>;
+  ) as unknown as KindErrorType<TKind, typeof context>;
 
-  error.cause = err;
+  const error = (factory as any)(err.message) as unknown as KindError<TKind, string, TCtx>;
+
+  (error as any).cause = err;
   if (err.stack) {
-    error.stackTrace = createStackTrace(err);
+    error.stackTrace = () => createStackTrace(err);
   }
 
-  return error as KindError<TKind, TCtx>;
+  return error as KindError<TKind, string, TCtx>;
 };
 
 export function errorFromResponse<
@@ -68,9 +70,9 @@ export function errorFromResponse<
     underlying: res,
   };
 
-  const wrapper = createKindError(kind, context);
+  const wrapper = createKindError(kind, context) as unknown as KindErrorType<TKind, typeof context>;
 
-  return wrapper(res.statusText);
+  return (wrapper as any)((res as any).statusText);
 }
 
 export function getMessageInObject<
@@ -121,9 +123,9 @@ export function errorFromObject<
     underlying: obj,
   };
 
-  const error = createKindError(kind, context);
+  const error = createKindError(kind, context) as unknown as KindErrorType<TKind, typeof context>;
 
-  return error(message);
+  return (error as any)(message);
 }
 
 /**
@@ -144,12 +146,12 @@ export function errorFromRest<
   const message = isString(rest)
     ? rest
     : isObject(rest)
-      ? hasIndexOf(rest, "error") && typeof rest.error === "string"
-        ? rest.error
-        : hasIndexOf(rest, "msg") && typeof rest.msg === "string"
-          ? rest.msg
-          : hasIndexOf(rest, "message") && typeof rest.message === "string"
-            ? rest.message
+      ? hasIndexOf(rest, "error") && typeof (rest as any).error === "string"
+        ? (rest as any).error
+        : hasIndexOf(rest, "msg") && typeof (rest as any).msg === "string"
+          ? (rest as any).msg
+          : hasIndexOf(rest, "message") && typeof (rest as any).message === "string"
+            ? (rest as any).message
             : "Unknown"
       : "Unknown";
 
@@ -159,7 +161,7 @@ export function errorFromRest<
       ...ctx,
       underlying: rest,
     },
-  );
+  ) as unknown as KindErrorType<TKind, Record<string, unknown>>;
 
-  return error(message);
+  return (error as any)(message as string);
 }

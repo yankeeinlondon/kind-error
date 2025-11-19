@@ -14,7 +14,7 @@ export type KindErrorShape = {
   subType: string | undefined;
   message: string;
   stack?: string;
-  stackTrace: KindStackItem[];
+  stackTrace: () => KindStackItem[];
   context: Record<string, unknown>;
 } & Error;
 
@@ -27,7 +27,7 @@ export type KindErrorShape = {
 export type KindError<
   TName extends string = string,
   TMsg extends string = string,
-  TCtx extends Record<string, unknown> = EmptyObject,
+  TCtx extends Record<string, any> = EmptyObject,
 > = (
     {
       __kind: "KindError";
@@ -37,7 +37,7 @@ export type KindError<
       subType: AsKindSubType<TName>;
       message: TMsg;
       stack?: string;
-      stackTrace: KindStackItem[];
+      stackTrace: () => KindStackItem[];
       context: TCtx;
 
       toString: () => string;

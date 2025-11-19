@@ -64,7 +64,7 @@ export function createKindError<
         err.__kind = "KindError";
         err.kind = name;
         err.type = asKindType(name);
-        err.subType = asKindSubType<string>(name as string);
+        err.subType = asKindSubType<TName>(name);
         err.name = pascalName;
         err.message = msg;
         err.stackTrace = () => stackTrace;
@@ -86,7 +86,7 @@ export function createKindError<
         kind: name,
         errorName: pascalName,
         type: asKindType(name),
-        subType: asKindSubType(name),
+        subType: asKindSubType<TName>(name),
         context,
 
         proxy<E, P extends AsContextShape<TContext>>(
@@ -158,5 +158,5 @@ export function createKindError<
 
     const namedFn = renameFunction(fn, `${pascalName}ErrorType`);
 
-    return createFnWithProps(namedFn, props) as unknown as Rtn<TName, TContext>;
+    return createFnWithProps(namedFn, props as any) as unknown as Rtn<TName, TContext>;
 }

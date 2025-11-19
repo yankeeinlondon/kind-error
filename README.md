@@ -1,6 +1,30 @@
 # Kind Error
 
-> A better error primitive than what Javascript hands you.
+> A better error primitive for Javascript/Typescript.
+
+## Install
+
+Using pnpm:
+
+```sh
+pnpm install @yankeeinlondon/kind-error
+```
+
+<details>
+
+<summary>
+Alternatives
+</summary>
+<br/>
+
+| <span style="font-weight: 200">Manager</span>| <span style="font-weight: 200">Shell Command</span> |
+| --- | --- |
+| **npm** | npm install @yankeeinlondon/gotcha  |
+| **pnpm** | pnpm add @yankeeinlondon/gotcha | 
+| **yarn** | yarn add @yankeeinlondon/gotcha | 
+| **bun** | bun add @yankeeinlondon/gotcha | 
+
+</details>
 
 ## Usage
 

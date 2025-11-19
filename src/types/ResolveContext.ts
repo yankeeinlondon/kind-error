@@ -19,8 +19,7 @@ import type { AsContextShape, NonVariants } from "~/types";
  */
 export type ResolveContext<
   TSchema extends Record<string, unknown>,
-  TCtx extends Record<string, N> | undefined,
-  N extends Narrowable = Narrowable,
+  TCtx extends Record<string, any> | undefined,
 > = As<
   IsUndefined<TCtx> extends true
     ? IsEqual<TSchema, Record<string, unknown>> extends true

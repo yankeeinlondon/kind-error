@@ -22,15 +22,17 @@ export function toStringFn<
   const { name, message, stackTrace } = err;
 
   return () => {
-    const func = err.fn
-      ? ` inside the function ${`${chalk.bold(err.fn)}()`}`
+    const frames = stackTrace();
+    const first = frames[0];
+    const func = first?.function
+      ? ` inside the function ${`${chalk.bold(first.function)}()`}`
       : "";
-    const fileInfo = err.file && err.line
-      ? `\n\n${chalk.italic("in ")}file ${chalk.bold.blue(link(err.file, resolve(err.file)))} at line ${chalk.bold(err.line)}${func}`
+    const fileInfo = first?.file && first?.line
+      ? `\n\n${chalk.italic("in ")}file ${chalk.bold.blue(link(first.file, resolve(first.file)))} at line ${chalk.bold(first.line)}${func}`
       : "";
 
-    const stack = stackTrace().slice(1).length > 0
-      ? `\n${stackTrace().slice(1).map(l => `    - ${chalk.blue(fileLink(l?.file))}:${l?.line}:${l?.col}${l?.function ? ` in ${chalk.bold(`${l?.function}()`)}` : ""}`).join("\n")}`
+    const stack = frames.slice(1).length > 0
+      ? `\n${frames.slice(1).map(l => `    - ${chalk.blue(fileLink(l?.file))}:${l?.line}:${l?.col}${l?.function ? ` in ${chalk.bold(`${l?.function}()`)}` : ""}`).join("\n")}`
       : "";
 
     const context = Object.keys(err.context).length > 0

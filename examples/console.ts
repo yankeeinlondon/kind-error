@@ -1,4 +1,4 @@
-import { createKindError } from "src";
+import { createKindError } from "../src";
 
 function throwUp() {
     const Invalid = createKindError("InvalidFormat", { foo: "testing" });

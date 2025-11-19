@@ -1,3 +1,4 @@
+import type { KindErrorType } from "~/types";
 import type { Narrowable } from "inferred-types/types";
 import { isObject } from "inferred-types/runtime";
 import { isError, isFetchError, isKindError } from "~/type-guards";
@@ -31,9 +32,6 @@ export function proxyFn<
           : isObject(err)
             ? errorFromObject(name, context, err)
             : errorFromRest(name, context, err);
-    return error as unknown as ReturnType<KindErrorType__Props<
-      TKind,
-            TBase & Record<"underlying", E>
-    >["proxy"]>;
+    return error as any;
   };
 }

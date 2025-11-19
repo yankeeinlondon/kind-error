@@ -1,24 +1,28 @@
 import type { KindError } from "~/types";
 
-export function toJsonFn<T extends KindError<any, any>>(
+export function toJsonFn<T extends KindError<any, any, any>>(
   err: T,
 ) {
-  return () => err.fn
-    ? {
+  return () => {
+    const stack = err.stackTrace();
+    const first = stack[0];
+    return first?.function
+      ? {
         name: err.name,
         kind: err.kind,
         message: err.message,
         context: err.context,
-        fn: err.fn,
-        line: err.line,
+        fn: first.function,
+        line: first.line,
         stack: err.stack,
       }
-    : {
+      : {
         name: err.name,
         kind: err.kind,
         message: err.message,
         context: err.context,
-        line: err.line,
+        line: first?.line,
         stack: err.stack,
       };
+  };
 }

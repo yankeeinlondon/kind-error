@@ -1,4 +1,4 @@
-import { createKindError } from "src";
+import { createKindError } from "../src";
 
 
 const FooBarType = createKindError("foo/bar");
