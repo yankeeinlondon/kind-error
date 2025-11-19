@@ -2,12 +2,12 @@
 
 > A better error primitive for Javascript/Typescript.
 
-![image](./docs/kind-error-overview.png)
+![overview diagram](./docs/kind-error-overview.png)
 
 ## Install
 
 ```sh
-pnpm install @yankeeinlondon/kind-error
+pnpm add @yankeeinlondon/kind-error
 ```
 
 <details>
@@ -20,13 +20,12 @@ Alternatives
 | <span style="font-weight: 200">Manager</span>| <span style="font-weight: 200">Shell Command</span> |
 | --- | --- |
 | **npm** | npm install @yankeeinlondon/kind-error  |
-| **pnpm** | pnpm add @yankeeinlondon/kind-error | 
 | **yarn** | yarn add @yankeeinlondon/kind-error | 
 | **bun** | bun add @yankeeinlondon/kind-error | 
 
 </details>
 
-## Usage
+## Basic Usage
 
 1. Create an Error _type_ with first call to `createKindError`:
 
@@ -76,49 +75,93 @@ Alternatives
     By default a `KindErrorType` is _strict_ about the properties it allows for. This means that if you want to add a `color` property you'd have to have included it in the schema for the type. You can, however, add optional parameters to a type so that `color` is not required but _can_ be included if so desired.
 
 
-### Rebasing
+## Partial Application
 
-After you've defined an error type like `InvalidRequest` from above, but before we generate the
-error, we can "rebase" it with additional context.
+The ability to define an error type with a context schema of key/value pairs to be -- in part -- filled in later when the error is actually being raised is handy because often the details we need to complete an error are only available later. However, to increase flexibility and encourage consistency we must also recognize that sometimes the context we need to report fully on an error is built up in stages over time. This is where the power of _partial application_ comes from.
+
+Let's demonstrate this with an example:
+
+1. Let's define an error type which immediately sets the `lib` property but then defines two additional required properties `section` and `url`:
+
+    ```ts
+    const InvalidRequest = createKindError("invalid-request", { 
+        lib: "kind-error", // static property
+        section: "one|two|three", // an enumerated set of section choices
+        url: "string" // any string value
+    });
+    ```
+
+2. In our code base we may move into a part of the code where we _know_ the `section` we're in but the `url` is still going to be determined later:
+
+    ```ts
+    const Err = InvalidRequest.partial({ section: "one" });
+    ```
+
+3. Now when we actually want to raise an error we are only presented with the one remaining required property in the context schema `url`: 
+
+    ```ts
+    throw Err("This is the error message", { url });
+    ```
+
+In our example we chose to partially apply a _required_ property of the schema but this will work equally as well with an optional property in the schema too. 
+
+> Note: at any point when a partial application is done, the key/values applied become a static/readonly part of the context dictionary and future callers will only be required (and able) to modify the key/values which remain as undefined.
+
+## Error Proxy
+
+Once you get used to having `KindError`'s there's no going back ... says an entirely unbiased person. But in all seriousness, once you get get used to the strong typing, schema structuring and everything else you find yourself wishing all errors were `KindError`s. Well they can be ... in part due to the built-in "proxy" functionality of the `KindErrorType`.
+
+In the code below we show a standard try/catch block use-case where you might find using the proxy functionality useful:
 
 ```ts
-const InvalidRequest = createKindError("invalid-request", { lib: "foobar" });
-// ...
+const Unexpected = createKindError("unexpected");
 
-const IR2 = InvalidRequest.rebase({
-   handler: "bar"
-})
-```
-
-### Proxying Errors
-
-```ts
 try {
-    //...
-}
-catch (err) {
-    throw InvalidRequest.proxy(err, { url: "unknown"});
+    // do something dangerous (but exciting)
+} catch(e) {
+    // Crime never pays, of course you got an error!
+    // Hey it's not typed! Should you assume it's supposed to be an `Error`?
+    // Who cares, just proxy it.
+    throw UnexpectedOutcome.proxy(e, "just in case");
 }
 ```
 
-The `KindErrorType` provides a convenient `.proxy(err)` method which will take in any error type.
+Regardless of the underlying shape of `e`, the proxy function will evaluate it and apply the following logic:
 
-- if the error received is already a blessed `KindError` then it is simply proxied through "as is"
-- if the error is _not_ a `KindError` then:
-  - The error will be converted to the kind error's type/subType and name.
-  - The message from the underlying error will be placed into the message property of this error
-  - The callstack of the underlying error will be converted to a structured format and used as the callstack for the KindError
-  - The property `underlying` will be set to the underlying error's payload in case there are more details that can be extracted
-
-**Note:** just like in our previous example, any required properties of the schema must be provided when proxying an error through. These properties will serve as a way to ensure that the type of the error _can_ be produced. If however, the underlying error has the same property AND it is of the right type then it will override the value at runtime.
+- if `e` turns out to be a `KindError` then the error will be proxied through "as is" (why mess with perfection)
+- if `e` is just some plain jane `Error` type then extract the "message" and use it in a `Unexpected` kind error but add an `underlying` property which contains the base error.
+- if `e` is a fetch network response then we'll add both the `underlying` property _and_ a `code` property which proxies through the HTTP code returned.
+- if `e` is a POJO (_plain old javascript object_) then we'll look for a "message" property and use that for the wrapped kind error's message along with of course adding the `underlying` property.
+- if `e` is a string then we'll use that as the kind error's message; no `underlying` property needed.
+- in all other cases we'll add in the kind error's name in _prose_ format: `SomethingBadHappened` kind error will be have a message of "Something bad happened".
+  - If the user provided a _fallback_ message -- in our example we used `just in case` -- then we'll use that instead
 
 ## Type Guards
 
-Type guards help us _narrow_ the type at runtime and because the errors this repo produces have so much potential for literal types, we include some type guards to help you:
+Type guards are an important part of any good Typescript code. They help us _narrow_ the type at runtime and align the runtime values with the type system so that you can have the strongest benefit of the type system at design time.
 
-1. `isKindError(val)` this type guard will establish whether the variable `val` is a valid `KindError` or not. From this we will get literal types for name, type, subType, and typically message. 
-2. `KindErrorType.is(val)` each type definition comes with a `is(val)` type guard built in. This type guard will resolve not only the basic properties of a KindError but all properties defined in that particular error's schema.
+This library provides several type guards which you can use to help on your next project.
+
+### Detecting Errors
+
+1. `isOk(val)` _- tests whether value is any recognized form of `Error` or `RequestFailure` and if it is not excludes these error types from val's type._
+2. `isError(val)` _- tests whether `val` is any recognized form of an `Error` or `RequestFailure` and isolates the type of val to only these types._
+3. `isKindError(val, [kind])`  _- this type guard will establish whether the variable `val` is a valid `KindError` or not. You can also optionally specify a particular 'kind' you want to look for._
+4. `KindErrorType.is(val)` - _every `KindErrorType` error type comes with a `is(val)` type guard built in._
+
+### Used in Error Proxy
+
+We also expose some type guards which we internally use as part of the **proxy** functionality but you may find use for this too (and hey, _sharing is caring_):
+
+1. `isFetchResponse(val)`
+2. `isFetchError(val)`
+3. `isStringifyable(val)`
 
 ## Structured Callstack and Pretty Print
 
-All `KindError`'s will parse the string based callstack found in 
+The two major entity types defined in this repo are `KindErrorType` (a error type) and `KindError` (an error) and both come with built-in `toString()` functions which produce nice looking console output when converted to a string. WIth the `KindError` this output is aided by a structured call stack which is parsed from Javascript's string `stack` property and provided (if you want direct access) to the `stackTrace` property on kind errors.
+
+As an example, when you have something like the following code: `console.log(InvalidType)`, you'll get something resembling this in your console:
+
+![example stack trace output](docs/callstack.png)
+
