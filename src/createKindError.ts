@@ -9,7 +9,14 @@ import {
     isString,
     toPascalCase,
 } from "inferred-types";
-import { asKindSubType, asKindType, createStackTrace, getMessageInObject, getStackTrace, renameFunction } from "~/utils";
+import { 
+    asKindSubType, 
+    asKindType, 
+    createStackTrace, 
+    getMessageInObject, 
+    getStackTrace, 
+    renameFunction 
+} from "~/utils";
 import { toJsonFn, toStringFn } from "./instance";
 import { isKindError } from "./type-guards";
 
@@ -89,7 +96,10 @@ export function createKindError<
         subType: asKindSubType<TName>(name),
         context,
 
-        proxy<E, P extends AsContextShape<TContext>>(
+        proxy<
+            const E, 
+            const P extends AsContextShape<TContext>
+        >(
             e: E,
             ...args: [props?: P]
         ) {
