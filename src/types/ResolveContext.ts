@@ -20,7 +20,7 @@ import type { AsContextShape, NonVariants } from "~/types";
 export type ResolveContext<
   TSchema extends Record<string, unknown>,
   TCtx extends Record<string, N> | undefined,
-  N extends Narrowable = Narrowable
+  N extends Narrowable = Narrowable,
 > = As<
   IsUndefined<TCtx> extends true
     ? IsEqual<TSchema, Record<string, unknown>> extends true
@@ -41,8 +41,8 @@ export type ResolveContext<
                 ? EmptyObject
                 : TCtx extends Record<string, unknown>
                   ? ExpandDictionary<
-                        NonVariants<TSchema>
-                        & TCtx & Record<"__warning", `context was supposed to be empty as defined by the schema but context was added anyway!`>
+                    NonVariants<TSchema>
+                    & TCtx & Record<"__warning", `context was supposed to be empty as defined by the schema but context was added anyway!`>
                   >
                   : never
             : Fallback<TCtx, EmptyObject> extends ContextShape
@@ -50,11 +50,11 @@ export type ResolveContext<
                     NonVariants<TSchema> & Fallback<TCtx, EmptyObject>
               >
               : ExpandDictionary<
-                    NonVariants<TSchema> & Fallback<TCtx, EmptyObject>
-                    & {
-                    __warning: `The context provided for this error had properties which were inconsistent with the schema defined by the KindErrorType!`;
-                    __schema: TSchema;
-                    }
+                NonVariants<TSchema> & Fallback<TCtx, EmptyObject>
+                & {
+                  __warning: `The context provided for this error had properties which were inconsistent with the schema defined by the KindErrorType!`;
+                  __schema: TSchema;
+                }
               >
           : never,
   Record<string, unknown>

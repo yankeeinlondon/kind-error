@@ -1,16 +1,15 @@
 import type {
-  Dictionary,
   ExpandRecursively,
-  MergeObjects,
 } from "inferred-types";
 import type { KindErrorSignature } from "./KindErrorSignature";
 import type {
   AsContextShape,
   AsKindSubType,
   AsKindType,
-  FetchError,
+  HasRequiredVariants,
   KindError,
   KindErrorName,
+  ParseContext,
   ResolveContext,
 } from "~/types";
 
@@ -46,10 +45,10 @@ export type KindErrorType<
   /**
    * the shape of the error's context properties
    */
-  context: TContext;
+  context: ParseContext<TContext>;
 
   /**
-   * **proxy**`(err, [fallback msg]) -> KindError`
+   * **proxy**`(err, [props]) -> KindError`
    *
    * Allows you to proxy an error or error-like variable:
    *
@@ -64,10 +63,17 @@ export type KindErrorType<
    *        the schema for this error type, AND the type is consistent with this
    *        error type's schema then it will be set accordingly.
    */
-  proxy: <E, M extends string | undefined>(err: E, msg?: M) => E extends KindError
+  proxy: <
+    E,
+    P extends AsContextShape<TContext>,
+  >(
+    err: E,
+    ...args: HasRequiredVariants<TContext> extends true ? [props: P] : [props?: P]
+  ) => E extends KindError
     ? E
     : ExpandRecursively<
-            KindError<TName> & Record<"underlying", Error | Dictionary | FetchError>
+      KindError<TName, string, ResolveContext<TContext, P>>
+      & Record<"underlying", E>
     > & Error;
 
   /**
@@ -84,7 +90,7 @@ export type KindErrorType<
 
   /**
    * **rebase**`(context) -> KindErrorType`
-   * 
+   *
    * An alias for `partial`.
    */
   rebase: <T extends Partial<AsContextShape<TContext>>>(

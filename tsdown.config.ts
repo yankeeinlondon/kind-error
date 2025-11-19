@@ -1,4 +1,4 @@
-import { defineConfig } from "tsdown";
+import { defineConfig, type OutExtensionContext } from "tsdown";
 
 
 export default defineConfig([
@@ -8,8 +8,14 @@ export default defineConfig([
         dts: false,
         sourcemap: true,
         tsconfig: "./tsconfig.json",
+        outExtensions({ format }: OutExtensionContext) {
+            return {
+                js: format === "es"
+                    ? ".js"
+                    : ".cjs",
+            };
+        },
         outDir: "dist"
     }
 
 ]);
-

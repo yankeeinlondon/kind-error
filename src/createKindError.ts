@@ -1,14 +1,16 @@
 import type { Contains, EmptyObject, Err, MergeObjects } from "inferred-types";
-import type { AsContextShape, KindError, KindErrorType, ParseContext } from "~/types";
+import type { AsContextShape, KindError, KindErrorType, KindStackItem, ResolveContext } from "~/types";
 import { inspect } from "node:util";
 import {
   createFnWithProps,
   err,
+  isError,
+  isObject,
+  isString,
   toPascalCase,
 } from "inferred-types";
-import { asKindSubType, asKindType, getStackTrace, renameFunction } from "~/utils";
+import { asKindSubType, asKindType, createStackTrace, getMessageInObject, getStackTrace, renameFunction } from "~/utils";
 import { toJsonFn, toStringFn } from "./instance";
-import { proxyFn } from "./static";
 import { isKindError } from "./type-guards";
 
 type Rtn<
@@ -19,7 +21,7 @@ type Rtn<
     "invalid-name",
     `The name for a KindError must not include any of the following characters: "<", ">", "[", "]", "(", ")"`
   >
-  : KindErrorType<TName, ParseContext<TContext>>;
+  : KindErrorType<TName, TContext>;
 
 /**
  * **createKindError**`(name, context)`
@@ -42,46 +44,6 @@ export function createKindError<
   };
 
   const pascalName = toPascalCase(name.replace(/\//g, "-"));
-
-  const props = {
-    __kind: "KindErrorType",
-    kind: name,
-    errorName: pascalName,
-    type: asKindType(name),
-    subType: asKindSubType(name),
-    context,
-
-    proxy<E, M extends string>(e: E, msg?: M) {
-      return (
-        isKindError(e)
-          ? e
-          : proxyFn(name, msg || "", context)
-      ) as KindError<TName, string, TContext>;
-    },
-
-    partial,
-    rebase: partial,
-
-    is(val: unknown): val is KindError<TName, string, TContext> {
-      return isKindError(val) && val.kind === name;
-    },
-
-    toString() {
-      return `KindErrorType::${pascalName}(${name})`;
-    },
-
-    toJSON() {
-      return {
-        __kind: "KindErrorType",
-        kind: name,
-        name: `${pascalName}ErrorType`,
-        errorName: pascalName,
-        type: asKindType(name),
-        subType: asKindSubType(name),
-        context,
-      };
-    },
-  };
 
   const fn = <
     TMsg extends string,
@@ -117,6 +79,77 @@ export function createKindError<
     };
 
     return err;
+  };
+
+  const props = {
+    __kind: "KindErrorType",
+    kind: name,
+    errorName: pascalName,
+    type: asKindType(name),
+    subType: asKindSubType(name),
+    context,
+
+    proxy<E, P extends AsContextShape<TContext>>(
+      e: E,
+      ...args: [props?: P]
+    ) {
+      const props = args[0];
+      if (isKindError(e)) {
+        return e as unknown as KindError<TName, string, ResolveContext<TContext, P>> & Record<"underlying", E>;
+      }
+
+      let msg = "Unknown Error";
+      let stack: KindStackItem[] | undefined;
+
+      if (isError(e)) {
+        msg = e.message;
+        if (e.stack) {
+          stack = createStackTrace(e);
+        }
+      }
+      else if (isObject(e)) {
+        msg = getMessageInObject(e, "message", "msg", "error", "cause", "reason", "err", "code") || "Unknown Error";
+      }
+      else if (isString(e)) {
+        msg = e;
+      }
+
+      const mergedProps = {
+        ...(props || {}),
+        underlying: e,
+      };
+
+      const err = fn(msg, mergedProps);
+
+      if (stack) {
+        err.stackTrace = () => stack!;
+      }
+
+      return err as unknown as KindError<TName, string, ResolveContext<TContext, P>> & Record<"underlying", E>;
+    },
+
+    partial,
+    rebase: partial,
+
+    is(val: unknown): val is KindError<TName, string, TContext> {
+      return isKindError(val) && val.kind === name;
+    },
+
+    toString() {
+      return `KindErrorType::${pascalName}(${name})`;
+    },
+
+    toJSON() {
+      return {
+        __kind: "KindErrorType",
+        kind: name,
+        name: `${pascalName}ErrorType`,
+        errorName: pascalName,
+        type: asKindType(name),
+        subType: asKindSubType(name),
+        context,
+      };
+    },
   };
 
   const namedFn = renameFunction(fn, `${pascalName}ErrorType`);

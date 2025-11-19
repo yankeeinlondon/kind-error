@@ -52,22 +52,22 @@ export type KindErrorSignature<
       TMsg,
       ResolveContext<Record<string, unknown>, TCtx>
     >
-      : HasRequiredVariants<TSchema> extends true
-      ? <
-          TMsg extends string,
-          const TCtx extends AsContextShape<TSchema>,
-        >(msg: TMsg,
-          ctx: TCtx) => KindError<
-          TName,
-          TMsg,
-          ResolveContext<TSchema, TCtx>
-        >
-      : <
-          TMsg extends string,
-          const TCtx extends AsContextShape<TSchema>,
-        >(msg: TMsg,
-          ctx?: TCtx) => KindError<
-          TName,
-          TMsg,
-          ResolveContext<TSchema, TCtx>
-        >;
+  : HasRequiredVariants<TSchema> extends true
+    ? <
+        TMsg extends string,
+        const TCtx extends AsContextShape<TSchema>,
+      >(msg: TMsg,
+        ctx: TCtx) => KindError<
+        TName,
+        TMsg,
+        ResolveContext<TSchema, TCtx>
+      >
+    : <
+        TMsg extends string,
+        const TCtx extends AsContextShape<TSchema>,
+      >(msg: TMsg,
+        ctx?: TCtx) => KindError<
+        TName,
+        TMsg,
+        ResolveContext<TSchema, TCtx>
+      >;

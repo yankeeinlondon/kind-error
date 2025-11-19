@@ -73,13 +73,13 @@ export function errorFromResponse<
   return wrapper(res.statusText);
 }
 
-function getMessageInObject<
+export function getMessageInObject<
   T extends Dictionary,
 >(
   obj: T,
   ...props: readonly string[]
 ) {
-  let message: string = "";
+  let message: string | undefined;
 
   props.forEach((p) => {
     if (p in obj && isUndefined(message)) {

@@ -5,10 +5,7 @@ import {
     AssertError
 } from "inferred-types/types";
 import { 
-    AsContextShape,
     createKindError, 
-    HasRequiredVariants, 
-    HasVariant, 
     isKindErrorType, 
     KindError, 
     KindErrorShape, 

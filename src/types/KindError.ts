@@ -1,6 +1,5 @@
 import type {
   EmptyObject,
-  ExpandRecursively,
   PascalCase,
 } from "inferred-types";
 import type { AsKindSubType, AsKindType, KindStackItem } from "~/types";
