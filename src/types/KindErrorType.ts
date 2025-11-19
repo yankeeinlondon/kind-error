@@ -1,5 +1,6 @@
 import type {
   ExpandRecursively,
+  MergeObjects,
 } from "inferred-types";
 import type { KindErrorSignature } from "./KindErrorSignature";
 import type {
@@ -84,18 +85,9 @@ export type KindErrorType<
    * properties to set at instantiation (because these context parameters have now been
    * set and made static)
    */
-  partial: <T extends Partial<AsContextShape<TContext>>>(
+  partial: <const T extends Partial<AsContextShape<TContext>>>(
     context: T,
-  ) => KindErrorType<TName, ResolveContext<TContext, T>>;
-
-  /**
-   * **rebase**`(context) -> KindErrorType`
-   *
-   * An alias for `partial`.
-   */
-  rebase: <T extends Partial<AsContextShape<TContext>>>(
-    context: T,
-  ) => KindErrorType<TName, ResolveContext<TContext, T>>;
+  ) => KindErrorType<TName, MergeObjects<TContext, T>>;
 
   /**
    * **is**`(val): val is KindError<TName, string, TContext>`

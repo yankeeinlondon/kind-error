@@ -32,7 +32,6 @@ describe("kindError", () => {
         expect(FooBar.type).toBe("foo");
         expect(FooBar.subType).toBe("bar");
         expect(FooBar.errorName).toBe("FooBar");
-        expect(typeof FooBar.rebase).toBe("function");
         expect(typeof FooBar.is).toBe("function");
         expect(typeof FooBar.proxy).toBe("function");
 

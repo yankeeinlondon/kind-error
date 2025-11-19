@@ -46,7 +46,7 @@ export function createKindError<
   if (/[<>[\]()]/.test(name)) {
     return err("invalid-name", `The name for a KindError must not include any of the following characters: "<", ">", "[", "]", "(", ")"`) as Rtn<TName, TContext>;
   }
-  const partial = <C extends AsContextShape<TContext>>(ctx: C) => {
+  const partial = <const C extends AsContextShape<TContext>>(ctx: C) => {
     return createKindError(name, { ...context, ...ctx } as MergeObjects<TContext, C>);
   };
 
@@ -143,7 +143,6 @@ export function createKindError<
     },
 
     partial,
-    rebase: partial,
 
     is(val: unknown): val is KindError<TName, string, TContext> {
       return isKindError(val) && val.kind === name;

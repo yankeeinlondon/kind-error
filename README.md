@@ -30,7 +30,11 @@ Alternatives
 1. Create an Error _type_ with first call to `createKindError`:
 
    ```ts
-   const InvalidRequest = createKindError("invalid-request", { lib: "foobar", url: "string" });
+   const InvalidRequest = createKindError("invalid-request", { 
+        lib: "foobar", 
+        url: "string", 
+        method: "get|post|put|delete|undefined" 
+    });
    ```
 
    The error type `InvalidRequest` has now been created as a `KindErrorType`:
@@ -46,12 +50,13 @@ Alternatives
            - will make the **subType** `"get" | "post" | "put" | "delete"`
            - when you express the subtype as a union type, this will change the signature of calling this type:
              - The default calling signature is `ErrorType(message, props)` (where `props` is potentially optional if there are no required props in the )
-       - `stackTrace` - a structured stack trace
-       - **context**
+       - `stackTrace` - a structured stack trace for the error
+       - **Context**
          - any properties passed into the second parameter help define the _shape_ of the error
-         - In our example the `lib` and `url` properties have been set:
-           - because `lib` is a non-union string literal it is a fixed property and error created will always have a static property of `lib` that equals `foobar`.
-           - because `url` is both _required_ and a _wide_ type that means that calling the function will **require** that the `url` property be included!
+         - In our example:
+           - because `lib` is a non-union _string literal_ it is a fixed property (aka, non-variant) and will always be made available to all errors generated of this time but then creating the error the `lib` property will not be something you will be allowed to override.
+           - the `url` property is both _required_ and a _wide_ type that means that calling the function will **require** that the `url` property be included!
+           - the `method` property is a union and that union type includes `undefined` as a member so it will be treated as _optional_ parameter to the context.
 
 
 2. Creating an Error from an Error Type:
@@ -66,13 +71,20 @@ Alternatives
      throw InvalidRequest("oh no!", { url: "https://google.com" }); // valid
      ```
 
-    Now we've addressed the `url` constraint and the error will be produced without any issue.
+    Now we've addressed the `url` constraint we _optionally_ can also specify a "method".
+
+     ```ts
+     throw InvalidRequest("oh no!", { url: "https://google.com", method: "put" }); // valid
+     ```
+
+    The type system will require that you use one of the valid values for the `method` property should you choose to set it.
+
 
     ```ts
     throw InvalidRequest("oh no!", { url: "https://google.com", color: "red" }); // invalid
     ```
 
-    By default a `KindErrorType` is _strict_ about the properties it allows for. This means that if you want to add a `color` property you'd have to have included it in the schema for the type. You can, however, add optional parameters to a type so that `color` is not required but _can_ be included if so desired.
+    A `KindErrorType` is typically _strict_ about the properties it allows for. This means that if you want to add a `color` property you'd have to have included it in the schema for the error type.
 
 
 ## Partial Application

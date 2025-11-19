@@ -68,7 +68,7 @@ src/
 ├── createKindError.ts    # Main createKindError() function implementation
 ├── index.ts              # Public API exports
 ├── instance/             # Instance methods (toString, toJSON, inspect, asBrowserMessage)
-├── static/               # Static methods (proxy, rebase, is)
+├── static/               # Static methods (proxy, is)
 ├── type-guards/          # Type guards (isKindError, isError, isFetchError, etc.)
 ├── types/                # All TypeScript type definitions
 │   ├── KindError.ts      # KindError instance type
