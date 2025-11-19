@@ -1,21 +1,20 @@
-import { 
-    Contains,
-    Dictionary, 
-    MergeObjects, 
-    Narrowable, 
-    TypedFunction 
+import type {
+  Contains,
+  Dictionary,
+  MergeObjects,
+  Narrowable,
+  TypedFunction,
 } from "inferred-types";
-import type { 
-    FetchError,
-    KindErrorName, 
-    KindErrorSubTypeProp, 
-    KindErrorSymbol, 
-    KindErrorTypeName, 
-    KindErrorTypeProp, 
-    KindStackItem 
-} from ".";
 import type { inspect } from "node:util";
-
+import type {
+  FetchError,
+  KindErrorName,
+  KindErrorSubTypeProp,
+  KindErrorSymbol,
+  KindErrorTypeName,
+  KindErrorTypeProp,
+  KindStackItem,
+} from ".";
 
 /**
  * The _properties_ required for a `KindErrorType` type
@@ -89,9 +88,6 @@ export type KindErrorType__Props<
   toJSON: () => string;
 } & Record<string, Narrowable>;
 
-
-
-
 export type Stringifyable = string | boolean | number | null | Dictionary | Array<any> | Date;
 
 /**
@@ -107,9 +103,6 @@ type KindErrorType<
   TCtx extends Record<string, unknown> = Record<string, unknown>,
 > = KindErrorType__Fn<TKind, TCtx>
   & KindErrorType__Props<TKind, TCtx>;
-
-
-
 
 /**
  * **KindError**

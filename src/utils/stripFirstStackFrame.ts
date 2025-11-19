@@ -1,9 +1,8 @@
-
 /**
  * strips the first stack item from a JS string-based "stack"
  */
 export function stripFirstStackFrame<
-    T extends string | undefined
+  T extends string | undefined,
 >(
   stack?: string,
 ): T extends string ? string : undefined {

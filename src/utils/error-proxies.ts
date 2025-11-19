@@ -3,8 +3,7 @@ import type { FetchError, JsError, KindError, KindStackItem } from "../types";
 import { parse } from "error-stack-parser-es/lite";
 import { hasIndexOf, isObject, isString, isUndefined } from "inferred-types/runtime";
 import { relative } from "pathe";
-import { createKindError } from "~";
-import { isError } from "~";
+import { createKindError, isError } from "~";
 
 const IGNORABLES = ["@vitest/runner", "node:", "native"];
 

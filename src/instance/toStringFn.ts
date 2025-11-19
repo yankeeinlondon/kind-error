@@ -1,11 +1,10 @@
-import type { Dictionary, Narrowable } from "inferred-types/types";
+import type { Dictionary } from "inferred-types/types";
 import type { KindError, Stringifyable } from "~/types";
 import chalk from "chalk";
 import { Never } from "inferred-types/constants";
 import { resolve } from "pathe";
 import { fileLink, link } from "~/link";
 import { isStringifyable } from "~/type-guards";
-
 
 // TODO: refactor call signature
 

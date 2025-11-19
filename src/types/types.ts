@@ -3,11 +3,9 @@ import type {
   KebabCase,
   Split,
 } from "inferred-types/types";
-import { PascalName } from "~/types";
+import type { PascalName } from "~/types";
 
 export const KindErrorSymbol = "__kind";
-
-
 
 /**
  * a type utility which produces the _type_ for the `name` property
@@ -24,8 +22,6 @@ export type KindErrorName<
 > = PascalName<Split<T, "/">> extends readonly string[]
   ? Concat<PascalName<Split<T, "/">>>
   : never;
-
-
 
 /**
  * a type utility which produces the _type_ for the `type` property

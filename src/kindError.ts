@@ -58,7 +58,7 @@ import {
  * BadJuju("oh my god!");
  * BadJuju("oh my god!", { flavor: "strawberry"})
  * ```
- */ 
+ */
 function createKindError<
   TKind extends string,
   TBase extends Record<string, BC>,

@@ -26,6 +26,11 @@ export default antfu({
       "regexp/no-super-linear-backtracking": ["warn"],
     },
   },
+  unicorn: {
+    overrides: {
+        "unicorn/error-message": "warn"
+    }
+  },
   typescript: {
     overrides: {
       "ts/explicit-function-return-type": ["off"],

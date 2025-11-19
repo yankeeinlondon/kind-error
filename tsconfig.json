@@ -20,6 +20,6 @@
         "~/*": ["./src/*"]
     }
   },
-  "include": ["src", "tests", "examples"],
+  "include": ["src", "tests", "examples", "scripts"],
   "exclude": ["bin", "node_modules"]
 }

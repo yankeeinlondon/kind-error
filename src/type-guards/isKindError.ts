@@ -1,11 +1,11 @@
+import type { KebabCase } from "inferred-types";
 import type { KindError } from "~/types";
-import {isString, KebabCase, toKebabCase } from "inferred-types";
+import { isString, toKebabCase } from "inferred-types";
 import { isError } from "./isError";
-
 
 /**
  * Type guard to detect whether `val` passed in is a `KindError`.
- * 
+ *
  * - you may _optionally_ test for a specific `kind` of `KindError`
  * - when testing for a specific "kind" the _comparator_ and _kind_ are normalized
  *   to a kebab cased variant to increase matching likelihood
@@ -24,7 +24,7 @@ export function isKindError<
     && "type" in val
     && "stackTrace" in val
     && (
-        (isString(kind) && isString(val.kind) && toKebabCase(val.kind) === toKebabCase(kind)) ||
-        (!isString(kind))
-    )
+      (isString(kind) && isString(val.kind) && toKebabCase(val.kind) === toKebabCase(kind))
+      || (!isString(kind))
+    );
 }
