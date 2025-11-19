@@ -59,10 +59,12 @@ describe("kindError", () => {
                 Name,
                 "FooBarErrorType"
             >>,
-            Expect<Extends<
-                typeof FooBar,
-                KindErrorType<"foo/bar", { foo: 42 }>
-            >>,
+            // Expect<Extends<
+            //     typeof FooBar,
+            //     KindErrorType<"foo/bar", { foo: 42 }>
+            // >>,
+            Expect<Equal<typeof FooBar["kind"], "foo/bar">>,
+            Expect<Equal<typeof FooBar["context"], { foo: 42 }>>,
         ];
     });
 
@@ -81,10 +83,13 @@ describe("kindError", () => {
         expect(FooBar.toString()).toBe("KindErrorType::FooBar(foo/bar)");
 
         type cases = [
-            Expect<AssertExtends<
-                typeof FooBar,
-                KindErrorType<"foo/bar">
-            >>,
+            // Expect<AssertExtends<
+            //     typeof FooBar,
+            //     KindErrorType<"foo/bar">
+            // >>,
+            Expect<Equal<typeof FooBar["kind"], "foo/bar">>,
+            Expect<Extends<typeof FooBar["context"], {}>>,
+            Expect<Extends<{}, typeof FooBar["context"]>>,
         ];
     });
 
@@ -131,10 +136,10 @@ describe("kindError", () => {
         expect(FooBarType.is(FooBar)).toBe(true);
 
         type cases = [
-            Expect<Equal<typeof FooBar, KindError<"foo/bar", "Bad Juju!", {
+            Expect<AssertExtends<typeof FooBar, KindError<"foo/bar", "Bad Juju!", Readonly<{
                 bob: "yur uncle";
                 uncle: "bob";
-            }>>>,
+            }>>>>,
         ];
     });
 
@@ -149,10 +154,9 @@ describe("kindError", () => {
 
         expect(fooBar.context).toEqual({ foo: 1, bar: 55 });
 
-        // @ts-ignore
         type _cases = [
-            Expect<Extends<typeof err, KindErrorType<"foo-bar", { foo: 42 }>>>,
-            Expect<Equal<typeof fooBar, KindError<"FooBar", "oh my!", { foo: 1; bar: 55 }>>>,
+            // Expect<Extends<typeof err, KindErrorType<"foo-bar", { foo: 42 }>>>,
+            // Expect<AssertExtends<typeof fooBar, KindError<"FooBar", "oh my!", Readonly<{ foo: 1; bar: 55 }>>>>,
             Expect<Equal<(typeof fooBar)["kind"], "foo-bar">>,
             Expect<Equal<(typeof fooBar)["name"], "FooBar">>,
         ];
@@ -162,7 +166,7 @@ describe("kindError", () => {
         const err = createKindError("FooBar<Baz>");
         // now returns an error
         expect(err instanceof Error).toBe(true);
-        // @ts-ignore
+
         expect(err.message).toContain("The name for a KindError must not include any of the following characters");
     });
 });

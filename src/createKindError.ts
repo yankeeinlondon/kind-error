@@ -2,11 +2,8 @@ import type { Contains, EmptyObject, Err, MergeObjects } from "inferred-types";
 import type { AsContextShape, KindError, KindErrorType, ParseContext } from "~/types";
 import { inspect } from "node:util";
 import {
-
   createFnWithProps,
-
   err,
-
   toPascalCase,
 } from "inferred-types";
 import { asKindSubType, asKindType, getStackTrace, renameFunction } from "~/utils";

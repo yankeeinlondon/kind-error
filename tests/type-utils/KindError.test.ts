@@ -40,7 +40,7 @@ describe("KindError<TName,TMsg,TContext>", () => {
             Expect<AssertEqual<T["type"], "foobar">>,
             Expect<AssertEqual<T["subType"], undefined>>,
             Expect<AssertEqual<T["message"], "bad juju">>,
-            Expect<AssertEqual<T["lib"], "KindError">>,
+            Expect<AssertEqual<T["context"]["lib"], "KindError">>,
         ];
     });
 

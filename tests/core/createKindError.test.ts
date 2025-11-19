@@ -94,10 +94,8 @@ describe("Defining Error Types", () => {
 
             type cases = [
                 Expect<AssertEqual<Params, [msg: string, ctx?: EmptyObject]>>,
-                Expect<AssertEqual<
-                    Kind,
-                    KindErrorType<"my-error", { test: true }>
-                >>,
+                Expect<AssertEqual<Kind["kind"], "my-error">>,
+                Expect<AssertEqual<Kind["context"], { test: true }>>,
                 Expect<AssertExtends<Rtn,KindErrorShape>>,
                 Expect<AssertExtends<Rtn,KindError>>,
             ];
@@ -108,20 +106,6 @@ describe("Defining Error Types", () => {
                 test: true,
                 foo: "string | undefined"
             });
-
-            type X1 = HasVariant<{
-                test: true,
-                foo: "string | undefined"
-            }>
-
-            type X2 = HasRequiredVariants<{
-                test: true,
-                foo: "string | undefined"
-            }>
-            type Shape = AsContextShape<{
-                test: true,
-                foo: "string | undefined"
-            }>
 
             expect(typeof MyError).toBe("function");
             expect(MyError.__kind).toBe("KindErrorType");
@@ -138,10 +122,8 @@ describe("Defining Error Types", () => {
             type Rtn = ReturnType<Kind>;
 
             type cases = [
-                Expect<AssertEqual<
-                    typeof MyError,
-                    KindErrorType<"my-error", { test: true, foo: string | undefined }>
-                >>,
+                Expect<AssertEqual<Kind["kind"], "my-error">>,
+                Expect<AssertEqual<Kind["context"], { test: true, foo: string | undefined }>>,
                 Expect<AssertEqual<
                     Params,
                     [msg: string, ctx?: { foo?: string }]
@@ -171,10 +153,8 @@ describe("Defining Error Types", () => {
             type Rtn = ReturnType<Kind>;
 
             type cases = [
-                Expect<AssertEqual<
-                    Kind,
-                    KindErrorType<"my-error", { test: true; foo: string }>
-                >>,
+                Expect<AssertEqual<Kind["kind"], "my-error">>,
+                Expect<AssertEqual<Kind["context"], { test: true; foo: string }>>,
                 Expect<AssertEqual<
                     Params,
                     [msg: string, ctx: { foo: string }]

@@ -16,6 +16,7 @@ export type KindErrorShape = {
   message: string;
   stack?: string;
   stackTrace: KindStackItem[];
+  context: Record<string, unknown>;
 } & Error;
 
 /**
@@ -29,7 +30,7 @@ export type KindError<
   TMsg extends string = string,
   TCtx extends Record<string, unknown> = EmptyObject,
 > = (
-    ExpandRecursively<{
+    {
       __kind: "KindError";
       name: PascalCase<AsKindType<TName>>;
       kind: TName;
@@ -38,9 +39,9 @@ export type KindError<
       message: TMsg;
       stack?: string;
       stackTrace: KindStackItem[];
+      context: TCtx;
 
       toString: () => string;
-    } & TCtx
-    > & Error) extends infer KErr extends KindErrorShape
+    } & Error) extends infer KErr extends KindErrorShape
   ? KErr
   : never;
