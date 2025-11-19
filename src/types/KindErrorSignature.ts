@@ -45,29 +45,29 @@ export type KindErrorSignature<
 > = IsEqual<TSchema, Record<string, unknown>> extends true
   ? <
       TMsg extends string,
-      TCtx extends Record<string, unknown>,
+      const TCtx extends Record<string, unknown>,
     >(msg: TMsg,
       ctx?: TCtx) => KindError<
       TName,
       TMsg,
       ResolveContext<Record<string, unknown>, TCtx>
     >
-  : HasRequiredVariants<TSchema> extends true
-    ? <
-        TMsg extends string,
-        TCtx extends AsContextShape<TSchema>,
-      >(msg: TMsg,
-        ctx: TCtx) => KindError<
-        TName,
-        TMsg,
-        ResolveContext<TSchema, TCtx>
-      >
-    : <
-        TMsg extends string,
-        TCtx extends AsContextShape<TSchema>,
-      >(msg: TMsg,
-        ctx?: TCtx) => KindError<
-        TName,
-        TMsg,
-        ResolveContext<TSchema, TCtx>
-      >;
+      : HasRequiredVariants<TSchema> extends true
+      ? <
+          TMsg extends string,
+          const TCtx extends AsContextShape<TSchema>,
+        >(msg: TMsg,
+          ctx: TCtx) => KindError<
+          TName,
+          TMsg,
+          ResolveContext<TSchema, TCtx>
+        >
+      : <
+          TMsg extends string,
+          const TCtx extends AsContextShape<TSchema>,
+        >(msg: TMsg,
+          ctx?: TCtx) => KindError<
+          TName,
+          TMsg,
+          ResolveContext<TSchema, TCtx>
+        >;

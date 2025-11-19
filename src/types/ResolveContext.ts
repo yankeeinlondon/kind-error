@@ -5,9 +5,14 @@ import type {
   Fallback,
   IsEqual,
   IsUndefined,
+  Narrowable,
 } from "inferred-types";
 
 import type { AsContextShape, NonVariants } from "~/types";
+
+type Mutable<T> = {
+  -readonly [P in keyof T]: T[P];
+};
 
 /**
  * **ResolveContext**`<TSchema, TCtx>`
@@ -18,7 +23,8 @@ import type { AsContextShape, NonVariants } from "~/types";
  */
 export type ResolveContext<
   TSchema extends Record<string, unknown>,
-  TCtx extends Record<string, unknown> | undefined,
+  TCtx extends Record<string, N> | undefined,
+  N extends Narrowable
 > = As<
   IsUndefined<TCtx> extends true
     ? IsEqual<TSchema, Record<string, unknown>> extends true
@@ -28,7 +34,7 @@ export type ResolveContext<
         : TSchema
     // TCtx is defined
     : IsEqual<TSchema, Record<string, unknown>> extends true
-      ? Fallback<TCtx, EmptyObject>
+      ? Mutable<Fallback<TCtx, EmptyObject>>
       : IsEqual<TSchema, EmptyObject> extends true
         ? EmptyObject
         : IsEqual<AsContextShape<TSchema>, EmptyObject> extends true
@@ -39,15 +45,15 @@ export type ResolveContext<
               : TCtx extends Record<string, unknown>
                 ? ExpandDictionary<
                   NonVariants<TSchema>
-                  & TCtx & Record<"__warning", `context was supposed to be empty as defined by the schema but context was added anyway!`>
+                  & Mutable<TCtx> & Record<"__warning", `context was supposed to be empty as defined by the schema but context was added anyway!`>
                 >
                 : never
           : Fallback<TCtx, EmptyObject> extends AsContextShape<TSchema>
             ? ExpandDictionary<
-            NonVariants<TSchema> & Fallback<TCtx, EmptyObject>
+            NonVariants<TSchema> & Mutable<Fallback<TCtx, EmptyObject>>
             >
             : ExpandDictionary<
-              NonVariants<TSchema> & Fallback<TCtx, EmptyObject>
+              NonVariants<TSchema> & Mutable<Fallback<TCtx, EmptyObject>>
               & {
                 __warning: `The context provided for this error had properties which were inconsistent with the schema defined by the KindErrorType!`;
                 __schema: TSchema;

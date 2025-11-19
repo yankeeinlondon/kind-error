@@ -2,7 +2,6 @@ import type { Equal, Expect } from "@type-challenges/utils";
 import type {
     EmptyObject,
     Extends,
-    Narrowable,
 } from "inferred-types/types";
 import type {
     KindError,
@@ -132,7 +131,7 @@ describe("kindError", () => {
         expect(FooBarType.is(FooBar)).toBe(true);
 
         type cases = [
-            Expect<Equal<typeof FooBar, KindError<"foo/bar", {
+            Expect<Equal<typeof FooBar, KindError<"foo/bar", "Bad Juju!", {
                 bob: "yur uncle";
                 uncle: "bob";
             }>>>,
@@ -153,7 +152,7 @@ describe("kindError", () => {
         // @ts-ignore
         type _cases = [
             Expect<Extends<typeof err, KindErrorType<"foo-bar", { foo: 42 }>>>,
-            Expect<Equal<typeof fooBar, KindError<"FooBar", { foo: 1; bar: 55 }>>>,
+            Expect<Equal<typeof fooBar, KindError<"FooBar", "oh my!", { foo: 1; bar: 55 }>>>,
             Expect<Equal<(typeof fooBar)["kind"], "foo-bar">>,
             Expect<Equal<(typeof fooBar)["name"], "FooBar">>,
         ];
