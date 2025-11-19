@@ -35,7 +35,7 @@ export function errorFromError<
   kind: TKind,
   ctx: TCtx,
   err: TErr,
-): KindError<TKind, TCtx> {
+): KindError<TKind, string, TCtx> {
   const context = {
     ...ctx,
     underlying: err,

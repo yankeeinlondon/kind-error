@@ -1,6 +1,4 @@
 import { 
-    Dictionary, 
-    indexOf, 
     isDictionary, 
     isString,  
     Mutable, 

@@ -13,13 +13,12 @@ import { isStringifyable } from "~/type-guards";
  * creates the `toString()` function for a `KindError`
  */
 export function toStringFn<
-  T extends KindError<K, M, C>,
-  K extends string,
-  M extends string,
-  C extends Record<string, N>,
-  N extends Narrowable,
+  TErr extends KindError<TName, TMsg, TCtx>,
+  TName extends string,
+  TMsg extends string,
+  const TCtx extends Record<string, unknown>,
 >(
-  err: T,
+  err: TErr,
 ): () => string {
   const { name, message, stackTrace } = err;
 
