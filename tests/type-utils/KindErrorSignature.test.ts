@@ -8,7 +8,25 @@ import {  KindError, KindErrorSignature } from "~/types";
 
 describe("KindErrorSignature<TName,TContext>", () => {
 
-    it("no required or optional context", () => {
+    
+    it("no schema", () => {
+        // when no schema is defined then a looser approach is taken 
+        // with the context object 
+        type T1 = KindErrorSignature<"Testing", Record<string, unknown>>;
+
+        type Params = Parameters<T1>;
+        type Rtn = ReturnType<T1>;
+    
+        type cases = [
+            Expect<AssertEqual<
+                Params,
+                [ msg: string, ctx?: Record<string, unknown> ]
+            >>
+        ];
+    });
+    
+
+    it("no variant key/values", () => {
         type T1 = KindErrorSignature<"Testing", {test: true}>;
 
         type P = Parameters<T1>;

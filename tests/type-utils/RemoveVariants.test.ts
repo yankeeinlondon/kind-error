@@ -9,7 +9,7 @@ import { AssertEqual, EmptyObject } from "inferred-types";
 
 describe("RemoveVariants<T>", () => {
     it("no schema", () => {
-        type T = RemoveVariants<Dictionary<string>>;
+        type T = RemoveVariants<Record<string, unknown>>;
 
         type cases = [
             Expect<AssertEqual<T,EmptyObject>>,

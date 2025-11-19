@@ -4,12 +4,12 @@ import {
     AssertEqual, 
     EmptyObject,
 } from "inferred-types/types";
-import { StripNonVariantValues } from "~/types";
+import { Variants } from "~/types";
 
 describe("StripNonVariantValues<T>", () => {
 
     it("empty object", () => {
-        type T = StripNonVariantValues<EmptyObject>;
+        type T = Variants<EmptyObject>;
 
         type cases = [
             Expect<AssertEqual<T, EmptyObject>>,
@@ -17,7 +17,7 @@ describe("StripNonVariantValues<T>", () => {
     });
 
     it("single non-variant", () => {
-        type T = StripNonVariantValues<{ foo: "foo" }>;
+        type T = Variants<{ foo: "foo" }>;
 
         type cases = [
             Expect<AssertEqual<T, EmptyObject>>,
@@ -25,7 +25,7 @@ describe("StripNonVariantValues<T>", () => {
     });
 
     it("multiple non-variants", () => {
-        type T = StripNonVariantValues<{ foo: "foo", bar: "bar", baz: 42 }>;
+        type T = Variants<{ foo: "foo", bar: "bar", baz: 42 }>;
 
         type cases = [
             Expect<AssertEqual<T, EmptyObject>>,
@@ -33,7 +33,7 @@ describe("StripNonVariantValues<T>", () => {
     });
 
     it("wide type is considered variant", () => {
-        type T = StripNonVariantValues<{ foo: string; bar: "bar" }>;
+        type T = Variants<{ foo: string; bar: "bar" }>;
 
         type cases = [
             Expect<AssertEqual<T, {foo: string}>>,
@@ -41,7 +41,7 @@ describe("StripNonVariantValues<T>", () => {
     });    
 
     it("union type is considered variant", () => {
-        type T = StripNonVariantValues<{ foo: 1|2|3; bar: "bar" }>;
+        type T = Variants<{ foo: 1|2|3; bar: "bar" }>;
 
         type cases = [
             Expect<AssertEqual<T, {foo: 1|2|3}>>,
@@ -49,7 +49,7 @@ describe("StripNonVariantValues<T>", () => {
     });
 
     it("null is considered non-variant", () => {
-        type T = StripNonVariantValues<{ foo: null; bar: "bar" }>;
+        type T = Variants<{ foo: null; bar: "bar" }>;
 
         type cases = [
             Expect<AssertEqual<T, EmptyObject>>,
@@ -57,7 +57,7 @@ describe("StripNonVariantValues<T>", () => {
     });
 
     it("undefined literal is considered non-variant", () => {
-        type T = StripNonVariantValues<{ foo: undefined; bar: "bar" }>;
+        type T = Variants<{ foo: undefined; bar: "bar" }>;
 
         type cases = [
             Expect<AssertEqual<T, EmptyObject>>,
@@ -65,7 +65,7 @@ describe("StripNonVariantValues<T>", () => {
     });
 
     it("undefined in union with literal is considered variant", () => {
-        type T = StripNonVariantValues<{ foo: undefined | "foo"; bar: "bar" }>;
+        type T = Variants<{ foo: undefined | "foo"; bar: "bar" }>;
 
         type cases = [
             Expect<AssertEqual<T, {foo: "foo" | undefined}>>,
@@ -74,7 +74,7 @@ describe("StripNonVariantValues<T>", () => {
 
     describe("using tokens", () => {
         it("wide token is non-variant", () => {
-            type T = StripNonVariantValues<{ foo: "string"; bar: "bar" }>;
+            type T = Variants<{ foo: "string"; bar: "bar" }>;
 
             type cases = [
                 Expect<AssertEqual<T, {foo: string}>>,
@@ -82,7 +82,7 @@ describe("StripNonVariantValues<T>", () => {
         });
 
         it("union token is non-variant", () => {
-            type T = StripNonVariantValues<{ foo: `"foo" | undefined`; bar: "bar" }>;
+            type T = Variants<{ foo: `"foo" | undefined`; bar: "bar" }>;
 
             type cases = [
                 Expect<AssertEqual<T, {foo: "foo" | undefined}>>,

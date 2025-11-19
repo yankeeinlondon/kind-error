@@ -104,7 +104,7 @@ export type Stringifyable = string | boolean | number | null | Dictionary | Arra
  */
 type KindErrorType<
   TKind extends string = string,
-  TCtx extends Dictionary<string> = Dictionary<string>,
+  TCtx extends Record<string, unknown> = Record<string, unknown>,
 > = KindErrorType__Fn<TKind, TCtx>
   & KindErrorType__Props<TKind, TCtx>;
 

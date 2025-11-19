@@ -17,10 +17,10 @@ describe("DetectOptionalValues", () => {
     });
 
     it("wide dictionary", () => {
-        type T = DetectOptionalValues<Dictionary<string>>; 
+        type T = DetectOptionalValues<Record<string, unknown>>; 
 
         type cases = [
-            Expect<AssertEqual<T, Dictionary<string>>>
+            Expect<AssertEqual<T, Record<string, unknown>>>
         ];
     });
 

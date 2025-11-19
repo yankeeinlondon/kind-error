@@ -10,7 +10,7 @@ import { AssertEqual, EmptyObject } from "inferred-types";
 describe("ResolveContext<TSchema,TCtx>", () => {
 
     it("undefined schema, no context", () => {
-        type T = ResolveContext<Dictionary<string>, undefined>
+        type T = ResolveContext<Record<string, unknown>, undefined>
 
         type cases = [
             Expect<AssertEqual<T, EmptyObject>>
@@ -19,7 +19,7 @@ describe("ResolveContext<TSchema,TCtx>", () => {
 
     
     it("undefined schema, with context", () => {
-        type T = ResolveContext<Dictionary<string>, { foo: "foo"; bar: "bar" }>
+        type T = ResolveContext<Record<string, unknown>, { foo: "foo"; bar: "bar" }>
     
         type cases = [
             Expect<AssertEqual<T, { foo: "foo"; bar: "bar" }>>
@@ -34,6 +34,16 @@ describe("ResolveContext<TSchema,TCtx>", () => {
             Expect<AssertEqual<T, EmptyObject>>
         ];
     });
+
+    
+    it("test", () => {
+        type T = ResolveContext<{ test: true }, {}>
+    
+        type cases = [
+            /** type tests */
+        ];
+    });
+    
 
     
     it("schema with literal, context undefined", () => {

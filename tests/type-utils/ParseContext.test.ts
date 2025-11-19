@@ -18,10 +18,10 @@ describe("ParseContext<T>", () => {
     });
 
     it("wide dictionary", () => {
-        type T = ParseContext<Dictionary<string>>; 
+        type T = ParseContext<Record<string, unknown>>; 
 
         type cases = [
-            Expect<AssertEqual<T, Dictionary<string>>>
+            Expect<AssertEqual<T, Record<string, unknown>>>
         ];
     });
 

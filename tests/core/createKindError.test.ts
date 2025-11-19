@@ -4,7 +4,7 @@ import {
     Expect,
     AssertError
 } from "inferred-types/types";
-import { createKindError, KindError, KindErrorShape, KindErrorType } from "~";
+import { createKindError, HasNonVariant, KindError, KindErrorShape, KindErrorType } from "~";
 import { AssertExtends } from "inferred-types";
 
 describe("Defining Error Types", () => {
@@ -29,6 +29,9 @@ describe("Defining Error Types", () => {
 
 
         it("no context schema", () => {
+            // because no context schema defined, this makes it 
+            // flexible; allowing any KV value but with nothing
+            // required
             const MyError = createKindError("my-error");
 
             expect(typeof MyError).toBe("function");
@@ -41,7 +44,8 @@ describe("Defining Error Types", () => {
             expect(typeof MyError.proxy).toBe("function");
             expect(MyError.context).toEqual({});
 
-            type Params = Parameters<typeof MyError>
+            type Params = Parameters<typeof MyError>;
+            type Rtn = ReturnType<typeof MyError>;
 
             type cases = [
                 Expect<AssertEqual<
@@ -52,9 +56,10 @@ describe("Defining Error Types", () => {
         });
 
 
-
         it("literal context, nothing required, nothing optional", () => {
-
+            // a schema with ONLY a NonVariant KV defined means
+            // that this property will persist but that no other KV's
+            // are expected to be added when instantiated.
             const MyError = createKindError("my-error", { test: true });
 
             expect(typeof MyError).toBe("function");
@@ -118,7 +123,7 @@ describe("Defining Error Types", () => {
                 >>,
                 Expect<AssertEqual<
                     Params,
-                    [msg: string, ctx?: { foo?: string | undefined }]
+                    [msg: string, ctx?: { foo?: string }]
                 >>,
                 Expect<AssertExtends<Rtn, KindErrorShape>>,
                 Expect<AssertExtends<Rtn, KindError>>,

@@ -1,57 +1,20 @@
 import { 
-    As,
     Dictionary, 
-    EmptyObject,  
     ExpandRecursively, 
-    IsEqual, 
-    MergeObjects 
 } from "inferred-types";
 import { 
     KindError,
-    AsContext, 
+    AsContextShape, 
     AsKindSubType, 
     AsKindType, 
     HasRequiredVariants,
     FetchError, 
-    KindErrorName
+    KindErrorName,
+    ResolveContext
 } from "~/types";
+import { KindErrorSignature } from "./KindErrorSignature";
 
-/**
- * Determines the appropriate function signature for the KindErrorType's
- * function call. Variance is determined by the number of required and
- * optional parameter defined in the context/schema of the error type.
- */
-export type KindErrorSignature<
-    TName extends string,
-    TContext extends Dictionary<string>
-> = IsEqual<AsContext<TContext>, EmptyObject> extends true
-    ? <TMsg extends string>(msg: TMsg) => KindError<TName, TMsg, TContext>
-: IsEqual<TContext, Dictionary<string>> extends true
-    ? <TMsg extends string, TCtx extends Record<string,unknown>>(msg: TMsg, ctx?: TCtx) => KindError<
-        TName, 
-        TMsg, 
-        TContext
-    >
-: HasRequiredVariants<TContext> extends true
-    ? <
-        TMsg extends string, 
-        TCtx extends AsContext<TContext>
-    >(msg: TMsg, ctx: TCtx) =>
-        KindError<
-            TName, 
-            TMsg, 
-            MergeObjects<TContext, TCtx>
-        >
-: <
-    TMsg extends string, 
-    TCtx extends AsContext<TContext>
->(msg: TMsg, ctx?: TCtx) => KindError<
-    TName, 
-    TMsg, 
-    undefined extends TCtx 
-        ? TContext 
-        : MergeObjects<TContext, As<TCtx, Dictionary<string>>>
->;
+
 
 /**
  * **KindErrorType**`<TName,TContext>`
@@ -64,7 +27,7 @@ export type KindErrorSignature<
  */
 export type KindErrorType<
     TName extends string,
-    TContext extends Dictionary<string> = Dictionary<string>
+    TContext extends Record<string, unknown> = Record<string, unknown>
 > = {
     /** unique identifier of a `KindErrorType` */
     __kind: "KindErrorType";
@@ -117,14 +80,18 @@ export type KindErrorType<
      * properties to set at instantiation (because these context parameters have now been
      * set and made static)
      */
-    partial: <T extends Partial<AsContext<TContext>>>(context: T) => KindErrorType<TName,TContext>
+    partial: <T extends Partial<AsContextShape<TContext>>>(
+        context: T
+    ) => KindErrorType<TName,ResolveContext<TContext,undefined>>
 
     /**
      * **is**`(val): val is KindError<TName, string, TContext>`
      * 
      * A type guard which validates the error type's 
      */
-    is(val: unknown): val is KindError<TName, string, TContext>;
+    is(
+        val: unknown
+    ): val is KindError<TName, string, ResolveContext<TContext,undefined>>;
 
     toString(): string;
 

@@ -12,7 +12,7 @@ type Rtn<T> = T extends string
     ? Error & { message: T } 
     : T extends Error 
         ? T
-    : T extends Dictionary<string> 
+    : T extends Record<string, unknown> 
         ? Error & Mutable<T>
     : never;
 
@@ -23,7 +23,7 @@ type Rtn<T> = T extends string
  * 
  * - if an `Error` is passed in that will be proxied through unchanged
  */
-export function asError<const T extends string | Dictionary<string> | Error>(errLike: T): Rtn<T> {
+export function asError<const T extends string | Record<string, unknown> | Error>(errLike: T): Rtn<T> {
     if(isString(errLike)) {
         let err = new Error();
         err.message = errLike;

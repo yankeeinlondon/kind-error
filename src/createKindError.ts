@@ -9,7 +9,7 @@ import {
     MergeObjects,
     toPascalCase
 } from 'inferred-types';
-import {  AsContext, KindError, KindErrorType, ParseContext } from '~/types';
+import {  AsContextShape, KindError, KindErrorType, ParseContext } from '~/types';
 import { asKindSubType, asKindType, getStackTrace } from '~/utils';
 import { toStringFn } from './instance';
 import { isKindError } from './type-guards';
@@ -17,7 +17,7 @@ import { proxyFn } from './static';
 
 type Rtn<
     TName extends string, 
-    TContext extends Dictionary<string>
+    TContext extends Record<string, unknown>
 > = Contains<TName, "<" | ">" | "[" | "]" | "(" | ")"> extends true
     ? Err<
         "invalid-name",
@@ -34,7 +34,7 @@ type Rtn<
  */
 export function createKindError<
     const TName extends string,
-    const TContext extends Dictionary<string>
+    const TContext extends Record<string, unknown>
 >(
     name: TName,
     context: TContext = {} as EmptyObject as TContext
@@ -58,7 +58,7 @@ export function createKindError<
             ) as KindError<TName, string, TContext>
         },
 
-        partial<C extends AsContext<TContext>>(ctx: C) {
+        partial<C extends AsContextShape<TContext>>(ctx: C) {
             return createKindError(name, {...context, ...ctx} as MergeObjects<TContext,C>);
         },
 
@@ -74,7 +74,7 @@ export function createKindError<
 
     const fn = <
         TMsg extends string,
-        TCtx extends Dictionary<string>
+        TCtx extends Record<string, unknown>
     >(
         msg: TMsg,
         ctx?: TCtx
