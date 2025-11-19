@@ -63,19 +63,11 @@ export type KindErrorSignature<
         TMsg,
         ResolveContext<TSchema, TCtx>
     >
-: HasVariant<TSchema> extends true
-    // Optional Variants exist
-    ? <
+: <
         TMsg extends string,
         TCtx extends AsContextShape<TSchema>
     >(msg: TMsg, ctx?: TCtx) => KindError<
         TName,
         TMsg,
         ResolveContext<TSchema, TCtx>
-    >
-// No Variants
-: <TMsg extends string>(msg: TMsg) => KindError<
-    TName,
-    TMsg,
-    ResolveContext<TSchema, undefined>
->;
+    >;

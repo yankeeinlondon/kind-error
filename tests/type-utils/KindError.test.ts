@@ -3,7 +3,8 @@ import {
     Expect,
     AssertEqual
 } from "inferred-types/types";
-import { KindError } from "~";
+import { KindError, KindErrorShape } from "~";
+import { AssertExtends, AssertTrue } from "inferred-types";
 
 
 describe("KindError<TName,TMsg,TContext>", () => {
@@ -66,6 +67,19 @@ describe("KindError<TName,TMsg,TContext>", () => {
             Expect<AssertEqual<T["message"], string>>,
         ];
     });
+
+    
+    it("KindError extends KindErrorShape", () => {
+        
+        type cases = [
+            Expect<AssertExtends<KindError, KindErrorShape>>,
+            Expect<AssertExtends<
+                KindError<"Testing",string,{lib: "kind-error"}>, 
+                KindErrorShape
+            >>,
+        ];
+    });
+    
     
 
 });

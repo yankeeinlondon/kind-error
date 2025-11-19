@@ -1,6 +1,7 @@
 import {
     As,
     Dictionary,
+    EmptyObject,
     ExpandRecursively,
     PascalCase,
 } from 'inferred-types';
@@ -29,7 +30,7 @@ export type KindErrorShape = {
 export type KindError<
     TName extends string = string,
     TMsg extends string = string,
-    TCtx extends Record<string, unknown> = Record<string, unknown>
+    TCtx extends Record<string, unknown> = EmptyObject
 > = (
     ExpandRecursively<{
         __kind: "KindError";

@@ -14,49 +14,6 @@ import {
 import { DetectOptionalValues } from "./type-utils";
 
 /**
- * tests whether the schema `T` has any literal values which are not variants,
- * in it's key/value definition.
- */
-export type HasNonVariant<
-    T extends Record<string, unknown>,
-    K extends readonly (string & keyof T)[] = StringKeys<T>
-> = IsEqual<T, Record<string, unknown>> extends true
-? true
-: IsEqual<T, EmptyObject> extends true
-? false
-: K extends [
-    infer Head extends string & keyof T,
-    ...infer Rest extends readonly (string & keyof T)[]
-]
-    ? IsNonVariant<T[Head]> extends true
-        ? true
-        : HasNonVariant<T,Rest>
-: false;
-
-
-/**
- * **HasVariant**`<T>`
- * 
- * Tests whether a `KindErrorType`'s has a optional or required "variant"
- * key/value as part of it's schema.
- */
-export type HasVariant<
-    T extends Record<string, unknown>,
-    K extends readonly (string & keyof T)[] = StringKeys<T>
-> = IsEqual<T, Record<string, unknown>> extends true
-? true
-: IsEqual<T, EmptyObject> extends true
-? false
-: K extends [
-    infer Head extends string & keyof T,
-    ...infer Rest extends readonly (string & keyof T)[]
-]
-    ? IsNonVariant<T[Head]> extends true
-        ? HasNonVariant<T,Rest>
-        : true
-: false;
-
-/**
  * **IsNonVariant**`<T>`
  * 
  * Tests whether the type `T` is non-variant (aka, it can only have ONE value/type).
@@ -95,28 +52,24 @@ IsUnion<T> extends true
 export type IsVariant<T> = Not<IsNonVariant<T>>;
 
 /**
- * **NonVariants**`<T>`
- * 
- * When provided a `KindErrorType`'s context schema, it will return only the
- * key/values where the value is a _non-variant_ (aka, the type only allows a
- * single type/value).
+ * tests whether the schema `T` has any literal values which are not variants,
+ * in it's key/value definition.
  */
-export type NonVariants<
+export type HasNonVariant<
     T extends Record<string, unknown>,
-    K extends readonly (keyof T & string)[] = StringKeys<T>,
-    R extends Record<string, unknown> = EmptyObject
+    K extends readonly (string & keyof T)[] = StringKeys<T>
 > = IsEqual<T, Record<string, unknown>> extends true
-? EmptyObject
+? true
 : IsEqual<T, EmptyObject> extends true
-? EmptyObject
+? false
 : K extends [
-    infer Head extends keyof T & string,
-    ...infer Rest extends readonly (keyof T & string)[]
+    infer Head extends string & keyof T,
+    ...infer Rest extends readonly (string & keyof T)[]
 ]
     ? IsNonVariant<T[Head]> extends true
-        ? NonVariants<T,Rest,R & Record<Head, T[Head]>>
-        : NonVariants<T,Rest,R>
-: ExpandRecursively<R>;
+        ? true
+        : HasNonVariant<T,Rest>
+: false;
 
 
 /**
@@ -150,6 +103,44 @@ export type Variants<
     : IsNonVariant<T[Head]> extends true
         ? Variants<T,Rest,R>
         : Variants<T,Rest,R & Record<Head, T[Head]>>
+: ExpandRecursively<R>;
+
+/**
+ * **HasVariant**`<T>`
+ * 
+ * Tests whether a `KindErrorType`'s has a optional or required "variant"
+ * key/value as part of it's schema.
+ */
+export type HasVariant<
+    T extends Record<string, unknown>,
+    K extends readonly (string & keyof T)[] = StringKeys<T>
+> = IsEqual<Variants<T>, EmptyObject> extends true
+    ? false
+    : true;
+
+
+/**
+ * **NonVariants**`<T>`
+ * 
+ * When provided a `KindErrorType`'s context schema, it will return only the
+ * key/values where the value is a _non-variant_ (aka, the type only allows a
+ * single type/value).
+ */
+export type NonVariants<
+    T extends Record<string, unknown>,
+    K extends readonly (keyof T & string)[] = StringKeys<T>,
+    R extends Record<string, unknown> = EmptyObject
+> = IsEqual<T, Record<string, unknown>> extends true
+? EmptyObject
+: IsEqual<T, EmptyObject> extends true
+? EmptyObject
+: K extends [
+    infer Head extends keyof T & string,
+    ...infer Rest extends readonly (keyof T & string)[]
+]
+    ? IsNonVariant<T[Head]> extends true
+        ? NonVariants<T,Rest,R & Record<Head, T[Head]>>
+        : NonVariants<T,Rest,R>
 : ExpandRecursively<R>;
 
 

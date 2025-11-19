@@ -62,7 +62,9 @@ describe("Defining Error Types", () => {
                 Expect<AssertEqual<
                     Params,
                     [msg: string, ctx?: Record<string,unknown>]
-                >>
+                >>,
+                Expect<AssertExtends<Rtn, KindErrorShape>>,
+                Expect<AssertExtends<Rtn, KindError>>,
             ];
         });
 
@@ -96,14 +98,8 @@ describe("Defining Error Types", () => {
                     Kind,
                     KindErrorType<"my-error", { test: true }>
                 >>,
-                Expect<AssertExtends<
-                    Rtn,
-                    KindErrorShape
-                >>,
-                Expect<AssertExtends<
-                    Rtn,
-                    KindError
-                >>,
+                Expect<AssertExtends<Rtn,KindErrorShape>>,
+                Expect<AssertExtends<Rtn,KindError>>,
             ];
         });
 

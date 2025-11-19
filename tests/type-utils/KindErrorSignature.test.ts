@@ -3,7 +3,7 @@ import {
     Expect,
     Test,
 } from "inferred-types/types";
-import { AssertEqual, AssertExtends } from "inferred-types";
+import { AssertEqual, AssertExtends, EmptyObject } from "inferred-types";
 import {  KindError, KindErrorSignature } from "~/types";
 
 describe("KindErrorSignature<TName,TContext>", () => {
@@ -33,7 +33,7 @@ describe("KindErrorSignature<TName,TContext>", () => {
         type Rtn = ReturnType<T1>;
 
         type cases = [
-            Expect<AssertEqual<P, [msg: string]>>,
+            Expect<AssertEqual<P, [msg: string, ctx?: EmptyObject]>>,
             Expect<Rtn extends KindError ? true : false>,
         ];
     });
@@ -50,12 +50,16 @@ describe("KindErrorSignature<TName,TContext>", () => {
     
         type cases = [
             Expect<AssertEqual<P, [msg: string, ctx?: { foo?: string }]>>,
+            Expect<AssertExtends<Rtn, KindError>>,
+            Expect<AssertExtends<Rtn, KindError<"testing">>>,
+            Expect<AssertExtends<Rtn, KindError<"testing", string>>>,
+            Expect<AssertExtends<Rtn, KindError<"testing", string, { test: true; foo?: string}>>>,
         ];
     });
     
 
     it("no required but with optional context", () => {
-        type T = KindErrorSignature<"testing", {test: true, answer: 42 | undefined}>
+        type T = KindErrorSignature<"testing", {test: true, answer: `42 | undefined`}>
 
         type P = Parameters<T>;
         type Rtn = ReturnType<T>;
@@ -67,7 +71,7 @@ describe("KindErrorSignature<TName,TContext>", () => {
     });
 
     it("required prop", () => {
-        type T1 = KindErrorSignature<"Testing", {test: true, answer: 42 | 99}>
+        type T1 = KindErrorSignature<"testing", {test: true, answer: 42 | 99}>
         type P = Parameters<T1>;
         type Rtn = ReturnType<T1>;
 
