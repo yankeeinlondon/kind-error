@@ -1,5 +1,4 @@
 import type { Narrowable } from "inferred-types/types";
-import type { KindErrorType__Props } from "~/types";
 import { isObject } from "inferred-types/runtime";
 import { isError, isFetchError, isKindError } from "~/type-guards";
 import { errorFromError, errorFromObject, errorFromResponse, errorFromRest } from "~/utils/error-proxies";

@@ -10,6 +10,7 @@
     "test": "node ./scripts/test.mjs",
     "test:runtime": "vitest run",
     "test:types": "node_modules/.bin/typed test",
+    "test:source": "typed source -v",
     "test:watch": "vitest",
     "test:ci": "vitest run",
     "build": "tsdown --dts",
