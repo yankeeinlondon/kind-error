@@ -64,7 +64,7 @@ export function createKindError<
     err.__kind = "KindError";
     err.kind = name;
     err.type = asKindType(name);
-    err.subType = asKindSubType(name as string);
+    err.subType = asKindSubType<string>(name as string);
     err.name = pascalName;
     err.message = msg;
     err.stackTrace = () => stackTrace;
