@@ -5,7 +5,6 @@ import type {
   Fallback,
   IsEqual,
   IsUndefined,
-  Narrowable,
 } from "inferred-types";
 
 import type { AsContextShape, NonVariants } from "~/types";

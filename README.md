@@ -2,9 +2,9 @@
 
 > A better error primitive for Javascript/Typescript.
 
-## Install
+![image](./docs/kind-error-overview.png)
 
-Using pnpm:
+## Install
 
 ```sh
 pnpm install @yankeeinlondon/kind-error
@@ -19,10 +19,10 @@ Alternatives
 
 | <span style="font-weight: 200">Manager</span>| <span style="font-weight: 200">Shell Command</span> |
 | --- | --- |
-| **npm** | npm install @yankeeinlondon/gotcha  |
-| **pnpm** | pnpm add @yankeeinlondon/gotcha | 
-| **yarn** | yarn add @yankeeinlondon/gotcha | 
-| **bun** | bun add @yankeeinlondon/gotcha | 
+| **npm** | npm install @yankeeinlondon/kind-error  |
+| **pnpm** | pnpm add @yankeeinlondon/kind-error | 
+| **yarn** | yarn add @yankeeinlondon/kind-error | 
+| **bun** | bun add @yankeeinlondon/kind-error | 
 
 </details>
 
