@@ -64,7 +64,7 @@ export function createKindError<
     err.__kind = "KindError";
     err.kind = name;
     err.type = asKindType(name);
-    err.subType = asKindSubType(name);
+    err.subType = asKindSubType(name as string);
     err.name = pascalName;
     err.message = msg;
     err.stackTrace = () => stackTrace;
@@ -95,7 +95,11 @@ export function createKindError<
     ) {
       const props = args[0];
       if (isKindError(e)) {
-        return e as unknown as KindError<TName, string, ResolveContext<TContext, P>> & Record<"underlying", E>;
+        return e as unknown as KindError<
+            TName, 
+            string, 
+            ResolveContext<TContext, P>
+        > & Record<"underlying", E>;
       }
 
       let msg = "Unknown Error";
