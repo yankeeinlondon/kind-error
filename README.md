@@ -32,8 +32,8 @@ Alternatives
    ```ts
    const InvalidRequest = createKindError("invalid-request", { 
         lib: "foobar", 
-        url: "string", 
-        method: "get|post|put|delete|undefined" 
+        url: t => t.string(), 
+        method: t => t.optString("get", "post", "put", "delete")
     });
    ```
 

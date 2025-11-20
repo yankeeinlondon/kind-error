@@ -6,7 +6,6 @@ import {
 } from "inferred-types/types";
 import { 
     createKindError, 
-    KindError,
 } from "~";
 
 describe("KindErrorType.partial()", () => {

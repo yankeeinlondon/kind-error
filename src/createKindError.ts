@@ -2,33 +2,33 @@ import type { Contains, EmptyObject, Err, MergeObjects } from "inferred-types";
 import type { AsContextShape, KindError, KindErrorType, KindStackItem, ResolveContext } from "~/types";
 import { inspect } from "node:util";
 import {
-  createFnWithProps,
-  err,
-  isError,
-  isObject,
-  isString,
-  toPascalCase,
+    createFnWithProps,
+    err,
+    isError,
+    isObject,
+    isString,
+    toPascalCase,
 } from "inferred-types";
 import {
-  asKindSubType,
-  asKindType,
-  createStackTrace,
-  getMessageInObject,
-  getStackTrace,
-  renameFunction,
+    asKindSubType,
+    asKindType,
+    createStackTrace,
+    getMessageInObject,
+    getStackTrace,
+    renameFunction,
 } from "~/utils";
 import { toJsonFn, toStringFn } from "./instance";
 import { isKindError } from "./type-guards";
 
 type Rtn<
-  TName extends string,
-  TContext extends Record<string, unknown>,
+    TName extends string,
+    TContext extends Record<string, unknown>,
 > = Contains<TName, "<" | ">" | "[" | "]" | "(" | ")"> extends true
-  ? Err<
-    "invalid-name",
-    `The name for a KindError must not include any of the following characters: "<", ">", "[", "]", "(", ")"`
-  >
-  : KindErrorType<TName, TContext>;
+    ? Err<
+        "invalid-name",
+        `The name for a KindError must not include any of the following characters: "<", ">", "[", "]", "(", ")"`
+    >
+    : KindErrorType<TName, TContext>;
 
 /**
  * **createKindError**`(name, context)`
@@ -37,135 +37,135 @@ type Rtn<
  * the underlying `KindError` instance.
  */
 export function createKindError<
-  const TName extends string,
-  const TContext extends Record<string, unknown>,
+    const TName extends string,
+    const TContext extends Record<string, unknown>,
 >(
-  name: TName,
-  context: TContext = {} as EmptyObject as TContext,
+    name: TName,
+    context: TContext = {} as EmptyObject as TContext,
 ): Rtn<TName, TContext> {
-  if (/[<>[\]()]/.test(name)) {
-    return err("invalid-name", `The name for a KindError must not include any of the following characters: "<", ">", "[", "]", "(", ")"`) as Rtn<TName, TContext>;
-  }
-  const partial = <const C extends AsContextShape<TContext>>(ctx: C) => {
-    return createKindError(name, { ...context, ...ctx } as MergeObjects<TContext, C>);
-  };
-
-  const pascalName = toPascalCase(name.replace(/\//g, "-"));
-
-  const fn = <
-    TMsg extends string,
-    TCtx extends Record<string, unknown>,
-  >(
-    msg: TMsg,
-    ctx?: TCtx,
-  ) => {
-    const mergedContext = {
-      ...context,
-      ...(ctx || {}),
-    } as MergeObjects<TContext, TCtx>;
-
-    const err = new Error(msg) as any;
-
-    const stackTrace = getStackTrace();
-
-    err.__kind = "KindError";
-    err.kind = name;
-    err.type = asKindType(name);
-    err.subType = asKindSubType<TName>(name);
-    err.name = pascalName;
-    err.message = msg;
-    err.stackTrace = () => stackTrace;
-    err.stack = err.stack || "";
-    err.context = mergedContext;
-
-    err.toString = toStringFn(err);
-    err.toJSON = toJsonFn(err);
-
-    err[inspect.custom] = () => {
-      return err.toString();
+    if (/[<>[\]()]/.test(name)) {
+        return err("invalid-name", `The name for a KindError must not include any of the following characters: "<", ">", "[", "]", "(", ")"`) as Rtn<TName, TContext>;
+    }
+    const partial = <const C extends AsContextShape<TContext>>(ctx: C) => {
+        return createKindError(name, { ...context, ...ctx } as MergeObjects<TContext, C>);
     };
 
-    return err;
-  };
+    const pascalName = toPascalCase(name.replace(/\//g, "-"));
 
-  const props = {
-    __kind: "KindErrorType",
-    kind: name,
-    errorName: pascalName,
-    type: asKindType(name),
-    subType: asKindSubType<TName>(name),
-    context,
-
-    proxy<
-      const E,
-      const P extends AsContextShape<TContext>,
+    const fn = <
+        TMsg extends string,
+        TCtx extends Record<string, unknown>,
     >(
-      e: E,
-      ...args: [props?: P]
-    ) {
-      const props = args[0];
-      if (isKindError(e)) {
-        return e as unknown as KindError<
-          TName,
-          string,
-          ResolveContext<TContext, P>
-        > & Record<"underlying", E>;
-      }
+        msg: TMsg,
+        ctx?: TCtx,
+    ) => {
+        const mergedContext = {
+            ...context,
+            ...(ctx || {}),
+        } as MergeObjects<TContext, TCtx>;
 
-      let msg = "Unknown Error";
-      let stack: KindStackItem[] | undefined;
+        const err = new Error(msg) as any;
 
-      if (isError(e)) {
-        msg = e.message;
-        if (e.stack) {
-          stack = createStackTrace(e);
-        }
-      }
-      else if (isObject(e)) {
-        msg = getMessageInObject(e, "message", "msg", "error", "cause", "reason", "err", "code") || "Unknown Error";
-      }
-      else if (isString(e)) {
-        msg = e;
-      }
+        const stackTrace = getStackTrace();
 
-      const mergedProps = {
-        ...(props || {}),
-        underlying: e,
-      };
+        err.__kind = "KindError";
+        err.kind = name;
+        err.type = asKindType(name);
+        err.subType = asKindSubType<TName>(name);
+        err.name = pascalName;
+        err.message = msg;
+        err.stackTrace = () => stackTrace;
+        err.stack = err.stack || "";
+        err.context = mergedContext;
 
-      const err = fn(msg, mergedProps);
+        err.toString = toStringFn(err);
+        err.toJSON = toJsonFn(err);
 
-      if (stack) {
-        err.stackTrace = () => stack!;
-      }
+        err[inspect.custom] = () => {
+            return err.toString();
+        };
 
-      return err as unknown as KindError<TName, string, ResolveContext<TContext, P>> & Record<"underlying", E>;
-    },
+        return err;
+    };
 
-    partial,
-
-    is(val: unknown): val is KindError<TName, string, TContext> {
-      return isKindError(val) && val.kind === name;
-    },
-
-    toString() {
-      return `KindErrorType::${pascalName}(${name})`;
-    },
-
-    toJSON() {
-      return {
+    const props = {
         __kind: "KindErrorType",
         kind: name,
-        name: `${pascalName}ErrorType`,
         errorName: pascalName,
         type: asKindType(name),
-        subType: asKindSubType(name),
+        subType: asKindSubType<TName>(name),
         context,
-      };
-    },
-  };
 
-  const namedFn = renameFunction(fn, `${pascalName}ErrorType`);
+        proxy<
+            const E,
+            const P extends AsContextShape<TContext>,
+        >(
+            e: E,
+            ...args: [props?: P]
+        ) {
+            const props = args[0];
+            if (isKindError(e)) {
+                return e as unknown as KindError<
+                    TName,
+                    string,
+                    ResolveContext<TContext, P>
+                > & Record<"underlying", E>;
+            }
 
-  return createFnWithProps(namedFn, props as any) as unknown as Rtn<TName, TContext>;
+            let msg = "Unknown Error";
+            let stack: KindStackItem[] | undefined;
+
+            if (isError(e)) {
+                msg = e.message;
+                if (e.stack) {
+                    stack = createStackTrace(e);
+                }
+            }
+            else if (isObject(e)) {
+                msg = getMessageInObject(e, "message", "msg", "error", "cause", "reason", "err", "code") || "Unknown Error";
+            }
+            else if (isString(e)) {
+                msg = e;
+            }
+
+            const mergedProps = {
+                ...(props || {}),
+                underlying: e,
+            };
+
+            const err = fn(msg, mergedProps);
+
+            if (stack) {
+                err.stackTrace = () => stack!;
+            }
+
+            return err as unknown as KindError<TName, string, ResolveContext<TContext, P>> & Record<"underlying", E>;
+        },
+
+        partial,
+
+        is(val: unknown): val is KindError<TName, string, TContext> {
+            return isKindError(val) && val.kind === name;
+        },
+
+        toString() {
+            return `KindErrorType::${pascalName}(${name})`;
+        },
+
+        toJSON() {
+            return {
+                __kind: "KindErrorType",
+                kind: name,
+                name: `${pascalName}ErrorType`,
+                errorName: pascalName,
+                type: asKindType(name),
+                subType: asKindSubType(name),
+                context,
+            };
+        },
+    };
+
+    const namedFn = renameFunction(fn, `${pascalName}ErrorType`);
+
+    return createFnWithProps(namedFn, props) as unknown as Rtn<TName, TContext>;
 }

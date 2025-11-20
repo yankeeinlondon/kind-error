@@ -1,3 +1,6 @@
+export * from "./isAwsLambdaError";
+export * from "./isAxiosError";
+export * from "./isDefineSchema";
 export * from "./isError";
 export * from "./isFetchError";
 export * from "./isFetchResponse";
