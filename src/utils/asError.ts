@@ -23,7 +23,7 @@ type Rtn<T> = T extends string
  *
  * - if an `Error` is passed in that will be proxied through unchanged
  */
-export function asError<const T extends string | Record<string, unknown> | Error>(errLike: T): Rtn<T> {
+export function asError<const T extends string | Record<string, unknown> | Error>(errLike: T): Rtn<T> & Error {
     if (isString(errLike)) {
         const err = new Error();
         err.message = errLike;

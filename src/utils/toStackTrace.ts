@@ -8,7 +8,7 @@ const IGNORABLES = ["@vitest/runner", "node:", "native"];
  * converts a normal Javascript _stack_ string into a structured
  * stack trace.
  */
-export function toStackTrace<T extends string>(stack: T): KindStackItem[] {
+export function toStackTrace(stack: string, skip: number = 0): KindStackItem[] {
   const err = new Error("Stack Parser");
   err.stack = stack;
 
@@ -18,7 +18,8 @@ export function toStackTrace<T extends string>(stack: T): KindStackItem[] {
       .map(i => ({
         ...i,
         file: i.file ? relative(".", i.file) : undefined,
-      }));
+      }))
+      .slice(skip);
   }
   catch (e) {
     console.warn(`Failed to parse stack trace: ${e instanceof Error ? e.message : String(e)}`);
