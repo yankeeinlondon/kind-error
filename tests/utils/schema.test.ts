@@ -1,9 +1,9 @@
-import { describe, it } from "vitest";
+import { describe, it, expect } from 'vitest';
 import {
     Expect,
 } from "inferred-types/types";
 import { schemaProp } from "~/utils/schema";
-import { AssertEqual } from "inferred-types";
+import { AssertEqual, Suggest } from "inferred-types";
 
 describe("Schema", () => {
 
@@ -28,7 +28,6 @@ describe("Schema", () => {
                 Expect<AssertEqual<typeof asUndefined, undefined>>,
             ];
         });
-
         
         it("wide arrays", () => {
             const str = schemaProp(t => t.array("string"));
@@ -43,7 +42,6 @@ describe("Schema", () => {
                 Expect<AssertEqual<typeof union, (string | number)[]>>,
             ];
         });
-
         
         it("tuples", () => {
             const scalars = schemaProp(t => t.tuple("string","number"));
@@ -56,6 +54,59 @@ describe("Schema", () => {
                 Expect<AssertEqual<typeof fooBar, ["foo", "bar"]>>,
             ];
         });
+        
+        it("string literals and string literal unions", () => {
+            const foo = schemaProp(t => t.string("foo"));
+            const fooOrBar = schemaProp(t => t.string("foo", "bar"));
+        
+            type cases = [
+                Expect<AssertEqual<typeof foo, "foo">>,
+                Expect<AssertEqual<typeof fooOrBar, "foo" | "bar">>,
+            ];
+        });
+        
+        it("startsWith", () => {
+            const foo = schemaProp(t => t.startsWith("foo"));
+            const fooOrBar = schemaProp(t => t.startsWith("foo", "bar"));
+        
+            type cases = [
+                Expect<AssertEqual<typeof foo, `foo${string}`>>,
+                Expect<AssertEqual<typeof fooOrBar, `foo${string}` | `bar${string}`>>,
+            ];
+        });
+
+        it("endsWith", () => {
+            const foo = schemaProp(t => t.endsWith("foo"));
+            const fooOrBar = schemaProp(t => t.endsWith("foo", "bar"));
+        
+            type cases = [
+                Expect<AssertEqual<typeof foo, `${string}foo`>>,
+                Expect<AssertEqual<typeof fooOrBar, `${string}foo` | `${string}bar`>>,
+            ];
+        });
+
+        
+        it("suggestions", () => {
+            const fooBar = schemaProp(t => t.suggest("foo", "bar"));
+
+            type Actual = typeof fooBar;
+            type Expected = Suggest<"foo" | "bar">;
+        
+            type cases = [
+                Expect<AssertEqual<Actual, Expected>>,
+            ];
+        });
+        
+        
+        it("union", () => {
+            const union = schemaProp(t => t.union("foo","bar",42));
+        
+            type cases = [
+                Expect<AssertEqual<typeof union, "foo" | "bar" | 42>>
+            ];
+        });
+        
+        
         
         
     })

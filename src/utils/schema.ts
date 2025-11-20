@@ -1,9 +1,19 @@
-import { isFunction, Never, Suggest, InputTokenSuggestions, FromInputToken__String, ObjectKey, As, toJson, Narrowable, FromInputToken__Tuple } from 'inferred-types';
+import { 
+    isFunction, 
+    Never, 
+    Suggest, 
+    InputTokenSuggestions, 
+    FromInputToken__String, 
+    ObjectKey, 
+    toJson, 
+    Narrowable, 
+    FromInputToken__Tuple 
+} from 'inferred-types';
 import { isDefineSchema } from "~/type-guards";
 import { FromSchema, RecordKeySuggestions, SchemaApi, SchemaCallback, SchemaResult } from "~/types";
 import { asToken } from './asToken';
 
-const SCHEMA_API: SchemaApi = {
+const SCHEMA_API = {
     kind: "SchemaApi",
 
     boolean() {
@@ -22,12 +32,12 @@ const SCHEMA_API: SchemaApi = {
         return asToken(() => literals.length === 0 ? "string | undefined" : `${literals.join(" | ")} | undefined`) as unknown as [] extends T ? string | undefined : T[number] | undefined;
     },
 
-    startsWith<T extends readonly string[]>(...literals: T): `${T[number]}${string}` {
-        return asToken(() => `${literals.join(" | ")}{{String}}`) as unknown as `${T[number]}${string}`;
+    startsWith<T extends readonly string[]>(...literals: T) {
+        return asToken(() => `${literals.join(" | ")}{{String}}`) as any;
     },
 
-    endsWith<T extends readonly string[]>(...literals: T): `${string}${T[number]}` {
-        return asToken(() => `{{String}}${literals.join(" | ")}`) as unknown as `${string}${T[number]}`;
+    endsWith<T extends readonly string[]>(...literals: T) {
+        return asToken(() => `{{String}}${literals.join(" | ")}`) as any;
     },
 
     suggest<T extends readonly string[]>(...suggestions: T) {
@@ -114,9 +124,13 @@ const SCHEMA_API: SchemaApi = {
 
 };
 
-
+/**
+ * **schemaProp**`(cb) => type`
+ * 
+ * Defines a _type_ for property in a schema.
+ */
 export function schemaProp<T extends SchemaCallback>(cb: T): SchemaResult<T> {
-    const rtn = cb(SCHEMA_API);
+    const rtn = cb(SCHEMA_API as unknown as SchemaApi);
     return (
         isFunction(rtn)
         ? rtn()

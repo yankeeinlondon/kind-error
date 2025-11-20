@@ -19,13 +19,28 @@ import { Container, EmptyObject, ExpandRecursively, FromInputToken__String, From
 // TODO
 type TranslateDictionary<T> = unknown;
 
+/**
+ * Helper type to distribute template literal type over union members for startsWith.
+ * This prevents "union type too complex" errors by forcing TypeScript to distribute
+ * the operation across each union member individually rather than computing all
+ * combinations upfront.
+ */
+type StartsWithDistribute<T> = T extends string ? `${T}${string}` : never;
+
+/**
+ * Helper type to distribute template literal type over union members for endsWith.
+ * This prevents "union type too complex" errors by forcing TypeScript to distribute
+ * the operation across each union member individually rather than computing all
+ * combinations upfront.
+ */
+type EndsWithDistribute<T> = T extends string ? `${string}${T}` : never;
 
 
 /**
  * **SchemaApi**
- * 
+ *
  * The API surface used to define types.
- * 
+ *
  * - all functions allow for no parameters but many offer variant configuration
  *   but passing in parameters too.
  */
@@ -40,7 +55,7 @@ export type SchemaApi = {
 
     /**
      * **string**`(...literals)`
-     * 
+     *
      * a wide string (with no params), a string literal (with one param), or a string literal union
      * (with multiple params).
      */
@@ -48,28 +63,28 @@ export type SchemaApi = {
 
     /**
      * **optString**`(...literals)`
-     * 
-     * an _optional_ wide string (with no params), an _optional_ string literal (with one param), 
+     *
+     * an _optional_ wide string (with no params), an _optional_ string literal (with one param),
      * or an _optional_ string literal union (with multiple params).
      */
     optString<T extends readonly string[]>(...literals: T): [] extends T ? string | undefined : T[number] | undefined;
 
 
     /**
-     * **startsWith**`<T>(...literals: T) => `${T[number]}${string}`
-     * 
-     * defines a string literal which is defined to _start with_ any of the literals 
+     * **startsWith**`<T>(...literals: T) => StartsWithDistribute<T[number]>`
+     *
+     * defines a string literal which is defined to _start with_ any of the literals
      * you pass in.
      */
-    startsWith<T extends readonly string[]>(...literals: T): `${T[number]}${string}`;
+    startsWith<T extends readonly string[]>(...literals: T): StartsWithDistribute<T[number]>;
 
     /**
-     * **endsWith**`<T>(...literals: T) => `${string}${T[number]}`
-     * 
-     * defines a string literal which is defined to _end with_ any of the literals 
+     * **endsWith**`<T>(...literals: T) => EndsWithDistribute<T[number]>`
+     *
+     * defines a string literal which is defined to _end with_ any of the literals
      * you pass in.
      */
-    endsWith<T extends readonly string[]>(...literals: T): `${string}${T[number]}`;
+    endsWith<T extends readonly string[]>(...literals: T): EndsWithDistribute<T[number]>;
 
 
     /**
@@ -96,7 +111,7 @@ export type SchemaApi = {
     /**
      * creates a union type from the members listed
      */
-    union<T extends readonly unknown[]>(...members: T): T[number];
+    union<const T extends readonly unknown[]>(...members: T): T[number];
 
     /**
      * creates a map type by specifying the _key_ and _value_ properties as string tokens
