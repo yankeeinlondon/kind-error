@@ -1,8 +1,12 @@
 export * from "./asError";
+export * from "./asKindError";
 export * from "./asKindSubtype";
 export * from "./asKindType";
+export * from "./asToken";
 export * from "./error-proxies";
 export * from "./getStackTrace";
+export * from "./removeVariants";
 export * from "./renameFunction";
 export * from "./stripFirstStackFrame";
 export * from "./toStackString";
+

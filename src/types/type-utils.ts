@@ -66,7 +66,7 @@ export type AsKindSubType<T extends string> = As<
     : RetainAfter<T, "/"> extends infer SubType extends string
       ? SubType extends ""
         ? undefined
-        : Contains<SubType, "|"> extends true
+        : SubType extends `${string}|${string}`
           ? PrepUnion<SubType>
           : SubType
       : never,

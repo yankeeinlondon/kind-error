@@ -7,3 +7,4 @@ export * from "./isFetchResponse";
 export * from "./isKindError";
 export * from "./isKindErrorType";
 export * from "./isStringifyable";
+export * from "./isRuntimeToken"

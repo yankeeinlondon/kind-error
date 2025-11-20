@@ -1,16 +1,13 @@
-import { isDictionary, isNumber, isString } from "inferred-types";
-import type { EmptyObject } from "inferred-types"
-import { 
-    isAwsLambdaError, 
-    isAxiosError, 
-    isError, 
-    isFetchResponse, 
-    isKindError 
+import { indexOf, isDictionary, isNumber, isString } from "inferred-types";
+import {
+    isAwsLambdaError,
+    isAxiosError,
+    isError,
+    isFetchResponse,
+    isKindError
 } from "~/type-guards";
 import { KindErrorTypeContext, HasRequiredVariants } from "~/types";
-import { KindError } from '../types/KindError';
-
-
+import { asKindError, removeVariants } from "~/utils";
 
 /** 
  * **proxyFn**`(name, schema) -> (errLike, [fallbackMsg]) -> KindError`
@@ -22,80 +19,138 @@ import { KindError } from '../types/KindError';
  * **proxy** function.
  */
 export function proxyFn<
-    TName extends string, 
-    const TSchema extends Record<string,unknown>
+    TName extends string,
+    const TSchema extends Record<string, unknown>
 >(
-    name: TName,
-    schema: TSchema,
+    kind: TName,
+    schema: TSchema, // TODO: we need to incorporate this into the results
 ) {
+    const schemaKeyValue = removeVariants(schema);
 
     return <
-        const TErr, 
+        const TErr,
         const TCtx extends HasRequiredVariants<TSchema> extends true
-            ?  KindErrorTypeContext<TSchema> & { msgFallback?: string }
-            : (KindErrorTypeContext<TSchema> & { msgFallback?: string }) | string | undefined
+        ? KindErrorTypeContext<TSchema> & { msgFallback?: string }
+        : (KindErrorTypeContext<TSchema> & { msgFallback?: string }) | string | undefined
     >(
         errLike: TErr,
         context?: TCtx
     ) => {
         const ctx = (
             isString(context)
-            ? { msgFallback: context }
-            : context
+                ? { msgFallback: context }
+                : context
         ) as KindErrorTypeContext<TSchema> & { msgFallback?: string };
 
-        if(isKindError(errLike)) {
+        if (isKindError(errLike)) {
             return errLike; // pass through as is
         }
 
         if (isAxiosError(errLike)) {
-
+            return asKindError({
+                kind,
+                message: errLike.message,
+                code: errLike.response?.status || 0,
+                underlying: errLike,
+                ...schemaKeyValue
+            })
         }
 
         if (isAwsLambdaError(errLike)) {
+            return asKindError({
+                kind,
+                message: errLike.errorMessage,
+                cause: `AWS Lambda returned an error`,
+                underlying: errLike,
+                ...schemaKeyValue
+            })
 
         }
 
         if (isFetchResponse(errLike)) {
-
+            return asKindError({
+                kind,
+                message: `fetch request returned an error while trying to reach${errLike.url}`,
+                code: errLike.status,
+                underlying: errLike,
+                ...schemaKeyValue
+            })
         }
 
-        if (isError(errLike)) {
 
+        if (isError(errLike)) {
+            return asKindError({
+                kind,
+                message: errLike.message === ""
+                    ? ctx.msgFallback || `Unknown error (${errLike.name})`
+                    : errLike.message,
+                ...(
+                    isNumber(isNumber(indexOf(errLike, "code")))
+                        ? { code: indexOf(errLike, "code") as number }
+                        : {}
+                ),
+                underlying: errLike,
+                ...schemaKeyValue
+            })
         }
 
         if (isDictionary(errLike)) {
             const message = isString(errLike?.message)
                 ? errLike.message
                 : isString(errLike?.errmsg)
-                ? errLike.errmsg
-                : isString(errLike.errorMessage)
-                ? errLike.errorMessage
-                : isString(errLike.info)
-                ? errLike.info
-                : isString(errLike.hint)
-                ? errLike.hint
-                : isString(ctx?.msgFallback)
-                ? ctx.msgFallback
-                : `Unknown error (see underlying property): ${String(errLike)}`;
+                    ? errLike.errmsg
+                    : isString(errLike.errorMessage)
+                        ? errLike.errorMessage
+                        : isString(errLike.info)
+                            ? errLike.info
+                            : isString(errLike.hint)
+                                ? errLike.hint
+                                : isString(ctx?.msgFallback)
+                                    ? ctx.msgFallback
+                                    : `Unknown error (see underlying property): ${String(errLike)}`;
             const code = isNumber(errLike?.code)
                 ? errLike.code
                 : isNumber(errLike?.errorCode)
-                ? errLike.errorCode
-                : isNumber(errLike?.statusCode)
-                ? errLike.statusCode
-                : null;
+                    ? errLike.errorCode
+                    : isNumber(errLike?.statusCode)
+                        ? errLike.statusCode
+                        : isNumber(errLike?.status)
+                            ? errLike.status
+                            : null;
 
 
             return (
                 isNumber(code)
-                    ? {
-                        __kind: "KindError",
-                        kind: name,
-
-                    }
+                    ? asKindError({
+                        kind,
+                        message,
+                        code,
+                        underlying: errLike,
+                        ...schemaKeyValue
+                    })
+                    : asKindError({
+                        kind,
+                        message,
+                        underlying: errLike,
+                        ...schemaKeyValue
+                    })
             )
         }
+
+        if (isString(errLike)) {
+            return asKindError({
+                kind,
+                message: errLike,
+                ...schemaKeyValue
+            })
+        }
+
+        return asKindError({
+            kind,
+            message: `Unknown error (see underlying property): ${String(errLike)}`,
+            underlying: errLike,
+            ...schemaKeyValue
+        })
 
     }
 

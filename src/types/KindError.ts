@@ -1,5 +1,6 @@
 import type {
   EmptyObject,
+  Expand,
   PascalCase,
 } from "inferred-types";
 import type { AsKindSubType, AsKindType, KindStackItem } from "~/types";
@@ -14,8 +15,7 @@ export type KindErrorShape = {
   subType: string | undefined;
   message: string;
   stack?: string;
-  stackTrace: () => KindStackItem[];
-  context: Record<string, unknown>;
+  stackTrace: KindStackItem[];
 } & Error;
 
 /**
@@ -28,7 +28,7 @@ export type KindError<
   TName extends string = string,
   TMsg extends string = string,
   TCtx extends Record<string, any> = EmptyObject,
-> = (
+> = Expand<
     {
       __kind: "KindError";
       name: PascalCase<AsKindType<TName>>;
@@ -37,10 +37,9 @@ export type KindError<
       subType: AsKindSubType<TName>;
       message: TMsg;
       stack?: string;
-      stackTrace: () => KindStackItem[];
-      context: TCtx;
+      stackTrace: KindStackItem[];
 
       toString: () => string;
-    } & Error) extends infer KErr extends KindErrorShape
+    } & TCtx> & Error extends infer KErr extends KindErrorShape
   ? KErr
   : never;

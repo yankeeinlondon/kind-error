@@ -1,4 +1,4 @@
-import { Container, EmptyObject, ExpandRecursively, IsUndefined, Narrowable, Scalar, shape, StringKeys, Suggest, TypedFunction } from "inferred-types";
+import { Container, EmptyObject, ExpandRecursively, FromInputToken__String, InputTokenSuggestions, IsUndefined, Narrowable, Scalar, shape, StringKeys, Suggest, TypedFunction } from "inferred-types";
 
 // export type TranslateDictionary<
 //     const T extends Record<string,unknown>,
@@ -18,6 +18,7 @@ import { Container, EmptyObject, ExpandRecursively, IsUndefined, Narrowable, Sca
 
 // TODO
 type TranslateDictionary<T> = unknown;
+
 
 
 /**
@@ -73,6 +74,22 @@ export type SchemaApi = {
      * or an _optional_ numeric literal union (with multiple params).
      */
     optNumber<T extends readonly number[]>(...literals: T): [] extends T ? number | undefined : T[number] | undefined;
+
+    /**
+     * creates a union type from the members listed
+     */
+    union<T extends readonly unknown[]>(...members: T): T[number];
+
+    /**
+     * creates a map type by specifying the _key_ and _value_ properties as string tokens
+     * representing the type desired
+     */
+    map<
+        K extends InputTokenSuggestions, 
+        V extends InputTokenSuggestions
+    >(key: K, value: V): Map<FromInputToken__String<K>, FromInputToken__String<V>>;
+
+    set<V extends InputTokenSuggestions>(value: V): Set<FromInputToken__String<V>>;
 
     // /**
     //  * A literal-like dictionary type where each key/value is typed independently
@@ -192,3 +209,13 @@ export type SchemaToken =
     | Record<string, SchemaCallback>
     | readonly SchemaToken[]
     | Narrowable; // to be treated one-for-one as their runtime value/type
+
+
+/**
+ * An identity function which returns a string InputToken for the type it's
+ * representing. The function must also have a key of `kind` which equals
+ * "RuntimeToken".
+ * 
+ * **Related:** `asToken()`, `isRuntimeToken()`
+ */
+export type RuntimeToken<T = unknown> = () => T & { kind: "RuntimeToken" };
