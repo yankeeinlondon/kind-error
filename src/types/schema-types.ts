@@ -1,4 +1,4 @@
-import { Container, EmptyObject, ExpandRecursively, FromInputToken__String, InputTokenSuggestions, IsUndefined, Narrowable, Scalar, shape, StringKeys, Suggest, TypedFunction } from "inferred-types";
+import { Container, EmptyObject, ExpandRecursively, FromInputToken__String, FromInputToken__Tuple, InputTokenSuggestions, IsUndefined, Narrowable, ObjectKey, Scalar, shape, StringKeys, Suggest, TypedFunction } from "inferred-types";
 
 // export type TranslateDictionary<
 //     const T extends Record<string,unknown>,
@@ -54,6 +54,24 @@ export type SchemaApi = {
      */
     optString<T extends readonly string[]>(...literals: T): [] extends T ? string | undefined : T[number] | undefined;
 
+
+    /**
+     * **startsWith**`<T>(...literals: T) => `${T[number]}${string}`
+     * 
+     * defines a string literal which is defined to _start with_ any of the literals 
+     * you pass in.
+     */
+    startsWith<T extends readonly string[]>(...literals: T): `${T[number]}${string}`;
+
+    /**
+     * **endsWith**`<T>(...literals: T) => `${string}${T[number]}`
+     * 
+     * defines a string literal which is defined to _end with_ any of the literals 
+     * you pass in.
+     */
+    endsWith<T extends readonly string[]>(...literals: T): `${string}${T[number]}`;
+
+
     /**
      * **suggest**`(...suggestions)`
      * 
@@ -89,14 +107,72 @@ export type SchemaApi = {
         V extends InputTokenSuggestions
     >(key: K, value: V): Map<FromInputToken__String<K>, FromInputToken__String<V>>;
 
-    set<V extends InputTokenSuggestions>(value: V): Set<FromInputToken__String<V>>;
+    /**
+     * define the type for a `Set<T>` type
+     */
+    set<T extends InputTokenSuggestions>(value: T): Set<FromInputToken__String<T>>;
 
-    // /**
-    //  * A literal-like dictionary type where each key/value is typed independently
-    //  */
-    // dictionary<const T extends Record<string,unknown>>(dict?: T): IsUndefined<T> extends true 
-    //     ? Record<string,unknown>
-    //     : TranslateDictionary<T>;
+    /**
+     * define the type for an _optional_ `Set<T>` type
+     */
+    optSet<T extends InputTokenSuggestions>(value: T): Set<FromInputToken__String<T>> | undefined;
+
+    /**
+     * **record**`(key, value)`
+     * 
+     * Define a record/dictionary by setting the key and value types.
+     * 
+     * **Related:** `dictionary()`
+     */
+    record<
+        K extends RecordKeySuggestions, 
+        V extends InputTokenSuggestions
+    >(
+        key: K, 
+        value: V
+    ): FromInputToken__String<K> extends infer Key extends ObjectKey
+        ? Record<
+            Key,
+            FromInputToken__String<V>
+        >
+        : Record<never, never>;
+
+    /**
+     * **optRecord**`(key, value) => Record | undefined`
+     * 
+     * Define an _optional_ record/dictionary by setting the key and value types.
+     * 
+     * **Related:** `dictionary()`
+     */
+    optRecord<
+        K extends RecordKeySuggestions, 
+        V extends InputTokenSuggestions
+    >(
+        key: K, 
+        value: V
+    ): FromInputToken__String<K> extends infer Key extends ObjectKey
+        ? Record<
+            Key,
+            FromInputToken__String<V>
+        > & undefined
+        : undefined;
+
+    /**
+     * A literal-like dictionary type where each key/value is typed independently
+     * using callbacks.
+     */
+    dictionary<
+        const T extends Record<string, N[] | Record<string,N> | SchemaCallback>, 
+        N extends Narrowable
+    >(dict: T): FromSchema<T>;
+
+    /**
+     * A literal-like dictionary type in union with `undefined` where each key/value is typed independently using callbacks.
+     */
+    optDictionary<
+        const T extends Record<string, N[] | Record<string,N> | SchemaCallback>, 
+        N extends Narrowable
+    >(dict: T): FromSchema<T> | undefined;
 
     // /**
     //  * An _optional_ literal-like dictionary type where each key/value is typed independently
@@ -106,15 +182,36 @@ export type SchemaApi = {
     //     : TranslateDictionary<T>;
     
 
-    // /**
-    //  * **array**`(...types)`
-    //  * 
-    //  * A wide array type where each element in the array represents an _allowed_ type in the
-    //  * array. If not types are specified this will translate into `unknown[]`.
-    //  */
-    // array<const T extends readonly [Scalar | Object, ...readonly unknown[]]>(...members: T): T[number][];
+    /**
+     * **array**`(...types)`
+     * 
+     * A wide array type where each element in the array represents an _allowed_ type in the
+     * array. If not types are specified this will translate into `unknown[]`.
+     */
+    array<const T extends readonly [InputTokenSuggestions, ...readonly InputTokenSuggestions[]]>(...members: T): FromInputToken__Tuple<T>[number][];
 
-    // tuple<const T extends readonly unknown[]>(...elements: T): T;
+    /**
+     * **optArray**`(...types)`
+     * 
+     * A wide array type where each element in the array represents an _allowed_ type in the
+     * array. If not types are specified this will translate into `unknown[]`.
+     */
+    optArray<const T extends readonly [InputTokenSuggestions, ...readonly InputTokenSuggestions[]]>(...members: T): T[number][] | undefined;
+
+    /**
+     * **tuple**`(...elements)`
+     * 
+     * Treats each element as a "token" for an element in the tuple.
+     */
+    tuple<T extends readonly InputTokenSuggestions[]>(...elements: T): FromInputToken__Tuple<T>;
+
+    /**
+     * **optTuple**`(...elements)`
+     * 
+     * Treats each element as a "token" for an element in the tuple; converts into an
+     * _optional_ tuple (e.g., `FromInputToken<T> | undefined`)
+     */
+    optTuple<const T extends readonly InputTokenSuggestions[]>(...elements: T): FromInputToken__Tuple<T> | undefined;
 
 
     // map<const K, const V>(key: K, value: V): Map<K,V>;
@@ -219,3 +316,11 @@ export type SchemaToken =
  * **Related:** `asToken()`, `isRuntimeToken()`
  */
 export type RuntimeToken<T = unknown> = () => T & { kind: "RuntimeToken" };
+
+
+export type RecordKeySuggestions = Suggest<
+| `"foo" | "bar"`
+| `"_{{String}}"`
+| `"{{String}}_"`
+| "string"
+>
