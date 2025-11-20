@@ -1,23 +1,19 @@
-import { Container, EmptyObject, ExpandRecursively, FromInputToken__String, FromInputToken__Tuple, InputTokenSuggestions, IsUndefined, Narrowable, ObjectKey, Scalar, shape, StringKeys, Suggest, TypedFunction } from "inferred-types";
+import { 
+    EmptyObject, 
+    ExpandRecursively, 
+    FromInputToken__String, 
+    FromInputToken__Tuple, 
+    InputTokenSuggestions, 
+    Narrowable, 
+    ObjectKey, 
+    Scalar, 
+    StringKeys, 
+    Suggest, 
+    TypedFunction 
+} from "inferred-types";
+import { Email, EmailDomain } from "./Domains";
 
-// export type TranslateDictionary<
-//     const T extends Record<string,unknown>,
-//     K extends readonly (string & keyof T)[] = StringKeys<T>,
-//     R extends Record<string, unknown> = EmptyObject
-// > = K extends [
-//     infer Head extends string & keyof T,
-//     ...infer Rest extends readonly (string & keyof T)[]
-// ]
-//     ? T[Head] extends infer Value
-//         ? Value extends SchemaCallback
-//             ? 
-//             : 
-//         : never
 
-// ;
-
-// TODO
-type TranslateDictionary<T> = unknown;
 
 /**
  * Helper type to distribute template literal type over union members for startsWith.
@@ -35,23 +31,10 @@ type StartsWithDistribute<T> = T extends string ? `${T}${string}` : never;
  */
 type EndsWithDistribute<T> = T extends string ? `${string}${T}` : never;
 
-
 /**
- * **SchemaApi**
- *
- * The API surface used to define types.
- *
- * - all functions allow for no parameters but many offer variant configuration
- *   but passing in parameters too.
+ * the string-based type definition of `SchemaApi`
  */
-export type SchemaApi = {
-    kind: "SchemaApi";
-
-    boolean(): boolean;
-    true(): true;
-    false(): false;
-    null(): null;
-    undefined(): undefined;
+export type SchemaApi__String = {
 
     /**
      * **string**`(...literals)`
@@ -94,7 +77,12 @@ export type SchemaApi = {
      * type will match the type.
      */
     suggest<T extends readonly string[]>(...literals: T): [] extends T ? string : Suggest<T[number]>;
+}
 
+/**
+ * the numeric-based type definition of `SchemaApi`
+ */
+export type SchemaApi__Numeric = {
 
     /**
      * a wide number (with no params), a numeric literal (with one param), or a
@@ -109,10 +97,58 @@ export type SchemaApi = {
     optNumber<T extends readonly number[]>(...literals: T): [] extends T ? number | undefined : T[number] | undefined;
 
     /**
-     * creates a union type from the members listed
+     * Make type a `BigInt`
      */
-    union<const T extends readonly unknown[]>(...members: T): T[number];
+    bigInt(): BigInt;
 
+    /**
+     * Make type an _optional_ `BigInt`
+     */
+    optBigInt(): BigInt | undefined;
+}
+
+/**
+ * the array and tuple type definition of `SchemaApi`
+ */
+export type SchemaApi__ArrayTuple = {
+
+    /**
+     * **array**`(...types)`
+     * 
+     * A wide array type where each element in the array represents an _allowed_ type in the
+     * array. If not types are specified this will translate into `unknown[]`.
+     */
+    array<const T extends readonly InputTokenSuggestions[]>(...members: T): FromInputToken__Tuple<T>[number][];
+
+    /**
+     * **optArray**`(...types)`
+     * 
+     * A wide array type where each element in the array represents an _allowed_ type in the
+     * array. If not types are specified this will translate into `unknown[]`.
+     */
+    optArray<const T extends readonly InputTokenSuggestions[]>(...members: T): T[number][] | undefined;
+
+    /**
+     * **tuple**`(...elements)`
+     * 
+     * Treats each element as a "token" for an element in the tuple.
+     */
+    tuple<T extends readonly InputTokenSuggestions[]>(...elements: T): FromInputToken__Tuple<T>;
+
+    /**
+     * **optTuple**`(...elements)`
+     * 
+     * Treats each element as a "token" for an element in the tuple; converts into an
+     * _optional_ tuple (e.g., `FromInputToken<T> | undefined`)
+     */
+    optTuple<const T extends readonly InputTokenSuggestions[]>(...elements: T): FromInputToken__Tuple<T> | undefined;
+}
+
+
+/**
+ * the object based type definition of `SchemaApi`
+ */
+export type SchemaApi__Object = {
     /**
      * creates a map type by specifying the _key_ and _value_ properties as string tokens
      * representing the type desired
@@ -173,7 +209,7 @@ export type SchemaApi = {
         : undefined;
 
     /**
-     * A literal-like dictionary type where each key/value is typed independently
+     * A _literal-like_ dictionary type where each key/value is typed independently
      * using callbacks.
      */
     dictionary<
@@ -182,57 +218,56 @@ export type SchemaApi = {
     >(dict: T): FromSchema<T>;
 
     /**
-     * A literal-like dictionary type in union with `undefined` where each key/value is typed independently using callbacks.
+     * A _literal-like_ dictionary type in union with `undefined` where each key/value is 
+     * typed independently using callbacks.
      */
     optDictionary<
         const T extends Record<string, N[] | Record<string,N> | SchemaCallback>, 
         N extends Narrowable
     >(dict: T): FromSchema<T> | undefined;
-
-    // /**
-    //  * An _optional_ literal-like dictionary type where each key/value is typed independently
-    //  */
-    // optDictionary<const T extends Record<string,unknown>>(dict?: T): IsUndefined<T> extends true 
-    //     ? Record<string,unknown>
-    //     : TranslateDictionary<T>;
-    
-
-    /**
-     * **array**`(...types)`
-     * 
-     * A wide array type where each element in the array represents an _allowed_ type in the
-     * array. If not types are specified this will translate into `unknown[]`.
-     */
-    array<const T extends readonly [InputTokenSuggestions, ...readonly InputTokenSuggestions[]]>(...members: T): FromInputToken__Tuple<T>[number][];
-
-    /**
-     * **optArray**`(...types)`
-     * 
-     * A wide array type where each element in the array represents an _allowed_ type in the
-     * array. If not types are specified this will translate into `unknown[]`.
-     */
-    optArray<const T extends readonly [InputTokenSuggestions, ...readonly InputTokenSuggestions[]]>(...members: T): T[number][] | undefined;
-
-    /**
-     * **tuple**`(...elements)`
-     * 
-     * Treats each element as a "token" for an element in the tuple.
-     */
-    tuple<T extends readonly InputTokenSuggestions[]>(...elements: T): FromInputToken__Tuple<T>;
-
-    /**
-     * **optTuple**`(...elements)`
-     * 
-     * Treats each element as a "token" for an element in the tuple; converts into an
-     * _optional_ tuple (e.g., `FromInputToken<T> | undefined`)
-     */
-    optTuple<const T extends readonly InputTokenSuggestions[]>(...elements: T): FromInputToken__Tuple<T> | undefined;
-
-
-    // map<const K, const V>(key: K, value: V): Map<K,V>;
-    // weakmap<const K extends Container, const V>(key: K, value: V): WeakMap<K,V>;
-    // set<T extends readonly unknown[]>(types: T): Set<T[number]>;
 }
+
+export type SchemaApi__Atomic = {
+    /** set the type to the wide `boolean` type */
+    boolean(): boolean;
+    /** set the type to `true` */
+    true(): true;
+    /** set the type to `false` */
+    false(): false;
+    /** set the type to `null` */
+    null(): null;
+    /** set the type to `undefined` */
+    undefined(): undefined;
+}
+
+export type SchemaApi__Domain = {
+    email<const T extends readonly EmailDomain[]>(
+        ...constraints: T
+    ): [] extends T ? Email : Email<T>;
+}
+
+/**
+ * **SchemaApi**
+ *
+ * The API surface used to define types.
+ *
+ * - all functions allow for no parameters but many offer variant configuration
+ *   but passing in parameters too.
+ */
+export type SchemaApi = {
+    kind: "SchemaApi";
+
+    /**
+     * creates a union type from the members listed
+     */
+    union<const T extends readonly unknown[]>(...members: T): T[number];
+
+} 
+    & SchemaApi__Atomic 
+    & SchemaApi__String 
+    & SchemaApi__Numeric 
+    & SchemaApi__ArrayTuple 
+    & SchemaApi__Object;
 
 /**
  * **SchemaCallback**
@@ -299,6 +334,17 @@ export type FromSchema<
             R & Record<Head, T[Head]>
         >
 : ExpandRecursively<R>;
+
+
+export type TupleDefn = readonly (Scalar | SchemaCallback)[];
+
+export type FromSchemaTuple<
+    T extends readonly (Scalar | SchemaCallback)[]
+> = {
+    [K in keyof T]: T[K] extends SchemaCallback
+        ? SchemaResult<T[K]>
+        : T[K]
+};
 
 /**
  * **SchemaToken**

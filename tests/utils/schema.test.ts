@@ -1,11 +1,48 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
     Expect,
 } from "inferred-types/types";
-import { schemaProp } from "~/utils/schema";
-import { AssertEqual, Suggest } from "inferred-types";
+import { schemaProp, schemaTuple } from "~/utils/schema";
+import { AssertEqual, isFunction, Suggest, TupleDefn } from "inferred-types";
+import { FromSchemaTuple, isRuntimeToken } from '~';
 
 describe("Schema", () => {
+
+    describe("schemaTuple()", () => {
+        
+        it("just scalars", () => {
+            const t = schemaTuple("foo","bar",42);
+
+            expect(isRuntimeToken(t)).toBe(true);
+            if(isRuntimeToken(t)) {
+                expect(t()).toBe("<<tuple::foo, bar, 42>>")
+            }
+        
+            type cases = [
+                Expect<AssertEqual<typeof t, ["foo","bar", 42]>>
+            ];
+        });
+
+        it("just callbacks", () => {
+            const tup = schemaTuple(t => t.string("foo","bar"), t => t.number());
+            expect(isFunction(tup)).toBe(true);
+
+            expect(
+                isRuntimeToken(tup), 
+                `tuple = ${JSON.stringify((tup as any)())} & { kind: "${(tup as any)?.kind}"}`
+            ).toBe(true);
+
+            if(isRuntimeToken(tup)) {
+                expect(tup()).toBe(`<<tuple::(t) => t.string("foo", "bar"), (t) => t.number()`)
+            }
+        
+            type cases = [
+                Expect<AssertEqual<typeof tup, ["foo" | "bar", number]>>
+            ];
+        });
+        
+    })
+
 
     describe("schemaProp()", () => {
 
@@ -96,6 +133,20 @@ describe("Schema", () => {
                 Expect<AssertEqual<Actual, Expected>>,
             ];
         });
+
+        
+        it("numbers", () => {
+            const wide = schemaProp(t => t.number());
+            const literal = schemaProp(t => t.number(42));
+            const numUnion = schemaProp(t => t.number(42,99))
+        
+            type cases = [
+                Expect<AssertEqual<typeof wide, number>>,
+                Expect<AssertEqual<typeof literal, 42>>,
+                Expect<AssertEqual<typeof numUnion, 42 | 99>>,
+            ];
+        });
+        
         
         
         it("union", () => {
