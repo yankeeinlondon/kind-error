@@ -4,7 +4,7 @@ import {
 } from "inferred-types/types";
 import { schemaProp, schemaTuple } from "~/utils/schema";
 import { AssertEqual, isFunction, Suggest, TupleDefn } from "inferred-types";
-import { FromSchemaTuple, isRuntimeToken } from '~';
+import {  isRuntimeToken } from '~';
 
 describe("Schema", () => {
 
@@ -33,11 +33,22 @@ describe("Schema", () => {
             ).toBe(true);
 
             if(isRuntimeToken(tup)) {
-                expect(tup()).toBe(`<<tuple::(t) => t.string("foo", "bar"), (t) => t.number()`)
+                expect(tup()).toBe(`<<tuple::(t) => t.string("foo", "bar"), (t) => t.number()>>`)
             }
         
             type cases = [
                 Expect<AssertEqual<typeof tup, ["foo" | "bar", number]>>
+            ];
+        });
+
+        
+        it("mixed", () => {
+            const tup = schemaTuple("foo", t => t.number());
+            expect(isFunction(tup)).toBe(true);
+            expect(isRuntimeToken(tup)).toBe(true);
+        
+            type cases = [
+                Expect<AssertEqual<typeof tup, ["foo", number]>>
             ];
         });
         
@@ -154,6 +165,45 @@ describe("Schema", () => {
         
             type cases = [
                 Expect<AssertEqual<typeof union, "foo" | "bar" | 42>>
+            ];
+        });
+        
+        
+        it("email", () => {
+            const e1 = schemaProp(t => t.email());
+            const e2 = schemaProp(t => t.email("microsoft.com"));
+            const e3 = schemaProp(t => t.email(t => t.endsWith("microsoft.com")));
+
+            expect(isRuntimeToken(e1)).toBe(true);
+            expect(isRuntimeToken(e2)).toBe(true);
+            expect(isRuntimeToken(e3)).toBe(true);
+        
+            if(isRuntimeToken(e1)) {
+                expect(e1()).toBe("<<email>>");
+            }
+            if(isRuntimeToken(e2)) {
+                expect(e2()).toBe("<<email::microsoft.com>>");
+            }
+            if(isRuntimeToken(e3)) {
+                expect(e3()).toBe(`<<email::{{String}}microsoft.com>>`)
+            }
+
+            type cases = [
+                Expect<AssertEqual<typeof e1, `${string}@${string}.${string}`>>,
+                Expect<AssertEqual<typeof e2, `${string}@microsoft.com`>>,
+                Expect<AssertEqual<typeof e3, `${string}@${string}microsoft.com`>>,
+                
+            ];
+        });
+
+        
+        it("ip4Address", () => {
+            const ip = schemaProp(t => t.ip4Address("192.168.1.0/24"));
+
+            expect(isRuntimeToken(ip))
+        
+            type cases = [
+                /** type tests */
             ];
         });
         

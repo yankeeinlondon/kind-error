@@ -6,5 +6,6 @@ export * from "./isFetchError";
 export * from "./isFetchResponse";
 export * from "./isKindError";
 export * from "./isKindErrorType";
+export * from "./isRuntimeToken";
+export * from './isSchemaTuple';
 export * from "./isStringifyable";
-export * from "./isRuntimeToken"

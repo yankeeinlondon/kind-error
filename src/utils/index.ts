@@ -7,6 +7,7 @@ export * from "./error-proxies";
 export * from "./getStackTrace";
 export * from "./removeVariants";
 export * from "./renameFunction";
+export * from "./schema";
 export * from "./stripFirstStackFrame";
 export * from "./toStackString";
 
