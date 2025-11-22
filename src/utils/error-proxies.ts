@@ -1,7 +1,7 @@
-import type { Dictionary, Narrowable } from "inferred-types/types";
+import type { Dictionary, Narrowable } from "inferred-types";
 import type { FetchError, JsError, KindError, KindErrorType, KindStackItem } from "../types";
 import { parse } from "error-stack-parser-es/lite";
-import { hasIndexOf, isObject, isString, isUndefined } from "inferred-types/runtime";
+import { hasIndexOf, isObject, isString, isUndefined } from "inferred-types";
 import { relative } from "pathe";
 import { createKindError, isError } from "~";
 

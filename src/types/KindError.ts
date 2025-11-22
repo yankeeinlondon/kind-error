@@ -29,17 +29,18 @@ export type KindError<
   TMsg extends string = string,
   TCtx extends Record<string, any> = EmptyObject,
 > = Expand<
-    {
-      __kind: "KindError";
-      name: PascalCase<AsKindType<TName>>;
-      kind: TName;
-      type: AsKindType<TName>;
-      subType: AsKindSubType<TName>;
-      message: TMsg;
-      stack?: string;
-      stackTrace: KindStackItem[];
+  {
+    __kind: "KindError";
+    name: PascalCase<AsKindType<TName>>;
+    kind: TName;
+    type: AsKindType<TName>;
+    subType: AsKindSubType<TName>;
+    message: TMsg;
+    stack?: string;
+    stackTrace: KindStackItem[];
 
-      toString: () => string;
-    } & TCtx> & Error extends infer KErr extends KindErrorShape
+    toString: () => string;
+  } & TCtx
+> & Error extends infer KErr extends KindErrorShape
   ? KErr
   : never;

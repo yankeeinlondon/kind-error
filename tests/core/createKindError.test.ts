@@ -101,7 +101,7 @@ describe("Defining Error Types", () => {
         it("literal context, nothing required, foo optional", () => {
             const MyError = createKindError("my-error", {
                 test: true,
-                foo: "string | undefined"
+                foo: t => t.optString()
             });
 
             expect(typeof MyError).toBe("function");

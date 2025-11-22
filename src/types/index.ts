@@ -5,8 +5,14 @@ export * from "./KindErrorParams";
 export * from "./KindErrorSignature";
 export * from "./KindErrorType";
 export * from "./ResolveContext";
+export * from "./RuntimeToken";
+export * from "./SchemaApi";
+export * from "./SchemaCallback";
+export * from "./SchemaDictionary";
+export * from "./SchemaProperty";
+export * from "./SchemaResult";
+export * from "./SchemaTuple";
 export * from "./type-utils";
 export * from "./types";
 export * from "./variants";
 
-export * from "./schema/index";

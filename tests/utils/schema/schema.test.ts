@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
     Expect,
-} from "inferred-types/types";
-import { schemaProp, schemaTuple } from "~/utils/schema";
-import { AssertEqual, isFunction, Suggest, TupleDefn } from "inferred-types";
+} from "inferred-types";
+import { schemaObject, schemaProp, schemaTuple } from "~/utils/schema";
+import { AssertEqual, isFunction, Suggest } from "inferred-types";
 import {  isRuntimeToken } from '~';
 
 describe("Schema", () => {
@@ -33,7 +33,7 @@ describe("Schema", () => {
             ).toBe(true);
 
             if(isRuntimeToken(tup)) {
-                expect(tup()).toBe(`<<tuple::(t) => t.string("foo", "bar"), (t) => t.number()>>`)
+                expect(tup()).toBe(`<<tuple::foo | bar, number>>`)
             }
         
             type cases = [
@@ -49,6 +49,50 @@ describe("Schema", () => {
         
             type cases = [
                 Expect<AssertEqual<typeof tup, ["foo", number]>>
+            ];
+        });
+        
+    })
+
+    describe("schemaObject()", () => {
+        
+        it("scalar types", () => {
+            const t = schemaObject({
+                foo: t=>t.string(),
+                bar: t=>t.number()
+            });
+
+            expect(isRuntimeToken(t)).toBe(true);
+
+            if(isRuntimeToken(t)) {
+                expect(t()).toBe("<<string>>")
+            }
+        
+            type cases = [
+                Expect<AssertEqual<typeof t, { foo: string; bar: number }>>
+            ];
+        });
+
+        it("literals and unions", () => {
+            const t = schemaObject({
+                foo: t=>t.string("foo","bar","baz"),
+                bar: t=>t.number(42)
+            });
+        
+            type cases = [
+                Expect<AssertEqual<typeof t, { foo: "foo" | "bar" | "baz"; bar: 42 }>>
+            ];
+        });
+
+        
+        it("unions with undefined are optional props", () => {
+            const t = schemaObject({
+                foo: t => t.optString(),
+                bar: t => t.number()
+            })
+        
+            type cases = [
+               Expect<AssertEqual<typeof t, { foo?: string; bar: number }>>
             ];
         });
         

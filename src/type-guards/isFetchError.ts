@@ -1,5 +1,5 @@
 import type { FetchError } from "~/types";
-import { isObject } from "inferred-types/runtime";
+import { isObject } from "inferred-types";
 
 /**
  * type guard which tests whether `val` is a failed `Response` object

@@ -1,5 +1,5 @@
 import type { KindError } from "~/types";
-import { toKebabCase } from "inferred-types/runtime";
+import { toKebabCase } from "inferred-types";
 import { isKindError } from "~/type-guards";
 
 /**

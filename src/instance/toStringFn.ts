@@ -1,7 +1,7 @@
-import type { Dictionary } from "inferred-types/types";
+import type { Dictionary } from "inferred-types";
 import type { KindError, Stringifyable } from "~/types";
 import chalk from "chalk";
-import { Never } from "inferred-types/constants";
+import { Never } from "inferred-types";
 import { resolve } from "pathe";
 import { fileLink, link } from "~/link";
 import { isStringifyable } from "~/type-guards";
