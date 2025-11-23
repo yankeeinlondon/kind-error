@@ -84,13 +84,12 @@ export function schemaProp<T extends SchemaCallback | Scalar>(cb: T): T extends 
  */
 export function schemaTuple<const T extends readonly (Scalar | SchemaCallback)[]>(...elements: T) {
     const tokens = elements.map(t => {
-        return (
-            isScalar(t)
-                ? t
-                : isFunction(t)
-                    ? t(SCHEMA_API)
-                    : Never
-        );
+        const val = isScalar(t)
+            ? t
+            : isFunction(t)
+                ? t(SCHEMA_API)
+                : Never;
+        return isFunction(val) ? val() : val;
     });
 
     return asRuntimeTokenCallback(
@@ -110,7 +109,7 @@ export function schemaObject<const T extends Record<string, Scalar | SchemaCallb
         const val = isFunction(defn[k])
             ? defn[k](SCHEMA_API)
             : defn[k];
-
+        output[k] = isFunction(val) ? val() : val;
     }
 
     return asRuntimeTokenCallback(`dictionary::${toJson(output)}`) as unknown as DetectOptionalValues<FromSchema<T>>

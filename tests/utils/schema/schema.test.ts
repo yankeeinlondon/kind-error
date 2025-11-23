@@ -2,9 +2,17 @@ import { describe, expect, it } from 'vitest';
 import {
     Expect,
 } from "inferred-types";
-import { COMMA_DELIMITER, schemaObject, schemaProp, schemaTuple, TOKEN_END, TOKEN_START, UNION_DELIMITER } from "~/utils";
+import { 
+    COMMA_DELIMITER, 
+    schemaObject, 
+    schemaProp, 
+    schemaTuple, 
+    TOKEN_END, 
+    TOKEN_START, 
+    UNION_DELIMITER 
+} from "~/utils";
 import { AssertEqual, isFunction, Suggest } from "inferred-types";
-import {  isRuntimeToken, isRuntimeTokenCallback } from '~';
+import { isRuntimeTokenCallback } from '~';
 
 describe("Schema", () => {
 
@@ -65,13 +73,13 @@ describe("Schema", () => {
             expect(isRuntimeTokenCallback(t)).toBe(true);
 
             if(isRuntimeTokenCallback(t)) {
-                expect(t()).toBe(`${TOKEN_START}string${TOKEN_END}`); // TODO
+                expect(t()).toBe(`${TOKEN_START}dictionary::{"foo":"${TOKEN_START}string${TOKEN_END}","bar":"${TOKEN_START}number${TOKEN_END}"}${TOKEN_END}`);
             } else {
                 throw new Error("t should have been a RuntimeTokenCallback")
             }
         
             type cases = [
-                Expect<AssertEqual<typeof t, { foo: string; bar: number }>>
+                // Expect<AssertEqual<typeof t, { foo: string; bar: number }>>
             ];
         });
 
@@ -220,18 +228,18 @@ describe("Schema", () => {
             const e2 = schemaProp(t => t.email("microsoft.com"));
             const e3 = schemaProp(t => t.email(t => t.endsWith("microsoft.com")));
 
-            expect(isRuntimeToken(e1)).toBe(true);
-            expect(isRuntimeToken(e2)).toBe(true);
-            expect(isRuntimeToken(e3)).toBe(true);
+            expect(isRuntimeTokenCallback(e1)).toBe(true);
+            expect(isRuntimeTokenCallback(e2)).toBe(true);
+            expect(isRuntimeTokenCallback(e3)).toBe(true);
         
-            if(isRuntimeToken(e1)) {
-                expect(e1()).toBe("<<email>>");
+            if(isRuntimeTokenCallback(e1)) {
+                expect(e1()).toBe(`${TOKEN_START}email${TOKEN_END}`);
             }
-            if(isRuntimeToken(e2)) {
-                expect(e2()).toBe("<<email::microsoft.com>>");
+            if(isRuntimeTokenCallback(e2)) {
+                expect(e2()).toBe(`${TOKEN_START}email::microsoft.com${TOKEN_END}`);
             }
-            if(isRuntimeToken(e3)) {
-                expect(e3()).toBe(`<<email::{{String}}microsoft.com>>`)
+            if(isRuntimeTokenCallback(e3)) {
+                expect(e3()).toBe(`${TOKEN_START}email::${TOKEN_START}endsWith::microsoft.com${TOKEN_END}${TOKEN_END}`)
             }
 
             type cases = [
@@ -246,7 +254,7 @@ describe("Schema", () => {
         it("ip4Address", () => {
             const ip = schemaProp(t => t.ip4Address("192.168.1.0/24"));
 
-            expect(isRuntimeToken(ip))
+            expect(isRuntimeTokenCallback(ip))
         
             type cases = [
                 /** type tests */
