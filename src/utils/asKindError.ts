@@ -15,15 +15,22 @@ export function asKindError<
   err.__kind = "KindError";
   err.type = asKindType(obj.kind);
   err.subType = asKindSubType(obj.kind);
-  if (isNumber(obj.code)) {
-    err.code = obj.code;
-  }
+
   err.stackTrace = getStackTrace();
   const leftover = obj as Dictionary;
+  const context: Dictionary = {};
 
   for (const k of Object.keys(leftover)) {
-    err[k] = leftover[k];
+    if (!["kind", "message", "stack", "name"].includes(k)) {
+      context[k] = leftover[k];
+      err[k] = leftover[k];
+    }
   }
+  if (isNumber(obj.code)) {
+    context.code = obj.code;
+    err.code = obj.code;
+  }
+  err.context = context;
 
   return err as unknown as KindError<T["kind"], T["message"], ExpandRecursively<Omit<Mutable<T>, "kind" | "message">>>;
 }

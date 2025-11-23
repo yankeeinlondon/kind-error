@@ -9,7 +9,8 @@ import {
     isKindErrorType, 
     KindError, 
     KindErrorShape, 
-    KindErrorType 
+    KindErrorType,
+    SchemaCallback
 } from "~";
 import { AssertExtends, EmptyObject } from "inferred-types";
 
@@ -58,7 +59,7 @@ describe("Defining Error Types", () => {
             type cases = [
                 Expect<AssertEqual<
                     Params,
-                    [msg: string, ctx?: Record<string,unknown>]
+                    [msg: string, ctx?: EmptyObject]
                 >>,
                 Expect<AssertExtends<Rtn, KindErrorShape>>,
                 Expect<AssertExtends<Rtn, KindError>>,
@@ -112,7 +113,8 @@ describe("Defining Error Types", () => {
             expect(typeof MyError.is).toBe("function");
             expect(typeof MyError.partial).toBe("function");
             expect(typeof MyError.proxy).toBe("function");
-            expect(MyError.context).toEqual({ test: true, foo: "string | undefined"});
+            expect(MyError.context.test).toBe(true);
+            expect(typeof MyError.context.foo).toBe("function");
 
             type Kind = typeof MyError;
             type Params = Parameters<Kind>;
@@ -120,7 +122,7 @@ describe("Defining Error Types", () => {
 
             type cases = [
                 Expect<AssertEqual<Kind["kind"], "my-error">>,
-                Expect<AssertEqual<Kind["context"], { test: true, foo: string | undefined }>>,
+                Expect<AssertExtends<Kind["context"], { test: true, foo: SchemaCallback }>>,
                 Expect<AssertEqual<
                     Params,
                     [msg: string, ctx?: { foo?: string }]
@@ -151,7 +153,7 @@ describe("Defining Error Types", () => {
 
             type cases = [
                 Expect<AssertEqual<Kind["kind"], "my-error">>,
-                Expect<AssertEqual<Kind["context"], { test: true; foo: string }>>,
+                Expect<AssertExtends<Kind["context"], { test: true; foo: "string" }>>,
                 Expect<AssertEqual<
                     Params,
                     [msg: string, ctx: { foo: string }]

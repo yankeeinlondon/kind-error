@@ -1,4 +1,5 @@
 import type { NonVariants } from "~/types";
+import { isVariant } from "./isVariant";
 
 /**
  * **removeVariants**`(schema) -> Record<string,unknown>`
@@ -8,6 +9,12 @@ import type { NonVariants } from "~/types";
  * where the value is _type reference_.
  */
 export function removeVariants<T extends Record<string, unknown>>(schema: T): NonVariants<T> {
-  // TODO
-  return schema as NonVariants<T>;
+  const result: Record<string, unknown> = {};
+  for (const [key, val] of Object.entries(schema)) {
+    if (!isVariant(val)) {
+      result[key] = val;
+    }
+  }
+
+  return result as NonVariants<T>;
 }

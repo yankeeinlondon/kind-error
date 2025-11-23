@@ -53,6 +53,7 @@ export function proxyFn<
         code: errLike.response?.status || 0,
         underlying: errLike,
         ...schemaKeyValue,
+        ...ctx,
       });
     }
 
@@ -63,6 +64,7 @@ export function proxyFn<
         cause: `AWS Lambda returned an error`,
         underlying: errLike,
         ...schemaKeyValue,
+        ...ctx,
       });
     }
 
@@ -73,6 +75,7 @@ export function proxyFn<
         code: errLike.status,
         underlying: errLike,
         ...schemaKeyValue,
+        ...ctx,
       });
     }
 
@@ -89,6 +92,7 @@ export function proxyFn<
         ),
         underlying: errLike,
         ...schemaKeyValue,
+        ...ctx,
       });
     }
 
@@ -124,12 +128,14 @@ export function proxyFn<
               code,
               underlying: errLike,
               ...schemaKeyValue,
+              ...ctx,
             })
           : asKindError({
               kind,
               message,
               underlying: errLike,
               ...schemaKeyValue,
+              ...ctx,
             })
       );
     }
@@ -139,6 +145,7 @@ export function proxyFn<
         kind,
         message: errLike,
         ...schemaKeyValue,
+        ...ctx,
       });
     }
 
@@ -147,6 +154,7 @@ export function proxyFn<
       message: `Unknown error (see underlying property): ${String(errLike)}`,
       underlying: errLike,
       ...schemaKeyValue,
+      ...ctx,
     });
   };
 }

@@ -62,6 +62,7 @@ describe("asKindError(obj)", () => {
         expect(isError(e)).toBe(true);
         expect(isKindError(e)).toBe(true);
         expect(isKindError(e, "invalid-type"));
+        expect(e.code).toBe(404);
 
         type E = typeof e;
 

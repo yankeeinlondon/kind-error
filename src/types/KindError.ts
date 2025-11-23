@@ -40,6 +40,7 @@ export type KindError<
     stackTrace: KindStackItem[];
 
     toString: () => string;
+    context: TCtx;
   } & TCtx
 > & Error extends infer KErr extends KindErrorShape
   ? KErr

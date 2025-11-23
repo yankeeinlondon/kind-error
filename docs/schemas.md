@@ -1,68 +1,94 @@
 # Kind Error Type Schemas
 
-There are some advanced type utilities included in this repo to allow for runtime expression of Typescript types. This allows a `KindErrorRule` to define a context schema which is composed of  scalar values (treated as literal constants) and schema callback functions which allow for the creation of virtually _any_ required type.
+The `kind-error` library includes a powerful schema system that allows `KindErrorType` definitions to express TypeScript types at runtime. This enables strict typing for error context, distinguishing between static (constant) context and dynamic (required/optional) context.
 
-Here's an example of how one might configure the schema for a `KindErrorType`:
+## Defining a Schema
+
+When creating a `KindErrorType` using `createKindError`, you can provide a schema dictionary. This dictionary defines the shape of the context object that instances of this error will carry.
 
 ```ts
+import { createKindError } from "@yankeeinlondon/kind-error";
+
 const MyError = createKindError("my-error", {
-    lib: "kind-error",
-    scope: t => t.string("one","two","three"),
-    color: t => t.optString("foo", "bar", "baz")
-})
+    // Static Context (Literal)
+    lib: "kind-error", 
+    
+    // Dynamic Context (Schema Callbacks)
+    scope: t => t.string("one", "two", "three"),
+    retryCount: t => t.number(),
+    color: t => t.optString("red", "blue")
+});
 ```
 
-In the example we have:
+### Static vs. Dynamic Context
 
-- a `lib` property which is seen as a static/constant key/value of `{ lib: "kind-error" }`.
-  - When an error is being created the context object presented at that point WILL NOT include `lib` because this has already been expressed in the error type.
-- a `scope` property which is defined as a union of the string literals `one`, `two`, and `three`.
-  - When an error is being created the context object will see `scope` as a **required** property and force the caller to define it to one of the values in the union.
-- the `color` property is defined as an _optional_ union type of `foo`, `bar`, and `baz`. Therefore when creating an error of this type, setting `color` will be allowed but not required.
+The schema distinguishes between two types of properties:
+
+1. **Static Context (Literals):**
+    * Defined as direct scalar values (string, number, boolean).
+    * Example: `lib: "kind-error"`
+    * **Behavior:** These values are *automatically* added to every `KindError` instance created from this type. The user *does not* need to provide them when throwing the error.
+
+2. **Dynamic Context (Schema Callbacks):**
+    * Defined using a `SchemaCallback` function (e.g., `t => t.string()`).
+    * Example: `scope: t => t.string(...)`
+    * **Behavior:** These define the *shape* of the data the user must (or may) provide when throwing the error.
+        * **Required:** If the type is required (e.g., `t.string()`), the `createKindError` factory will require it in the second argument.
+        * **Optional:** If the type is optional (e.g., `t.optString()`), the property is optional in the factory function.
+
+## Creating Error Instances
+
+Based on the schema defined above, the `MyError` factory will have the following signature:
+
+```ts
+// Valid
+const err = MyError("Something went wrong", { 
+    scope: "one", 
+    retryCount: 5 
+});
+// err.context includes: { lib: "kind-error", scope: "one", retryCount: 5 }
+
+// Valid (with optional 'color')
+const err2 = MyError("Colors!", { 
+    scope: "two", 
+    retryCount: 1, 
+    color: "red" 
+});
+
+// Invalid (missing required 'retryCount')
+// TS Error: Property 'retryCount' is missing...
+const err3 = MyError("Oops", { scope: "one" }); 
+```
 
 ## The Schema Type System
 
+The schema system relies on a set of core types to bridge the gap between runtime definitions and TypeScript's type system.
+
 ### Core Types
 
-The types which make this schema system work start with these core types:
+* **`SchemaApi`**: The API surface provided to the callback function (`t`). It offers methods like `string()`, `number()`, `boolean()`, `array()`, `tuple()`, `union()`, etc.
+* **`SchemaCallback`**: A function that receives `SchemaApi` and returns a schema definition.
+  * Signature: `(t: SchemaApi) => unknown`
+* **`SchemaDictionary`**: A key/value map where values can be `Scalar` (static) or `SchemaCallback` (dynamic).
+* **`SchemaResult<T>`**: A utility type that extracts the *TypeScript type* represented by a `SchemaCallback`.
+* **`FromSchema<T>`**: A powerful utility that converts a `SchemaDictionary` (or property/tuple) into its resolved TypeScript type.
+  * `FromSchema<{ val: t => t.number() }>` resolves to `{ val: number }`.
 
-- `SchemaApi` 
-  - the API surface a caller can use when defining a `SchemaCallback` to define a type
-- `SchemaCallback` 
-  - the definition of the callback (e.g., `t => t.string()`) structure to use when defining a type
-- `SchemaResult<T>` 
-  - a type utility which will determine the _type_ of the `SchemaCallback` provided.
-- `RuntimeTokenCallback`
-  - schema's which use a `SchemaCallback` to define type return:
-    - the _type_ they represent to the type system, but
-    - they return a `RuntimeTokenCallback` to the runtime system
-  - a `RuntimeTokenCallback` is a function which takes zero parameters and returns a `RuntimeToken`.
-- `RuntimeToken`
-  - a string literal which always looks like `<<${string}>>`
-  - be careful at visual inspection as the tokens are meant to be visibly clear to human evaluation but they intentionally contain special strings which are there to ensure easier parsing.
+### Runtime Tokens
 
-### Schema Primitives
+Under the hood, `SchemaCallback` functions return **Runtime Tokens** (strings like `<<string>>` or `<<union::foo|bar>>`). These tokens are used by the runtime system (e.g., for validation or serialization) while the TypeScript compiler uses the `FromSchema` utility to infer the correct static types.
 
-We have three types which represent the _schema primitives_ that provide the structure/shape for our schema definitions:
+This dual nature allows `kind-error` to provide both:
 
-- `SchemaProperty`
-  - the primary "building block" for schemas
-  - represents either:
-    - a `Scalar` value,
-    - or a `SchemaCallback`
+1. **Compile-time safety:** ensuring you pass the correct context data.
+2. **Runtime introspection:** allowing tools to inspect the expected structure of error types.
 
-- `SchemaDictionary` 
-  - a key/value dictionary, where the _values_ are `SchemaProperty`'s
+## Runtime Support
 
-- `SchemaTuple`
-  - a tuple where each element is a `SchemaProperty`
+The runtime system provides several functions to help in the implementation of schemas. This includes:
 
-### Schema Type Utilities
+* `schemaProperty()`
+* `schemaObject()`
+* `schemaTuple()`
 
-
-- `FromSchema<T>`
-  - converts a `SchemaProperty`, `SchemaDictionary`, or `SchemaTuple` into the _type_ which is represented by the underlying
-  - this has NO impact on the runtime values (it can't as it's just a type utility)
-- `AsRuntimeTok
-
-
+These three functions provide various ways to leverage the type utilities while manipulating the runtime system to ensure that the runtime is able to provide consistently narrow schema types.

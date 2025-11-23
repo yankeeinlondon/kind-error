@@ -12,6 +12,8 @@ import type {
   StringKeys,
 } from "inferred-types";
 import type { DetectOptionalValues } from "./type-utils";
+import type { SchemaCallback } from "./SchemaCallback";
+import type { SchemaResult } from "./SchemaResult";
 
 /**
  * **IsNonVariant**`<T>`
@@ -21,22 +23,24 @@ import type { DetectOptionalValues } from "./type-utils";
 export type IsNonVariant<T>
   = IsUnion<T> extends true
     ? false
-    : T extends InputToken
-      ? FromInputToken<T> extends Error
+    : T extends SchemaCallback
+      ? IsNonVariant<SchemaResult<T>>
+      : T extends InputToken
+        ? FromInputToken<T> extends Error
         // do not treat as token
-        ? IsLiteralLike<T> extends true
-          ? IsUnion<T> extends true
-            ? false
-            : true
-          : false
-      // treat as token
-        : FromInputToken<T> extends infer Token
-          ? IsLiteralLike<Token> extends true
-            ? IsUnion<Token> extends true
+          ? IsLiteralLike<T> extends true
+            ? IsUnion<T> extends true
               ? false
               : true
             : false
-          : false
+      // treat as token
+          : FromInputToken<T> extends infer Token
+            ? IsLiteralLike<Token> extends true
+              ? IsUnion<Token> extends true
+                ? false
+                : true
+              : false
+            : false
     // not input token
       : IsLiteralLike<T> extends true
         ? IsUnion<T> extends true
@@ -91,17 +95,21 @@ export type Variants<
         infer Head extends keyof T & string,
         ...infer Rest extends readonly (keyof T & string)[],
       ]
-        ? T[Head] extends InputToken
-          ? FromInputToken<T[Head]> extends Error
-            ? IsNonVariant<T[Head]> extends true
+        ? T[Head] extends SchemaCallback
+          ? IsNonVariant<SchemaResult<T[Head]>> extends true
+            ? Variants<T, Rest, R>
+            : Variants<T, Rest, R & Record<Head, SchemaResult<T[Head]>>>
+          : T[Head] extends InputToken
+            ? FromInputToken<T[Head]> extends Error
+              ? IsNonVariant<T[Head]> extends true
+                ? Variants<T, Rest, R>
+                : Variants<T, Rest, R & Record<Head, T[Head]>>
+              : IsNonVariant<FromInputToken<T[Head]>> extends true
+                ? Variants<T, Rest, R>
+                : Variants<T, Rest, R & Record<Head, FromInputToken<T[Head]>>>
+            : IsNonVariant<T[Head]> extends true
               ? Variants<T, Rest, R>
               : Variants<T, Rest, R & Record<Head, T[Head]>>
-            : IsNonVariant<FromInputToken<T[Head]>> extends true
-              ? Variants<T, Rest, R>
-              : Variants<T, Rest, R & Record<Head, FromInputToken<T[Head]>>>
-          : IsNonVariant<T[Head]> extends true
-            ? Variants<T, Rest, R>
-            : Variants<T, Rest, R & Record<Head, T[Head]>>
         : ExpandRecursively<R>;
 
 /**
@@ -136,9 +144,13 @@ export type NonVariants<
       infer Head extends keyof T & string,
       ...infer Rest extends readonly (keyof T & string)[],
     ]
-      ? IsNonVariant<T[Head]> extends true
-        ? NonVariants<T, Rest, R & Record<Head, T[Head]>>
-        : NonVariants<T, Rest, R>
+      ? T[Head] extends SchemaCallback
+        ? IsNonVariant<SchemaResult<T[Head]>> extends true
+          ? NonVariants<T, Rest, R & Record<Head, SchemaResult<T[Head]>>>
+          : NonVariants<T, Rest, R>
+        : IsNonVariant<T[Head]> extends true
+          ? NonVariants<T, Rest, R & Record<Head, T[Head]>>
+          : NonVariants<T, Rest, R>
       : ExpandRecursively<R>;
 
 /**
@@ -166,10 +178,15 @@ export type RemoveVariants<
       infer Head extends string & keyof T,
       ...infer Rest extends readonly (string & keyof T)[],
     ]
-      ? IsUnion<T[Head]> extends true
-        ? RemoveVariants<T, Rest, R>
-        : RemoveVariants<T, Rest, R & Record<Head, T[Head]>>
+      ? T[Head] extends SchemaCallback
+        ? IsNonVariant<SchemaResult<T[Head]>> extends true
+          ? RemoveVariants<T, Rest, R & Record<Head, SchemaResult<T[Head]>>>
+          : RemoveVariants<T, Rest, R>
+        : IsUnion<T[Head]> extends true
+          ? RemoveVariants<T, Rest, R>
+          : RemoveVariants<T, Rest, R & Record<Head, T[Head]>>
       : ExpandRecursively<R>;
+
 
 /**
  * Tests whether the context shape defined in the `KindErrorType` has

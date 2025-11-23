@@ -15,6 +15,8 @@ import type {
   TrimEach,
   UnionExtends,
 } from "inferred-types";
+import type { SchemaCallback } from "./SchemaCallback";
+import type { SchemaResult } from "./SchemaResult";
 
 /**
  * Type utility which converts a string literal to a valid
@@ -104,9 +106,11 @@ export type ParseContext<
   infer Head extends string & keyof T,
   ...infer Rest extends readonly (string & keyof T)[],
 ]
-  ? T[Head] extends InputToken
-    ? FromInputToken<T[Head]> extends Error
-      ? ParseContext<T, Rest, R & Record<Head, T[Head]>>
-      : ParseContext<T, Rest, R & Record<Head, FromInputToken<T[Head]>>>
-    : ParseContext<T, Rest, R & Record<Head, T[Head]>>
+  ? T[Head] extends SchemaCallback
+    ? ParseContext<T, Rest, R & Record<Head, SchemaResult<T[Head]>>>
+    : T[Head] extends InputToken
+      ? FromInputToken<T[Head]> extends Error
+        ? ParseContext<T, Rest, R & Record<Head, T[Head]>>
+        : ParseContext<T, Rest, R & Record<Head, FromInputToken<T[Head]>>>
+      : ParseContext<T, Rest, R & Record<Head, T[Head]>>
   : ExpandRecursively<R>;

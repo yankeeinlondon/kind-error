@@ -1,6 +1,6 @@
 import type { Not } from "inferred-types";
 import type { IsNonVariant } from "~/types";
-import { isString } from "inferred-types";
+import { isFunction, isString } from "inferred-types";
 
 /**
  * **isVariant**`(val) -> boolean`
@@ -12,9 +12,15 @@ import { isString } from "inferred-types";
  *   reference.
  */
 export function isVariant<const T>(val: T): string extends T ? boolean : Not<IsNonVariant<T>> {
+  if (isFunction(val)) {
+    return true as string extends T ? boolean : Not<IsNonVariant<T>>;
+  }
+
   return (
     isString(val)
-      ? ["string", "number", "object", "array", "boolean"].includes(val)
+      ? val.startsWith("<<") && val.endsWith(">>")
+        ? true as string extends T ? boolean : Not<IsNonVariant<T>>
+        : ["string", "number", "object", "array", "boolean"].includes(val)
           ? true as string extends T ? boolean : Not<IsNonVariant<T>>
           : val.endsWith("[]")
             ? true as string extends T ? boolean : Not<IsNonVariant<T>>

@@ -46,7 +46,7 @@ export type KindErrorType<
   /**
    * the shape of the error's context properties
    */
-  context: ParseContext<TContext>;
+  context: TContext;
 
   /**
    * **proxy**`(err, [props]) -> KindError`
@@ -73,8 +73,11 @@ export type KindErrorType<
   ) => E extends KindError
     ? E
     : ExpandRecursively<
-      KindError<TName, string, ResolveContext<TContext, P>>
-      & Record<"underlying", E>
+      KindError<
+        TName,
+        string,
+        ResolveContext<TContext, P> & Record<"underlying", E>
+      >
     > & Error;
 
   /**

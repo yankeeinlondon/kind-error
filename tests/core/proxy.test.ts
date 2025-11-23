@@ -5,8 +5,8 @@ import { isKindError } from "~/type-guards";
 
 describe("KindErrorType.proxy()", () => {
     const MyError = createKindError("my-error", {
-        required: "string",
-        optional: "string?",
+        required: t => t.string(),
+        optional: t => t.optString(),
     });
 
     it("should proxy a standard Error object", () => {
