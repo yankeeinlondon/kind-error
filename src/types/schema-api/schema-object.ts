@@ -1,5 +1,5 @@
 import type { FromInputToken__String, InputTokenSuggestions, Narrowable, ObjectKey } from "inferred-types";
-import type { FromSchema, RecordKeySuggestions, SchemaCallback } from "./schema";
+import type { FromSchema, RecordKeySuggestions, SchemaCallback } from "~/types";
 
 /**
  * the object based type definition of `SchemaApi`
@@ -59,8 +59,9 @@ export interface SchemaApi__Object {
   >(
     key: K,
     value: V,
-  ) => FromInputToken__String<K> extends infer Key extends ObjectKey
-  ? Record<
+  ) => FromInputToken__String<K> extends
+  infer Key extends ObjectKey
+    ? Record<
       Key,
       FromInputToken__String<V>
     > & undefined

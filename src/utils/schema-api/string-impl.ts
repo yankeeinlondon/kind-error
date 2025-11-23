@@ -1,21 +1,22 @@
 import type { Suggest } from "inferred-types";
 
+import type { SchemaApi__String } from "~/types/schema-api";
 import { asRuntimeTokenCallback } from "~/utils";
-import { SchemaApi__String } from "~/types/schema-api";
 import { UNION_DELIMITER } from "~/utils/schema";
 
 export const SCHEMA_API_STRING: SchemaApi__String = {
   string<T extends readonly string[]>(...literals: T) {
     return asRuntimeTokenCallback(
-        literals.length === 0 ? "string" : `string::${literals.join(UNION_DELIMITER)}`
+      literals.length === 0 ? "string" : `string::${literals.join(UNION_DELIMITER)}`,
     ) as unknown as [] extends T ? string : T[number];
   },
 
   optString<T extends readonly string[]>(...literals: T) {
     return asRuntimeTokenCallback(
-        literals.length === 0 
-            ? "optString" : `optString::${[...literals, "undefined"].join(UNION_DELIMITER)}`
-        ) as unknown as [] extends T ? string | undefined : T[number] | undefined;
+      literals.length === 0
+        ? "optString"
+        : `optString::${[...literals, "undefined"].join(UNION_DELIMITER)}`,
+    ) as unknown as [] extends T ? string | undefined : T[number] | undefined;
   },
 
   startsWith<T extends readonly string[]>(...literals: T) {
@@ -23,7 +24,6 @@ export const SCHEMA_API_STRING: SchemaApi__String = {
       `startsWith::${literals.join(UNION_DELIMITER)}`,
     ) as unknown as `${T[number]}${string}`;
   },
-  
 
   endsWith<T extends readonly string[]>(...literals: T) {
     return asRuntimeTokenCallback(

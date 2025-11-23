@@ -1,5 +1,4 @@
-
-import { SchemaApi__Atomic } from "~/types/schema-api";
+import type { SchemaApi__Atomic } from "~/types/schema-api";
 import { asRuntimeTokenCallback } from "~/utils";
 
 export const SCHEMA_API_ATOMIC: SchemaApi__Atomic = {

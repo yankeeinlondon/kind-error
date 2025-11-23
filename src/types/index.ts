@@ -7,14 +7,15 @@ export * from "./KindErrorSignature";
 export * from "./KindErrorType";
 export * from "./ResolveContext";
 export * from "./RuntimeToken";
+export * from "./schema-api/index";
 export * from "./SchemaApi";
 export * from "./SchemaCallback";
 export * from "./SchemaDictionary";
 export * from "./SchemaProperty";
 export * from "./SchemaResult";
 export * from "./SchemaTuple";
+export * from "./suggestions";
 export * from "./type-utils";
 export * from "./types";
-export * from "./variants";
 
-export * from "./schema-api/index"
+export * from "./variants";

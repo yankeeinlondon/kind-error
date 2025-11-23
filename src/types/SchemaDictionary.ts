@@ -1,11 +1,11 @@
-import { Narrowable, Scalar } from "inferred-types";
-import { SchemaCallback } from "./SchemaCallback";
+import type { Narrowable, Scalar } from "inferred-types";
+import type { SchemaCallback } from "./SchemaCallback";
 
 /**
  * **SchemaDictionary**
  *
  * A `SchemaDictionary` is a dictionary of key/value pairs. The _values_ can
- * consist of either a scalar literal type or a `SchemaCallback` to define the 
+ * consist of either a scalar literal type or a `SchemaCallback` to define the
  * type via the `SchemaApi`.
  *
  * **Related:** `FromSchema`, `SchemaApi`, `SchemaCallback`

@@ -1,7 +1,6 @@
+import type { CreateNetmask, Email, EmailDomain, Ip4Address, Netmask, SchemaApi__Domain } from "~/types/schema-api";
 
 import { isFunction } from "inferred-types";
-
-import { CreateNetmask, Email, EmailDomain, Ip4Address, Netmask, SchemaApi__Domain } from "~/types/schema-api";
 import { asRuntimeTokenCallback } from "~/utils";
 import { COMMA_DELIMITER } from "~/utils/schema";
 
@@ -26,9 +25,9 @@ export const SCHEMA_API_DOMAIN: SchemaApi__Domain = {
 
   ip4Address<const T extends CreateNetmask | Netmask | undefined = undefined>(filter?: T) {
     return asRuntimeTokenCallback(
-        filter 
-            ? `ip4Address` 
-            : `ip4Address::${filter}`
+      filter
+        ? `ip4Address`
+        : `ip4Address::${filter}`,
     ) as unknown as Ip4Address<T>;
   },
 } as const;

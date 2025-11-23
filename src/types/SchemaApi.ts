@@ -1,12 +1,11 @@
-import { 
-    SchemaApi__ArrayTuple, 
-    SchemaApi__Atomic, 
-    SchemaApi__Domain, 
-    SchemaApi__Numeric, 
-    SchemaApi__Object, 
-    SchemaApi__String 
-} from "./schema-api/index"
-
+import type {
+  SchemaApi__ArrayTuple,
+  SchemaApi__Atomic,
+  SchemaApi__Domain,
+  SchemaApi__Numeric,
+  SchemaApi__Object,
+  SchemaApi__String,
+} from "./schema-api/index";
 
 /**
  * **SchemaApi**

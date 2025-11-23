@@ -10,4 +10,3 @@ export * from "./isSchemaApi";
 export * from "./isSchemaDictionary";
 export * from "./isSchemaTuple";
 export * from "./isStringifyable";
-

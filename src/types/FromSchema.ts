@@ -1,29 +1,28 @@
-import { 
-    EmptyObject, 
-    ExpandRecursively, 
-    Scalar, 
-    StringKeys 
+import type {
+  EmptyObject,
+  ExpandRecursively,
+  Scalar,
+  StringKeys,
 } from "inferred-types";
 
-import { 
-    SchemaDictionary,
-    SchemaCallback,
-    SchemaResult,
-    SchemaProperty, 
-    SchemaTuple,
+import type {
+  SchemaCallback,
+  SchemaDictionary,
+  SchemaProperty,
+  SchemaResult,
+  SchemaTuple,
 } from "~/types";
 
 export type FromSchemaProperty<T extends SchemaProperty> = T extends Scalar
-? T
-: T extends SchemaCallback
+  ? T
+  : T extends SchemaCallback
     ? SchemaResult<T>
-: never;
-
+    : never;
 
 export type FromSchemaDictionary<
-    T extends SchemaDictionary,
-    K extends readonly (keyof T & string)[] = StringKeys<T>,
-    R extends Record<string, unknown> = EmptyObject
+  T extends SchemaDictionary,
+  K extends readonly (keyof T & string)[] = StringKeys<T>,
+  R extends Record<string, unknown> = EmptyObject,
 > = K extends [
   infer Head extends string & keyof T,
   ...infer Rest extends readonly (string & keyof T)[],
@@ -42,29 +41,27 @@ export type FromSchemaDictionary<
   : ExpandRecursively<R>;
 
 export type FromSchemaTuple<
-    T extends SchemaTuple
+  T extends SchemaTuple,
 > = {
-    [K in keyof T]: T[K] extends Scalar
-        ? T[K]
-        : T[K] extends SchemaCallback
-        ? SchemaResult<T[K]>
-        : never
+  [K in keyof T]: T[K] extends Scalar
+    ? T[K]
+    : T[K] extends SchemaCallback
+      ? SchemaResult<T[K]>
+      : never
 };
-
 
 /**
  * **FromSchema**`<T>`
  *
- * Converts a `SchemaProperty`, `SchemaDictionary`, or 
+ * Converts a `SchemaProperty`, `SchemaDictionary`, or
  * `SchemaTuple` into the _type_ it represents.
  */
 export type FromSchema<
   T extends SchemaProperty | SchemaDictionary | SchemaTuple,
 > = T extends SchemaDictionary
-? FromSchemaDictionary<T>
-: T extends SchemaTuple
+  ? FromSchemaDictionary<T>
+  : T extends SchemaTuple
     ? FromSchemaTuple<T>
-: T extends SchemaProperty
-    ? FromSchemaProperty<T>
-: never;
-
+    : T extends SchemaProperty
+      ? FromSchemaProperty<T>
+      : never;

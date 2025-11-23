@@ -1,6 +1,4 @@
-import { TypedFunction } from "inferred-types";
-import { SchemaApi } from "./SchemaApi";
-
+import type { SchemaApi } from "./SchemaApi";
 
 /**
  * **SchemaCallback**
@@ -17,4 +15,3 @@ import { SchemaApi } from "./SchemaApi";
  * the API surface.
  */
 export type SchemaCallback<TReturn = unknown> = (api: SchemaApi) => TReturn;
-

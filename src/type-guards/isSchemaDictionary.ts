@@ -3,12 +3,12 @@ import { isDictionary } from "inferred-types";
 
 /**
  * **isSchemaDictionary**`(val)`
- * 
+ *
  * Checks whether a `val` is a `SchemaDictionary`:
- * 
+ *
  * - a schema dictionary is a key/value type but the values
  *   can be either:
- *     - a raw **scalar** value, or 
+ *     - a raw **scalar** value, or
  *     - a `SchemaCallback` function.
  */
 export function isSchemaDictionary(val: unknown): val is SchemaApi {
