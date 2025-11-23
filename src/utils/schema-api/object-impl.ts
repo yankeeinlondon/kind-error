@@ -17,13 +17,6 @@ export const SCHEMA_API_OBJECT: SchemaApi__Object = {
     return asRuntimeTokenCallback(`map::${key}${COMMA_DELIMITER}${value}`) as unknown as Map<FromInputToken__String<K>, FromInputToken__String<V>>;
   },
 
-  weakmap<K extends InputTokenSuggestions, V extends InputTokenSuggestions>(
-    key: K,
-    value: V,
-  ): Map<FromInputToken__String<K>, FromInputToken__String<V>> {
-    return asRuntimeTokenCallback(`map::${key}${COMMA_DELIMITER}${value}`) as unknown as Map<FromInputToken__String<K>, FromInputToken__String<V>>;
-  },
-
   set<T extends InputTokenSuggestions>(val: T): Set<FromInputToken__String<T>> {
     return asRuntimeTokenCallback(`set::${val}`) as unknown as Set<FromInputToken__String<T>>;
   },

@@ -9,6 +9,7 @@ const InvalidType = createKindError("invalid-type", {
 });
 
 function three() {
+    console.log(InvalidType.toString());
     console.log(InvalidType("uh oh"));
 }
 

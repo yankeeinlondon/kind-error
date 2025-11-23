@@ -34,25 +34,25 @@ export function errorFromError<
   kind: TKind,
   ctx: TCtx,
   err: TErr,
-): KindError<TKind, string, TCtx> {
+): any {
   const context = {
     ...ctx,
     underlying: err,
-  };
+  } as any;
 
   const factory = createKindError(
     kind,
     context,
-  ) as unknown as KindErrorType<TKind, typeof context>;
+  ) as any;
 
-  const error = (factory as any)(err.message) as unknown as KindError<TKind, string, TCtx>;
+  const error = factory(err.message);
 
   (error as any).cause = err;
   if (err.stack) {
-    error.stackTrace = () => createStackTrace(err);
+    error.stackTrace = createStackTrace(err);
   }
 
-  return error as KindError<TKind, string, TCtx>;
+  return error;
 };
 
 export function errorFromResponse<
@@ -64,15 +64,15 @@ export function errorFromResponse<
   kind: TKind,
   ctx: TCtx,
   res: TErr,
-) {
+): any {
   const context = {
     ...ctx,
     underlying: res,
-  };
+  } as any;
 
-  const wrapper = createKindError(kind, context) as unknown as KindErrorType<TKind, typeof context>;
+  const wrapper = createKindError(kind, context) as any;
 
-  return (wrapper as any)((res as any).statusText);
+  return wrapper((res as any).statusText);
 }
 
 export function getMessageInObject<
@@ -106,7 +106,7 @@ export function errorFromObject<
   kind: TKind,
   ctx: TCtx,
   obj: TObj,
-) {
+): any {
   const message = getMessageInObject(
     obj,
     "message",
@@ -121,11 +121,11 @@ export function errorFromObject<
   const context = {
     ...ctx,
     underlying: obj,
-  };
+  } as any;
 
-  const error = createKindError(kind, context) as unknown as KindErrorType<TKind, typeof context>;
+  const error = createKindError(kind, context) as any;
 
-  return (error as any)(message);
+  return error(message);
 }
 
 /**
@@ -142,15 +142,15 @@ export function errorFromRest<
   kind: TKind,
   ctx: TCtx,
   rest: TRest,
-) {
+): any {
   const message = isString(rest)
     ? rest
     : isObject(rest)
-      ? hasIndexOf(rest, "error") && typeof (rest as any).error === "string"
+      ? hasIndexOf(rest as any, "error") && typeof (rest as any).error === "string"
         ? (rest as any).error
-        : hasIndexOf(rest, "msg") && typeof (rest as any).msg === "string"
+        : hasIndexOf(rest as any, "msg") && typeof (rest as any).msg === "string"
           ? (rest as any).msg
-          : hasIndexOf(rest, "message") && typeof (rest as any).message === "string"
+          : hasIndexOf(rest as any, "message") && typeof (rest as any).message === "string"
             ? (rest as any).message
             : "Unknown"
       : "Unknown";
@@ -160,8 +160,8 @@ export function errorFromRest<
     {
       ...ctx,
       underlying: rest,
-    },
-  ) as unknown as KindErrorType<TKind, Record<string, unknown>>;
+    } as any,
+  ) as any;
 
-  return (error as any)(message as string);
+  return error(message as string);
 }

@@ -13,9 +13,13 @@ export function setSchemaApi(api: any) {
 export const SCHEMA_API_DOMAIN: SchemaApi__Domain = {
   email<T extends readonly EmailDomain[]>(...constraints: T) {
     const c = constraints.map(
-      i => isFunction(i)
-        ? i(_schemaApi)()
-        : i,
+      (i) => {
+        if (isFunction(i)) {
+          const result = i(_schemaApi);
+          return isFunction(result) ? result() : result;
+        }
+        return i;
+      },
     );
     return asRuntimeTokenCallback(constraints.length === 0
       ? `email`

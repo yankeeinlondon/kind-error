@@ -14,7 +14,6 @@ import {
   isFunction,
   isScalar,
   Never,
-  toJson,
 } from "inferred-types";
 import { isSchemaDictionary } from "~/type-guards";
 import {
@@ -112,7 +111,7 @@ export function schemaObject<const T extends Record<string, Scalar | SchemaCallb
     output[k] = isFunction(val) ? val() : val;
   }
 
-  return asRuntimeTokenCallback(`dictionary::${toJson(output)}`) as unknown as DetectOptionalValues<FromSchema<T>>;
+  return asRuntimeTokenCallback(`dictionary::${JSON.stringify(output)}`) as unknown as DetectOptionalValues<FromSchema<T>>;
 }
 
 setSchemaApi(SCHEMA_API);

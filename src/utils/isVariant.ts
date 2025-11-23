@@ -11,34 +11,34 @@ import { isFunction, isString } from "inferred-types";
  *   context schema are a static value/type literal or a _variant_ type
  *   reference.
  */
-export function isVariant<const T>(val: T): string extends T ? boolean : Not<IsNonVariant<T>> {
+export function isVariant<const T>(val: T): boolean {
   if (isFunction(val)) {
-    return true as string extends T ? boolean : Not<IsNonVariant<T>>;
+    return true;
   }
 
   return (
     isString(val)
       ? val.startsWith("<<") && val.endsWith(">>")
-        ? true as string extends T ? boolean : Not<IsNonVariant<T>>
+        ? true
         : ["string", "number", "object", "array", "boolean"].includes(val)
-          ? true as string extends T ? boolean : Not<IsNonVariant<T>>
+          ? true
           : val.endsWith("[]")
-            ? true as string extends T ? boolean : Not<IsNonVariant<T>>
+            ? true
             : val.startsWith("Record<") && val.endsWith(">")
-              ? true as string extends T ? boolean : Not<IsNonVariant<T>>
+              ? true
               : val.startsWith("Map<") && val.endsWith(">")
-                ? true as string extends T ? boolean : Not<IsNonVariant<T>>
+                ? true
                 : val.startsWith("Array<") && val.endsWith(">")
-                  ? true as string extends T ? boolean : Not<IsNonVariant<T>>
+                  ? true
                   : val.startsWith("WeakMap<") && val.endsWith(">")
-                    ? true as string extends T ? boolean : Not<IsNonVariant<T>>
+                    ? true
                     : val.startsWith("[") && val.endsWith("]")
-                      ? true as string extends T ? boolean : Not<IsNonVariant<T>>
+                      ? true
                       : val.startsWith("{") && val.endsWith("}")
-                        ? true as string extends T ? boolean : Not<IsNonVariant<T>>
+                        ? true
                         : val.includes("|")
-                          ? true as string extends T ? boolean : Not<IsNonVariant<T>>
-                          : false as string extends T ? boolean : Not<IsNonVariant<T>>
-      : false as string extends T ? boolean : Not<IsNonVariant<T>>
+                          ? true
+                          : false
+      : false
   );
 }

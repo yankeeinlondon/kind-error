@@ -122,7 +122,7 @@ export function proxyFn<
 
       return (
         isNumber(code)
-          ? asKindError({
+          ? (asKindError as any)({
               kind,
               message,
               code,
@@ -130,7 +130,7 @@ export function proxyFn<
               ...schemaKeyValue,
               ...ctx,
             })
-          : asKindError({
+          : (asKindError as any)({
               kind,
               message,
               underlying: errLike,

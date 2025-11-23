@@ -5,6 +5,8 @@ import {
     createFnWithProps,
     err,
     toPascalCase,
+    toStringLiteral,
+    toStringLiteral__Object,
 } from "inferred-types";
 import {
     asKindSubType,
@@ -16,6 +18,7 @@ import {
 import { toJsonFn, toStringFn } from "./instance";
 import { proxyFn } from "./static";
 import { isKindError } from "./type-guards";
+import chalk from "chalk";
 
 type Rtn<
     TName extends string,
@@ -110,7 +113,7 @@ export function createKindError<
         },
 
         toString() {
-            return `KindErrorType::${pascalName}(${name})`;
+            return `${chalk.dim("KindErrorType::")}${chalk.bold.blue(pascalName)}${chalk.bold(" (")}${chalk(toStringLiteral(schema as any))}${chalk.bold(")")}`;
         },
 
         toJSON() {

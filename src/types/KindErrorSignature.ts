@@ -64,7 +64,7 @@ export type KindErrorSignature<
       >
     : <
         TMsg extends string,
-        const TCtx extends AsContextShape<TSchema> = EmptyObject,
+        const TCtx extends Partial<AsContextShape<TSchema>> = EmptyObject,
       >(msg: TMsg,
         ctx?: TCtx) => KindError<
         TName,
