@@ -40,6 +40,14 @@ describe("NonVariants<T>", () => {
             Expect<AssertEqual<T, { foo: "foo"}>>
         ];
     });
+
+    it("handling optional props", () => {
+        type T = NonVariants<{ foo: "foo"; bar: string; baz?: 1|2|3 }>;
+    
+        type cases = [
+            Expect<AssertEqual<T, { foo: "foo"}>>
+        ];
+    });
     
     
 

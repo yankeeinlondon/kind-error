@@ -5,7 +5,6 @@ import type {
 } from "inferred-types/types";
 import type {
     KindError,
-    KindErrorType,
     KindErrorTypeName,
 } from "~";
 import { describe, expect, it } from "vitest";
@@ -35,7 +34,7 @@ describe("kindError", () => {
         expect(typeof FooBar.is).toBe("function");
         expect(typeof FooBar.proxy).toBe("function");
 
-        expect(FooBar.context).toEqual({ foo: 42 });
+        expect(FooBar.schema).toEqual({ foo: 42 });
 
         const expected = {
             name: "FooBarErrorType",
@@ -43,7 +42,7 @@ describe("kindError", () => {
             kind: "foo/bar",
             type: "foo",
             subType: "bar",
-            context: { foo: 42 },
+            schema: { foo: 42 },
             errorName: "FooBar",
         };
         const str = JSON.stringify(FooBar);
@@ -63,7 +62,7 @@ describe("kindError", () => {
             //     KindErrorType<"foo/bar", { foo: 42 }>
             // >>,
             Expect<Equal<typeof FooBar["kind"], "foo/bar">>,
-            Expect<AssertExtends<typeof FooBar["context"], { foo: 42 }>>,
+            Expect<AssertExtends<typeof FooBar["schema"], { foo: 42 }>>,
         ];
     });
 
@@ -78,7 +77,7 @@ describe("kindError", () => {
         expect(typeof FooBar.is).toBe("function");
         expect(typeof FooBar.proxy).toBe("function");
 
-        expect(FooBar.context).toEqual({});
+        expect(FooBar.schema).toEqual({});
         expect(FooBar.toString()).toBe("KindErrorType::FooBar(foo/bar)");
 
         type cases = [
@@ -87,8 +86,8 @@ describe("kindError", () => {
             //     KindErrorType<"foo/bar">
             // >>,
             Expect<Equal<typeof FooBar["kind"], "foo/bar">>,
-            Expect<Extends<typeof FooBar["context"], {}>>,
-            Expect<Extends<{}, typeof FooBar["context"]>>,
+            Expect<Extends<typeof FooBar["schema"], {}>>,
+            Expect<Extends<{}, typeof FooBar["schema"]>>,
         ];
     });
 
@@ -139,25 +138,6 @@ describe("kindError", () => {
                 bob: "yur uncle";
                 uncle: "bob";
             }>>>>,
-        ];
-    });
-
-
-
-    it.skip("with conflicting base context", () => {
-        // const err = createKindError("foo-bar", { foo: 42 });
-        // const fooBar = err("oh my!", { foo: 1, bar: 55 });
-
-        // expect(fooBar.name).toEqual("FooBar");
-        // expect(fooBar.kind).toEqual("foo-bar");
-
-        // expect(fooBar.context).toEqual({ foo: 1, bar: 55 });
-
-        type _cases = [
-            // Expect<Extends<typeof err, KindErrorType<"foo-bar", { foo: 42 }>>>,
-            // Expect<AssertExtends<typeof fooBar, KindError<"FooBar", "oh my!", Readonly<{ foo: 1; bar: 55 }>>>>,
-            // Expect<Equal<(typeof fooBar)["kind"], "foo-bar">>,
-            // Expect<Equal<(typeof fooBar)["name"], "FooBar">>,
         ];
     });
 

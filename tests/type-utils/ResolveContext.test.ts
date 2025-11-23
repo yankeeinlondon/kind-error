@@ -66,10 +66,14 @@ describe("ResolveContext<TSchema,TCtx>", () => {
     
     
     it("schema with one required, one optional; context fills required only", () => {
-        type T = ResolveContext<{foo: string; bar: number | undefined}, { foo: "foo" }>;
+        type T = ResolveContext<{
+            foo: string; 
+            bar: number | undefined
+        }, { foo: "foo" }
+        >;
     
         type cases = [
-            // this demonstrates the the schema's `bar` property is left off
+            // this demonstrates the the schema's `bar` property is explicitly set to undefined
             // when it's not defined
             Expect<AssertEqual<T, {foo: "foo"}>>
         ];
@@ -95,7 +99,8 @@ describe("ResolveContext<TSchema,TCtx>", () => {
                 foo: "foo"; 
                 bar: false;
                 __warning: `The context provided for this error had properties which were inconsistent with the schema defined by the KindErrorType!`;
-                __schema: { foo: string; bar: number | undefined}
+                __schema: { foo: string; bar: number | undefined},
+                __ctx: { foo: "foo", bar: false }
             }>>
         ];
     });
@@ -117,7 +122,8 @@ describe("ResolveContext<TSchema,TCtx>", () => {
                 lib: "kind-error"; 
                 color: "green";
                 __warning: `The context provided for this error had properties which were inconsistent with the schema defined by the KindErrorType!`,
-                __schema: { lib: "kind-error"; color: "red" | "blue" }
+                __schema: { color: "red" | "blue" },
+                __ctx: { color: "green" }
             }>>
         ];
     });

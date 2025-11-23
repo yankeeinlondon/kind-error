@@ -10,7 +10,6 @@ import type {
   HasRequiredVariants,
   KindError,
   KindErrorName,
-  ParseContext,
   ResolveContext,
 } from "~/types";
 
@@ -25,7 +24,7 @@ import type {
  */
 export type KindErrorType<
   TName extends string = string,
-  TContext extends Record<string, unknown> = Record<string, unknown>,
+  TSchema extends Record<string, unknown> = Record<string, unknown>,
 > = {
   /** unique identifier of a `KindErrorType` */
   __kind: "KindErrorType";
@@ -46,7 +45,7 @@ export type KindErrorType<
   /**
    * the shape of the error's context properties
    */
-  context: TContext;
+  schema: TSchema;
 
   /**
    * **proxy**`(err, [props]) -> KindError`
@@ -66,17 +65,17 @@ export type KindErrorType<
    */
   proxy: <
     E,
-    P extends AsContextShape<TContext>,
+    P extends AsContextShape<TSchema>,
   >(
     err: E,
-    ...args: HasRequiredVariants<TContext> extends true ? [props: P] : [props?: P]
+    ...args: HasRequiredVariants<TSchema> extends true ? [props: P] : [props?: P]
   ) => E extends KindError
     ? E
     : ExpandRecursively<
       KindError<
         TName,
         string,
-        ResolveContext<TContext, P> & Record<"underlying", E>
+        ResolveContext<TSchema, P> & Record<"underlying", E>
       >
     > & Error;
 
@@ -88,9 +87,9 @@ export type KindErrorType<
    * properties to set at instantiation (because these context parameters have now been
    * set and made static)
    */
-  partial: <const T extends Partial<AsContextShape<TContext>>>(
+  partial: <const T extends Partial<AsContextShape<TSchema>>>(
     context: T,
-  ) => KindErrorType<TName, MergeObjects<TContext, T>>;
+  ) => KindErrorType<TName, MergeObjects<TSchema, T>>;
 
   /**
    * **is**`(val): val is KindError<TName, string, TContext>`
@@ -99,8 +98,8 @@ export type KindErrorType<
    */
   is: (
     val: unknown,
-  ) => val is KindError<TName, string, ResolveContext<TContext, undefined>>;
+  ) => val is KindError<TName, string, ResolveContext<TSchema, undefined>>;
 
   toString: () => string;
 
-} & KindErrorSignature<TName, TContext>;
+} & KindErrorSignature<TName, TSchema>;

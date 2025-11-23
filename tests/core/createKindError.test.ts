@@ -9,7 +9,6 @@ import {
     isKindErrorType, 
     KindError, 
     KindErrorShape, 
-    KindErrorType,
     SchemaCallback
 } from "~";
 import { AssertExtends, EmptyObject } from "inferred-types";
@@ -49,7 +48,7 @@ describe("Defining Error Types", () => {
             expect(typeof MyError.is).toBe("function");
             expect(typeof MyError.partial).toBe("function");
             expect(typeof MyError.proxy).toBe("function");
-            expect(MyError.context).toEqual({});
+            expect(MyError.schema).toEqual({});
 
             expect(isKindErrorType(MyError)).toBe(true);
 
@@ -81,7 +80,7 @@ describe("Defining Error Types", () => {
             expect(typeof MyError.is).toBe("function");
             expect(typeof MyError.partial).toBe("function");
             expect(typeof MyError.proxy).toBe("function");
-            expect(MyError.context).toEqual({ test: true });
+            expect(MyError.schema).toEqual({ test: true });
 
             // the type of the ErrorKindType
             type Kind = typeof MyError;
@@ -93,7 +92,7 @@ describe("Defining Error Types", () => {
             type cases = [
                 Expect<AssertEqual<Params, [msg: string, ctx?: EmptyObject]>>,
                 Expect<AssertEqual<Kind["kind"], "my-error">>,
-                Expect<AssertEqual<Kind["context"], { test: true }>>,
+                Expect<AssertEqual<Kind["schema"], { test: true }>>,
                 Expect<AssertExtends<Rtn,KindErrorShape>>,
                 Expect<AssertExtends<Rtn,KindError>>,
             ];
@@ -113,8 +112,8 @@ describe("Defining Error Types", () => {
             expect(typeof MyError.is).toBe("function");
             expect(typeof MyError.partial).toBe("function");
             expect(typeof MyError.proxy).toBe("function");
-            expect(MyError.context.test).toBe(true);
-            expect(typeof MyError.context.foo).toBe("function");
+            expect(MyError.schema.test).toBe(true);
+            expect(typeof MyError.schema.foo).toBe("function");
 
             type Kind = typeof MyError;
             type Params = Parameters<Kind>;
@@ -122,7 +121,7 @@ describe("Defining Error Types", () => {
 
             type cases = [
                 Expect<AssertEqual<Kind["kind"], "my-error">>,
-                Expect<AssertExtends<Kind["context"], { test: true, foo: SchemaCallback }>>,
+                Expect<AssertExtends<Kind["schema"], { test: true, foo: SchemaCallback }>>,
                 Expect<AssertEqual<
                     Params,
                     [msg: string, ctx?: { foo?: string }]
@@ -135,7 +134,7 @@ describe("Defining Error Types", () => {
         it("literal context, foo required, nothing optional", () => {
             const MyError = createKindError("my-error", {
                 test: true,
-                foo: "string"
+                foo: t => t.string()
             });
 
             expect(typeof MyError).toBe("function");
@@ -145,7 +144,7 @@ describe("Defining Error Types", () => {
             expect(typeof MyError.is).toBe("function");
             expect(typeof MyError.partial).toBe("function");
             expect(typeof MyError.proxy).toBe("function");
-            expect(MyError.context).toEqual({ test: true, foo: "string"});
+            expect(MyError.schema).toEqual({ test: true, foo: "string"});
             
             type Kind = typeof MyError;
             type Params = Parameters<Kind>;
@@ -153,7 +152,7 @@ describe("Defining Error Types", () => {
 
             type cases = [
                 Expect<AssertEqual<Kind["kind"], "my-error">>,
-                Expect<AssertExtends<Kind["context"], { test: true; foo: "string" }>>,
+                Expect<AssertExtends<Kind["schema"], { test: true; foo: "string" }>>,
                 Expect<AssertEqual<
                     Params,
                     [msg: string, ctx: { foo: string }]
@@ -162,6 +161,34 @@ describe("Defining Error Types", () => {
                 Expect<AssertExtends<Rtn, KindError>>,
             ];
         });
+    })
+
+    describe("Advanced", () => {
+
+        
+        it("variant types defined in schema are not populated in final context properties", () => {
+            const Invalid = createKindError("invalid", {
+                lib: "kind-error",
+                color: t => t.optString("red","blue","green")
+            });
+
+            const err = Invalid("uh oh");
+            const withColor = Invalid("uh oh", { color: "blue"});
+
+            expect(err.lib).toBe("kind-error")
+            expect(err?.color).toBe(undefined);
+        
+            type cases = [
+                Expect<AssertEqual<typeof err["message"], "uh oh">>,
+                Expect<AssertEqual<typeof err["lib"], "kind-error">>,
+                Expect<AssertExtends<typeof err["color"], undefined>>,
+
+                Expect<AssertEqual<typeof withColor["message"], "uh oh">>,
+                Expect<AssertEqual<typeof withColor["lib"], "kind-error">>,
+                Expect<AssertExtends<typeof withColor["color"], "blue">>,
+            ];
+        });
+        
     })
 
 });

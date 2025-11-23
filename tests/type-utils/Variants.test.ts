@@ -48,6 +48,14 @@ describe("StripNonVariantValues<T>", () => {
         ];
     });
 
+    it("handling optional properties", () => {
+        type T = Variants<{ foo?: 1|2|3; bar: "bar" }>;
+
+        type cases = [
+            Expect<AssertEqual<T, {foo: 1|2|3|undefined}>>,
+        ];
+    });    
+
     it("null is considered non-variant", () => {
         type T = Variants<{ foo: null; bar: "bar" }>;
 

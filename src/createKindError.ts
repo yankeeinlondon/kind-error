@@ -1,5 +1,5 @@
-import type { Contains, EmptyObject, Err, MergeObjects } from "inferred-types";
-import type { AsContextShape, KindError, KindErrorType, SchemaDictionary } from "~/types";
+import type { As, Contains, EmptyObject, Err, MergeObjects, Mutable } from "inferred-types";
+import type { AsContextShape, DetectOptionalValues, FromSchema, KindError, KindErrorType, ResolveContext, SchemaDictionary } from "~/types";
 import { inspect } from "node:util";
 import {
     createFnWithProps,
@@ -19,13 +19,13 @@ import { isKindError } from "./type-guards";
 
 type Rtn<
     TName extends string,
-    TContext extends Record<string, unknown>,
+    TSchema extends SchemaDictionary,
 > = Contains<TName, "<" | ">" | "[" | "]" | "(" | ")"> extends true
     ? Err<
         "invalid-name",
         `The name for a KindError must not include any of the following characters: "<", ">", "[", "]", "(", ")"`
     >
-    : KindErrorType<TName, TContext>;
+    : KindErrorType<TName, DetectOptionalValues<FromSchema<TSchema>>>;
 
 /**
  * **createKindError**`(name, context)`
@@ -43,9 +43,16 @@ export function createKindError<
     if (/[<>[\]()]/.test(name)) {
         return err("invalid-name", `The name for a KindError must not include any of the following characters: "<", ">", "[", "]", "(", ")"`) as Rtn<TName, TSchema>;
     }
-    const partial = <const C extends AsContextShape<TSchema>>(ctx: C) => {
-        return createKindError(name, { ...schema, ...ctx } as MergeObjects<TSchema, C>);
-    };
+
+    const partial = <const C extends SchemaDictionary>(ctx: C) => {
+        return createKindError(
+            name,
+            { ...schema, ...ctx }
+        ) as unknown as KindErrorType<
+            TName,
+            ResolveContext<TSchema,C>
+        >;
+    } ;
 
     const pascalName = toPascalCase(name.replace(/\//g, "-"));
 
@@ -74,7 +81,6 @@ export function createKindError<
         err.message = msg;
         err.stackTrace = () => stackTrace;
         err.stack = err.stack || "";
-        err.context = mergedContext;
         Object.assign(err, mergedContext);
 
         err.toString = toStringFn(err);
@@ -93,7 +99,7 @@ export function createKindError<
         errorName: pascalName,
         type: asKindType(name),
         subType: asKindSubType<TName>(name),
-        context: schema,
+        schema,
 
         proxy: proxyFn(name, schema),
 
@@ -115,7 +121,7 @@ export function createKindError<
                 errorName: pascalName,
                 type: asKindType(name),
                 subType: asKindSubType(name),
-                context: schema,
+                schema,
             };
         },
     };

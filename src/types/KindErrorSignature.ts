@@ -1,4 +1,4 @@
-import type { IsEqual } from "inferred-types";
+import type { EmptyObject, IsEqual } from "inferred-types";
 import type {
   AsContextShape,
   HasRequiredVariants,
@@ -45,7 +45,7 @@ export type KindErrorSignature<
 > = IsEqual<TSchema, Record<string, unknown>> extends true
   ? <
       TMsg extends string,
-      const TCtx extends Record<string, unknown>,
+      const TCtx extends Record<string, unknown> = EmptyObject,
     >(msg: TMsg,
       ctx?: TCtx) => KindError<
       TName,
@@ -64,7 +64,7 @@ export type KindErrorSignature<
       >
     : <
         TMsg extends string,
-        const TCtx extends AsContextShape<TSchema>,
+        const TCtx extends AsContextShape<TSchema> = EmptyObject,
       >(msg: TMsg,
         ctx?: TCtx) => KindError<
         TName,

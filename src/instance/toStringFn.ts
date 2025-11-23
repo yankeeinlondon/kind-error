@@ -5,9 +5,6 @@ import { Never } from "inferred-types";
 import { resolve } from "pathe";
 import { fileLink, link } from "~/link";
 import { isStringifyable } from "~/type-guards";
-
-// TODO: refactor call signature
-
 /**
  * creates the `toString()` function for a `KindError`
  */

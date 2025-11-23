@@ -27,7 +27,7 @@ describe("KindErrorType.partial()", () => {
 
         // Assert Runtime
         expect(SpecificErr.kind).toBe("my-error");
-        expect(SpecificErr.context).toEqual({
+        expect(SpecificErr.schema).toEqual({
             region: "us-east",
             code: 404,
             user: "string" 
@@ -81,7 +81,7 @@ describe("KindErrorType.partial()", () => {
         const err = Step2("server error", { user: "admin" });
 
         // Assert Runtime
-        expect(Step2.context).toEqual({
+        expect(Step2.schema).toEqual({
             region: "us-west",
             code: 500,
             user: "string"

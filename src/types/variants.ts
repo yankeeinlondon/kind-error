@@ -83,7 +83,7 @@ export type HasNonVariant<
  */
 export type Variants<
   T extends Record<string, unknown>,
-  K extends readonly (keyof T & string)[] = StringKeys<T>,
+  K extends readonly (keyof T & string)[] = StringKeys<Required<T>>,
   R extends Record<string, unknown> = EmptyObject,
 > = IsEqual<T, EmptyObject> extends true
   ? EmptyObject
@@ -134,7 +134,7 @@ export type HasVariant<
  */
 export type NonVariants<
   T extends Record<string, unknown>,
-  K extends readonly (keyof T & string)[] = StringKeys<T>,
+  K extends readonly (keyof T & string)[] = StringKeys<Required<T>>,
   R extends Record<string, unknown> = EmptyObject,
 > = IsEqual<T, Record<string, unknown>> extends true
   ? EmptyObject
