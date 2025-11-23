@@ -3,35 +3,30 @@ import {
     Scalar,
     EN_SPACE,
     THIN_SPACE,
-    narrow
+    narrow,
+    isScalar,
+    toJson
 } from "inferred-types";
 import type {
     DetectOptionalValues,
-    FromSchemaObject,
     FromSchemaTuple,
-    AsRuntimeToken,
     SchemaApi,
     SchemaCallback,
     SchemaResult,
+    FromSchema,
 } from "~/types";
 import {
-    isArray,
-    isDictionary,
     isFunction,
-    isScalar,
     Never,
 } from "inferred-types";
 import { isSchemaDictionary } from "~/type-guards";
+import { SCHEMA_API_ARRAY_TUPLE, SCHEMA_API_ATOMIC, SCHEMA_API_DOMAIN, SCHEMA_API_NUMERIC, SCHEMA_API_OBJECT, SCHEMA_API_STRING } from "./schema-api";
+import { asRuntimeTokenCallback } from "./asRuntimeToken";
 
-import { asToken } from "../asToken";
-import { SCHEMA_API_ARRAY_TUPLE } from "./array-impl";
-import { SCHEMA_API_ATOMIC } from "./atomic-impl";
-import { SCHEMA_API_DOMAIN, setSchemaApi } from "./domain-impl";
-import { SCHEMA_API_NUMERIC } from "./numeric-impl";
-import { SCHEMA_API_OBJECT } from "./object-impl";
-import { SCHEMA_API_STRING } from "./string-impl";
+
 
 export const UNION_DELIMITER = `${EN_SPACE}|${EN_SPACE}` as const;
+export const COMMA_DELIMITER = `,${EN_SPACE}` as const;
 export const TOKEN_START = narrow(`<<${THIN_SPACE}`);
 export const TOKEN_END = `${THIN_SPACE}>>` as const;
 
@@ -46,27 +41,28 @@ export const SCHEMA_API = {
     ...SCHEMA_API_DOMAIN,
 
     union<const T extends readonly unknown[]>(...members: T): T[number] {
-        return asToken(() => members.join(UNION_DELIMITER)) as unknown as T[number];
+        return asRuntimeTokenCallback(`union::${members.join(UNION_DELIMITER)}`) as unknown as T[number];
     },
 } as SchemaApi;
-
-setSchemaApi(SCHEMA_API);
 
 /**
  * **schemaProp**`(cb) => type`
  *
  * Defines a _type_ for property in a schema.
  */
-export function schemaProp<T extends SchemaCallback>(cb: T): SchemaResult<T> {
-    const rtn = cb(SCHEMA_API);
-    return asToken(
-        () =>
-            isFunction(rtn)
-                ? rtn()
-                : isSchemaDictionary(rtn)
+export function schemaProp<T extends SchemaCallback | Scalar>(cb: T): T extends SchemaCallback ? SchemaResult<T>: T {
+    const resolved = isScalar(cb)
+        ? cb
+        : isFunction(cb)
+            ? cb(SCHEMA_API)
+            : Never;
+    return asRuntimeTokenCallback(
+            isFunction(resolved)
+                ? resolved()
+                : isSchemaDictionary(resolved)
                     ? Never
-                    : rtn,
-    ) as SchemaResult<T>;
+                    : resolved,
+    ) as T extends SchemaCallback ? SchemaResult<T>: T;
 }
 
 /**
@@ -76,10 +72,18 @@ export function schemaProp<T extends SchemaCallback>(cb: T): SchemaResult<T> {
  * tuple type that these tokens are meant to represent.
  */
 export function schemaTuple<const T extends readonly (Scalar | SchemaCallback)[]>(...elements: T) {
-    return asToken(
-        () => `<<tuple::${elements.map(t => isFunction(t)
-            ? (t(SCHEMA_API) as AsRuntimeToken)()
-            : t?.toString()).join(", ")}>>`,
+    const tokens = elements.map(t => {
+        return (
+            isScalar(t)
+                ? t
+                : isFunction(t)
+                    ? t(SCHEMA_API)
+                    : Never
+        );
+    });
+
+    return asRuntimeTokenCallback(
+        `tuple::${tokens.join(COMMA_DELIMITER)}`,
     ) as unknown as FromSchemaTuple<[...T]>;
 }
 
@@ -98,25 +102,5 @@ export function schemaObject<const T extends Record<string, Scalar | SchemaCallb
 
     }
 
-    return asToken(() => output) as unknown as DetectOptionalValues<FromSchemaObject<T>>
-}
-
-
-export function asSchema<
-    const T extends SchemaCallback | Scalar | readonly (Scalar | SchemaCallback)[] | Record<string, Scalar | SchemaCallback>
->(
-    schema: T
-) {
-
-    return (
-        isArray(schema)
-            ? schemaTuple(schema as any)
-            : isDictionary(schema)
-                ? schemaObject(schema)
-                : isScalar(schema)
-                    ? schemaProp(schema as SchemaCallback)
-                    : Never
-
-    )
-
+    return asRuntimeTokenCallback(`dictionary::${toJson(output)}`) as unknown as DetectOptionalValues<FromSchema<T>>
 }

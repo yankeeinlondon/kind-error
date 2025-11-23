@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest';
 import {
     Expect,
 } from "inferred-types";
-import { schemaObject, schemaProp, schemaTuple } from "~/utils/schema";
+import { COMMA_DELIMITER, schemaObject, schemaProp, schemaTuple, TOKEN_END, TOKEN_START, UNION_DELIMITER } from "~/utils";
 import { AssertEqual, isFunction, Suggest } from "inferred-types";
-import {  isRuntimeToken } from '~';
+import {  isRuntimeToken, isRuntimeTokenCallback } from '~';
 
 describe("Schema", () => {
 
@@ -13,9 +13,9 @@ describe("Schema", () => {
         it("just scalars", () => {
             const t = schemaTuple("foo","bar",42);
 
-            expect(isRuntimeToken(t)).toBe(true);
-            if(isRuntimeToken(t)) {
-                expect(t()).toBe("<<tuple::foo, bar, 42>>")
+            expect(isRuntimeTokenCallback(t)).toBe(true);
+            if(isRuntimeTokenCallback(t)) {
+                expect(t()).toBe(`${TOKEN_START}tuple::foo${COMMA_DELIMITER}bar${COMMA_DELIMITER}42${TOKEN_END}`)
             }
         
             type cases = [
@@ -28,12 +28,12 @@ describe("Schema", () => {
             expect(isFunction(tup)).toBe(true);
 
             expect(
-                isRuntimeToken(tup), 
+                isRuntimeTokenCallback(tup), 
                 `tuple = ${JSON.stringify((tup as any)())} & { kind: "${(tup as any)?.kind}"}`
             ).toBe(true);
 
-            if(isRuntimeToken(tup)) {
-                expect(tup()).toBe(`<<tuple::foo | bar, number>>`)
+            if(isRuntimeTokenCallback(tup)) {
+                expect(tup()).toBe(`${TOKEN_START}tuple::${TOKEN_START}string::foo${UNION_DELIMITER}bar${TOKEN_END}${COMMA_DELIMITER}${TOKEN_START}number${TOKEN_END}${TOKEN_END}`)
             }
         
             type cases = [
@@ -45,7 +45,7 @@ describe("Schema", () => {
         it("mixed", () => {
             const tup = schemaTuple("foo", t => t.number());
             expect(isFunction(tup)).toBe(true);
-            expect(isRuntimeToken(tup)).toBe(true);
+            expect(isRuntimeTokenCallback(tup)).toBe(true);
         
             type cases = [
                 Expect<AssertEqual<typeof tup, ["foo", number]>>
@@ -62,10 +62,12 @@ describe("Schema", () => {
                 bar: t=>t.number()
             });
 
-            expect(isRuntimeToken(t)).toBe(true);
+            expect(isRuntimeTokenCallback(t)).toBe(true);
 
-            if(isRuntimeToken(t)) {
-                expect(t()).toBe("<<string>>")
+            if(isRuntimeTokenCallback(t)) {
+                expect(t()).toBe(`${TOKEN_START}string${TOKEN_END}`); // TODO
+            } else {
+                throw new Error("t should have been a RuntimeTokenCallback")
             }
         
             type cases = [

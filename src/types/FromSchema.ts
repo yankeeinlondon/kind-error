@@ -2,7 +2,6 @@ import {
     EmptyObject, 
     ExpandRecursively, 
     Scalar, 
-    ScalarCallback, 
     StringKeys 
 } from "inferred-types";
 
@@ -43,11 +42,11 @@ export type FromSchemaDictionary<
   : ExpandRecursively<R>;
 
 export type FromSchemaTuple<
-    T extends readonly SchemaProperty[]
+    T extends SchemaTuple
 > = {
     [K in keyof T]: T[K] extends Scalar
         ? T[K]
-        : T[K] extends ScalarCallback
+        : T[K] extends SchemaCallback
         ? SchemaResult<T[K]>
         : never
 };

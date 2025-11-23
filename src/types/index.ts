@@ -1,5 +1,6 @@
 export * from "./base-types";
 export * from "./error-shapes";
+export * from "./FromSchema";
 export * from "./KindError";
 export * from "./KindErrorParams";
 export * from "./KindErrorSignature";

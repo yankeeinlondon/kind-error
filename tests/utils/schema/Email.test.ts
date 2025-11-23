@@ -3,18 +3,18 @@ import { describe, expect, it } from "vitest";
 import {
     AssertEqual,
     Expect,
-} from "inferred-types/types";
-import { schemaProp } from "~/utils";
-import { isRuntimeToken } from "~";
+} from "inferred-types";
+import { schemaProp, TOKEN_END, TOKEN_START } from "~/utils";
+import {  isRuntimeTokenCallback } from "~";
 
 describe("Email", () => {
 
     it("no params", () => {
         const email = schemaProp(t => t.email());
 
-        expect(isRuntimeToken(email)).toBe(true);
-        if(isRuntimeToken(email)) {
-            expect(email()).toBe("<<email>>")
+        expect(isRuntimeTokenCallback(email)).toBe(true);
+        if(isRuntimeTokenCallback(email)) {
+            expect(email()).toBe(`${TOKEN_START}email${TOKEN_END}`)
         }
 
         type cases = [
@@ -25,9 +25,9 @@ describe("Email", () => {
     it("single domain email", () => {
         const email = schemaProp(t => t.email("microsoft.com"));
 
-        expect(isRuntimeToken(email)).toBe(true);
-        if(isRuntimeToken(email)) {
-            expect(email()).toBe("<<email::microsoft.com>>")
+        expect(isRuntimeTokenCallback(email)).toBe(true);
+        if(isRuntimeTokenCallback(email)) {
+            expect(email()).toBe(`${TOKEN_START}email::microsoft.com${TOKEN_END}`)
         }
 
         type cases = [
@@ -38,9 +38,9 @@ describe("Email", () => {
     it("multi domain email", () => {
         const email = schemaProp(t => t.email("microsoft.com", "google.com"));
 
-        expect(isRuntimeToken(email)).toBe(true);
-        if(isRuntimeToken(email)) {
-            expect(email()).toBe("<<email::microsoft.com, google.com>>")
+        expect(isRuntimeTokenCallback(email)).toBe(true);
+        if(isRuntimeTokenCallback(email)) {
+            expect(email()).toBe(`${TOKEN_START}email::microsoft.com, google.com${TOKEN_END}`)
         }
 
         type cases = [
@@ -52,9 +52,9 @@ describe("Email", () => {
     it("pattern based", () => {
         const email = schemaProp(t => t.email(e => e.endsWith("microsoft.com")));
 
-        expect(isRuntimeToken(email)).toBe(true);
-        if(isRuntimeToken(email)) {
-            expect(email()).toBe("<<email::{{String}}microsoft.com>>")
+        expect(isRuntimeTokenCallback(email)).toBe(true);
+        if(isRuntimeTokenCallback(email)) {
+            expect(email()).toBe(`${TOKEN_START}email::{{String}}microsoft.com${TOKEN_END}`)
         }
     
         type cases = [

@@ -1,11 +1,13 @@
 export * from "./isAwsLambdaError";
 export * from "./isAxiosError";
-export * from "./isSchemaDictionary";
 export * from "./isError";
 export * from "./isFetchError";
 export * from "./isFetchResponse";
 export * from "./isKindError";
 export * from "./isKindErrorType";
 export * from "./isRuntimeToken";
+export * from "./isSchemaApi";
+export * from "./isSchemaDictionary";
 export * from "./isSchemaTuple";
 export * from "./isStringifyable";
+

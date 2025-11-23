@@ -1,8 +1,8 @@
-import type { AsRuntimeToken } from "~/types";
 import { isFunction } from "inferred-types";
+import { RuntimeToken, RuntimeTokenCallback } from "~/types";
 
 /**
- * A type guard which checks whether `val` is a `RuntimeToken`.
+ * A type guard which checks whether `val` is a `RuntimeTokenCallback`.
  * 
  * #### Notes:
  * 
@@ -38,6 +38,13 @@ import { isFunction } from "inferred-types";
  * )
  * ```
  */
-export function isRuntimeToken(val: unknown): val is AsRuntimeToken {
+export function isRuntimeTokenCallback(val: unknown): val is RuntimeTokenCallback {
+    return isFunction(val) && "kind" in val && val.kind === "RuntimeToken";
+}
+
+
+
+
+export function isRuntimeToken(val: unknown): val is RuntimeToken {
   return isFunction(val) && "kind" in val && val.kind === "RuntimeToken";
 }

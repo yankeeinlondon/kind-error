@@ -1,5 +1,13 @@
-import type { EndsWith, Ip4Octet, NumericChar, NumericChar__ZeroToFive, NumericChar__ZeroToFour, StripAfter, Suggest } from "inferred-types";
-import type { FromSchemaTuple, SchemaCallback } from "./schema";
+import type { 
+    EndsWith, 
+    Ip4Octet, 
+    NumericChar, 
+    NumericChar__ZeroToFive, 
+    NumericChar__ZeroToFour, 
+    StripAfter, 
+    Suggest 
+} from "inferred-types";
+import type { FromSchemaTuple, SchemaCallback } from "~/types";
 
 export type EmailDomain = `${string}.${string}` | SchemaCallback;
 
