@@ -34,17 +34,15 @@ describe("KindErrorType.partial()", () => {
         });
         
         expect(err.kind).toBe("my-error");
-        expect(err.context).toEqual({
-            region: "us-east",
-            code: 404,
-            user: "ken"
-        });
+        expect(err.region).toBe("us-east");
+        expect(err.code).toBe(404);
+        expect(err.user).toBe("ken");
 
         // Assert Types
         type SpecificParams = Parameters<typeof SpecificErr>;
         
         // Check that the resulting error has the correct context shape (all values resolved)
-        type ErrContext = typeof err.context;
+        type ErrContext = typeof err;
 
         type cases = [
             // The partial error type should require 'user' in its context
@@ -55,12 +53,16 @@ describe("KindErrorType.partial()", () => {
             // The resulting error context should have literal values for region/code
             // and string for user
             Expect<AssertEqual<
-                ErrContext,
-                Readonly<{
-                    region: "us-east";
-                    code: 404;
-                    user: "ken"; // narrow because we passed literal "ken"
-                }>
+                ErrContext["region"],
+                "us-east"
+            >>,
+            Expect<AssertEqual<
+                ErrContext["code"],
+                404
+            >>,
+            Expect<AssertEqual<
+                ErrContext["user"],
+                "ken"
             >>
         ];
     });
@@ -87,11 +89,9 @@ describe("KindErrorType.partial()", () => {
             user: "string"
         });
 
-        expect(err.context).toEqual({
-            region: "us-west",
-            code: 500,
-            user: "admin"
-        });
+        expect(err.region).toBe("us-west");
+        expect(err.code).toBe(500);
+        expect(err.user).toBe("admin");
 
         // Assert Types
         type Step1Params = Parameters<typeof Step1>;
@@ -110,12 +110,16 @@ describe("KindErrorType.partial()", () => {
             >>,
             // Resulting error has everything
             Expect<AssertEqual<
-                typeof err.context,
-                Readonly<{
-                    region: "us-west";
-                    code: 500;
-                    user: "admin";
-                }>
+                typeof err["region"],
+                "us-west"
+            >>,
+            Expect<AssertEqual<
+                typeof err["code"],
+                500
+            >>,
+            Expect<AssertEqual<
+                typeof err["user"],
+                "admin"
             >>
         ];
     });

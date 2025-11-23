@@ -19,7 +19,7 @@ export function toStringFn<
   const { name, message, stackTrace } = err;
 
   return () => {
-    const frames = stackTrace();
+    const frames = stackTrace;
     const first = frames[0];
     const func = first?.function
       ? ` inside the function ${`${chalk.bold(first.function)}()`}`
@@ -32,14 +32,17 @@ export function toStringFn<
       ? `\n${frames.slice(1).map(l => `    - ${chalk.blue(fileLink(l?.file))}:${l?.line}:${l?.col}${l?.function ? ` in ${chalk.bold(`${l?.function}()`)}` : ""}`).join("\n")}`
       : "";
 
-    const context = Object.keys(err.context).length > 0
-      ? `\n\nContext:\n${Object.keys(err.context).map(
+    const contextKeys = Object.keys(err).filter(
+      k => !["name", "message", "stack", "stackTrace", "kind", "type", "subType", "__kind", "toString", "toJSON"].includes(k),
+    );
+
+    const context = contextKeys.length > 0
+      ? `\n\nContext:\n${contextKeys.map(
         (key) => {
-          const context = err.context as Dictionary;
           const value = (
-            key in context
-              ? isStringifyable(context[key])
-                ? context[key]
+            key in err
+              ? isStringifyable((err as Dictionary)[key])
+                ? (err as Dictionary)[key]
                 : Never
               : null
           ) as Stringifyable;

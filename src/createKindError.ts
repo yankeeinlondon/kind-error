@@ -79,7 +79,7 @@ export function createKindError<
         err.subType = asKindSubType<TName>(name);
         err.name = pascalName;
         err.message = msg;
-        err.stackTrace = () => stackTrace;
+        err.stackTrace = stackTrace;
         err.stack = err.stack || "";
         Object.assign(err, mergedContext);
 
