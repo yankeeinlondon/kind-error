@@ -1,9 +1,6 @@
 import {
     Dictionary,
     Scalar,
-    EN_SPACE,
-    THIN_SPACE,
-    narrow,
     isScalar,
     toJson
 } from "inferred-types";
@@ -20,15 +17,29 @@ import {
     Never,
 } from "inferred-types";
 import { isSchemaDictionary } from "~/type-guards";
-import { SCHEMA_API_ARRAY_TUPLE, SCHEMA_API_ATOMIC, SCHEMA_API_DOMAIN, SCHEMA_API_NUMERIC, SCHEMA_API_OBJECT, SCHEMA_API_STRING } from "./schema-api";
-import { asRuntimeTokenCallback } from "./asRuntimeToken";
+import { 
+    SCHEMA_API_ARRAY_TUPLE, 
+    SCHEMA_API_ATOMIC, 
+    SCHEMA_API_DOMAIN, 
+    SCHEMA_API_NUMERIC, 
+    SCHEMA_API_OBJECT, 
+    SCHEMA_API_STRING,
+    setSchemaApi
+} from "./schema-api";
+import { 
+    asRuntimeTokenCallback,
+    UNION_DELIMITER,
+    COMMA_DELIMITER,
+    TOKEN_START,
+    TOKEN_END
+} from "./asRuntimeToken";
 
-
-
-export const UNION_DELIMITER = `${EN_SPACE}|${EN_SPACE}` as const;
-export const COMMA_DELIMITER = `,${EN_SPACE}` as const;
-export const TOKEN_START = narrow(`<<${THIN_SPACE}`);
-export const TOKEN_END = `${THIN_SPACE}>>` as const;
+export {
+    UNION_DELIMITER,
+    COMMA_DELIMITER,
+    TOKEN_START,
+    TOKEN_END
+};
 
 export const SCHEMA_API = {
     kind: "SchemaApi",
@@ -104,3 +115,5 @@ export function schemaObject<const T extends Record<string, Scalar | SchemaCallb
 
     return asRuntimeTokenCallback(`dictionary::${toJson(output)}`) as unknown as DetectOptionalValues<FromSchema<T>>
 }
+
+setSchemaApi(SCHEMA_API);

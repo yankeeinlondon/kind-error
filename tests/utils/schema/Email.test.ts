@@ -4,7 +4,7 @@ import {
     AssertEqual,
     Expect,
 } from "inferred-types";
-import { schemaProp, TOKEN_END, TOKEN_START } from "~/utils";
+import { COMMA_DELIMITER, schemaProp, TOKEN_END, TOKEN_START } from "~/utils";
 import {  isRuntimeTokenCallback } from "~";
 
 describe("Email", () => {
@@ -40,7 +40,7 @@ describe("Email", () => {
 
         expect(isRuntimeTokenCallback(email)).toBe(true);
         if(isRuntimeTokenCallback(email)) {
-            expect(email()).toBe(`${TOKEN_START}email::microsoft.com, google.com${TOKEN_END}`)
+            expect(email()).toBe(`${TOKEN_START}email::microsoft.com${COMMA_DELIMITER}google.com${TOKEN_END}`)
         }
 
         type cases = [
@@ -54,7 +54,7 @@ describe("Email", () => {
 
         expect(isRuntimeTokenCallback(email)).toBe(true);
         if(isRuntimeTokenCallback(email)) {
-            expect(email()).toBe(`${TOKEN_START}email::{{String}}microsoft.com${TOKEN_END}`)
+            expect(email()).toBe(`${TOKEN_START}email::${TOKEN_START}endsWith::microsoft.com${TOKEN_END}${TOKEN_END}`)
         }
     
         type cases = [

@@ -1,6 +1,10 @@
-import { createFnWithProps } from "inferred-types";
+import { createFnWithProps, EN_SPACE, narrow, THIN_SPACE } from "inferred-types";
 import { AsRuntimeToken, isRuntimeToken, RuntimeBaseType, RuntimeToken } from "~";
-import { TOKEN_END, TOKEN_START } from "./schema";
+
+export const UNION_DELIMITER = `${EN_SPACE}|${EN_SPACE}` as const;
+export const COMMA_DELIMITER = `,${EN_SPACE}` as const;
+export const TOKEN_START = narrow(`<<${THIN_SPACE}`);
+export const TOKEN_END = `${THIN_SPACE}>>` as const;
 
 /**
  * Converts the _payload_ of a `RuntimeToken` into a delimited, fully fledged `RuntimeToken`.
@@ -11,9 +15,16 @@ import { TOKEN_END, TOKEN_START } from "./schema";
 export function asRuntimeToken<
     T extends `${RuntimeBaseType}${string}` | RuntimeToken
 >(token: T): AsRuntimeToken<T>  {
-    return isRuntimeToken(token) 
-        ? token as AsRuntimeToken<T>
-        : `${TOKEN_START}${token}${TOKEN_END}` as AsRuntimeToken<T>
+    if (isRuntimeToken(token)) {
+        return token as AsRuntimeToken<T>;
+    }
+    const t = String(token);
+    
+    return (
+        t.startsWith(TOKEN_START) && t.endsWith(TOKEN_END)
+        ? t
+        : `${TOKEN_START}${t}${TOKEN_END}`
+    ) as AsRuntimeToken<T>;
 }
 
 /**
@@ -29,5 +40,5 @@ export function asRuntimeToken<
 export function asRuntimeTokenCallback<
     T extends `${RuntimeBaseType}${string}`
 >(token: T) {
-  return createFnWithProps(() => `${TOKEN_START}${asRuntimeToken(token)}${TOKEN_END}`, { kind: "RuntimeToken" });
+  return createFnWithProps(() => asRuntimeToken(token), { kind: "RuntimeToken" });
 }
