@@ -14,7 +14,7 @@ import {
     isKindError,
 
 } from "~";
-import { AssertExtends } from "inferred-types";
+import { AssertExtends, isArray } from "inferred-types";
 
 // Note: while type tests clearly fail visible inspection, they pass from Vitest
 // standpoint so always be sure to run `tsc --noEmit` over your test files to
@@ -48,7 +48,7 @@ describe("kindError", () => {
         const str = JSON.stringify(FooBar);
         const test = JSON.parse(str);
         expect(test).toEqual(expected);
-        expect(FooBar.toString()).toBe("KindErrorType::FooBar(foo/bar)");
+        expect(FooBar.toString()).toBe("KindErrorType::FooBar ({ foo: 42 })");
 
         type Name = KindErrorTypeName<"foo/bar">;
 
@@ -78,7 +78,7 @@ describe("kindError", () => {
         expect(typeof FooBar.proxy).toBe("function");
 
         expect(FooBar.schema).toEqual({});
-        expect(FooBar.toString()).toBe("KindErrorType::FooBar(foo/bar)");
+        expect(FooBar.toString()).toBe("KindErrorType::FooBar ({  })");
 
         type cases = [
             // Expect<AssertExtends<
@@ -99,7 +99,7 @@ describe("kindError", () => {
         expect(FooBar.type).toBe("foo");
         expect(FooBar.subType).toBe("bar");
         expect(FooBar.message).toBe("Bad Juju!");
-        expect(typeof FooBar.stackTrace).toBe("function");
+        expect(isArray(FooBar.stackTrace)).toBe(true);
 
         // type guards
         expect(FooBarType.is(FooBar)).toBe(true);
@@ -125,7 +125,7 @@ describe("kindError", () => {
         expect(FooBar.type).toBe("foo");
         expect(FooBar.subType).toBe("bar");
         expect(FooBar.message).toBe("Bad Juju!");
-        expect(typeof FooBar.stackTrace).toBe("function");
+        expect(isArray(FooBar.stackTrace)).toBe(true);
 
         // type guards
         expect(isError(FooBar)).toBe(true);

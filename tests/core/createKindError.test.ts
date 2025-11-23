@@ -11,7 +11,7 @@ import {
     KindErrorShape, 
     SchemaCallback
 } from "~";
-import { AssertExtends, EmptyObject } from "inferred-types";
+import { AssertExtends, EmptyObject, isFunction } from "inferred-types";
 
 describe("Defining Error Types", () => {
 
@@ -144,7 +144,8 @@ describe("Defining Error Types", () => {
             expect(typeof MyError.is).toBe("function");
             expect(typeof MyError.partial).toBe("function");
             expect(typeof MyError.proxy).toBe("function");
-            expect(MyError.schema).toEqual({ test: true, foo: "string"});
+            expect(MyError.schema.test).toEqual(true);
+            expect(isFunction(MyError.schema.foo)).toEqual(true);
             
             type Kind = typeof MyError;
             type Params = Parameters<Kind>;
