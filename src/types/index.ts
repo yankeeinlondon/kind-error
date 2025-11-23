@@ -17,3 +17,4 @@ export * from "./type-utils";
 export * from "./types";
 export * from "./variants";
 
+export * from "./schema-api/index"

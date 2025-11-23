@@ -35,12 +35,14 @@ describe("AsRuntimeToken<T>", () => {
 
     
     it("RuntimeTokenCallback", () => {
+        type MyCallback = (() => RuntimeToken<"string">) & { kind: "RuntimeToken" };
+
         type PreReq = DoesExtend<
-            (() => RuntimeToken<`string`>), 
+            MyCallback, 
             RuntimeTokenCallback
         >;
 
-        type T = AsRuntimeToken<(() => RuntimeToken<`string`>)>;
+        type T = AsRuntimeToken<MyCallback>;
     
         type cases = [
             Expect<AssertTrue<PreReq>>,
