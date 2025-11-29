@@ -1,5 +1,5 @@
 import type { Dictionary, Narrowable } from "inferred-types";
-import type { FetchError, JsError, KindError, KindErrorType, KindStackItem } from "../types";
+import type { FetchError, JsError, KindStackItem } from "../types";
 import { parse } from "error-stack-parser-es/lite";
 import { hasIndexOf, isObject, isString, isUndefined } from "inferred-types";
 import { relative } from "pathe";

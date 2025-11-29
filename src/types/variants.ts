@@ -11,9 +11,9 @@ import type {
   Not,
   StringKeys,
 } from "inferred-types";
-import type { DetectOptionalValues } from "./type-utils";
 import type { SchemaCallback } from "./SchemaCallback";
 import type { SchemaResult } from "./SchemaResult";
+import type { DetectOptionalValues } from "./type-utils";
 
 /**
  * **IsNonVariant**`<T>`
@@ -33,7 +33,7 @@ export type IsNonVariant<T>
               ? false
               : true
             : false
-      // treat as token
+        // treat as token
           : FromInputToken<T> extends infer Token
             ? IsLiteralLike<Token> extends true
               ? IsUnion<Token> extends true
@@ -41,12 +41,12 @@ export type IsNonVariant<T>
                 : true
               : false
             : false
-    // not input token
-      : IsLiteralLike<T> extends true
-        ? IsUnion<T> extends true
-          ? false
-          : true
-        : false;
+      // not input token
+        : IsLiteralLike<T> extends true
+          ? IsUnion<T> extends true
+            ? false
+            : true
+          : false;
 
 /**
  * **IsVariant**`<T>`
@@ -186,7 +186,6 @@ export type RemoveVariants<
           ? RemoveVariants<T, Rest, R>
           : RemoveVariants<T, Rest, R & Record<Head, T[Head]>>
       : ExpandRecursively<R>;
-
 
 /**
  * Tests whether the context shape defined in the `KindErrorType` has

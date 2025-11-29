@@ -1,5 +1,5 @@
-import type { Not, Scalar, ScalarCallback } from "inferred-types";
-import type { IsNonVariant, SchemaCallback } from "~/types";
+import type { Scalar } from "inferred-types";
+import type { SchemaCallback } from "~/types";
 import { isFunction, isString } from "inferred-types";
 import { asRuntimeToken } from "./asRuntimeToken";
 
@@ -13,7 +13,7 @@ import { asRuntimeToken } from "./asRuntimeToken";
  *   reference.
  */
 export function isVariant<const T extends Scalar | SchemaCallback>(val: T): boolean {
-    const token = asRuntimeToken(val);
+  const token = asRuntimeToken(val);
 
   if (isFunction(val)) {
     return true;
@@ -24,24 +24,22 @@ export function isVariant<const T extends Scalar | SchemaCallback>(val: T): bool
       ? val.startsWith("<<") && val.endsWith(">>")
         ? true
         : ["string", "number", "object", "array", "boolean"].includes(val)
-          ? true
-          : val.endsWith("[]")
             ? true
-            : val.startsWith("Record<") && val.endsWith(">")
+            : val.endsWith("[]")
               ? true
-              : val.startsWith("Map<") && val.endsWith(">")
+              : val.startsWith("Record<") && val.endsWith(">")
                 ? true
-                : val.startsWith("Array<") && val.endsWith(">")
+                : val.startsWith("Map<") && val.endsWith(">")
                   ? true
-                  : val.startsWith("WeakMap<") && val.endsWith(">")
+                  : val.startsWith("Array<") && val.endsWith(">")
                     ? true
-                    : val.startsWith("[") && val.endsWith("]")
+                    : val.startsWith("WeakMap<") && val.endsWith(">")
                       ? true
-                      : val.startsWith("{") && val.endsWith("}")
+                      : val.startsWith("[") && val.endsWith("]")
                         ? true
-                        : val.includes("|")
+                        : val.startsWith("{") && val.endsWith("}")
                           ? true
-                          : false
+                          : !!val.includes("|")
       : false
   );
 }

@@ -8,16 +8,15 @@ import type {
   OptionalKeysTuple,
 } from "inferred-types";
 
-import type {  DetectOptionalValues, NonVariants, Variants } from "~/types";
+import type { DetectOptionalValues, NonVariants, Variants } from "~/types";
 
 type UndefinedAreUndefined<
-    T extends Record<string, unknown>,
-    O extends readonly (keyof T & string)[] = As<
-        OptionalKeysTuple<DetectOptionalValues<T>>,
-        readonly (keyof T & string)[]
-    >
+  T extends Record<string, unknown>,
+  O extends readonly (keyof T & string)[] = As<
+    OptionalKeysTuple<DetectOptionalValues<T>>,
+    readonly (keyof T & string)[]
+  >,
 > = Record<O[number], undefined>;
-
 
 /**
  * **ResolveContext**`<TSchema, TCtx>`
@@ -30,24 +29,24 @@ export type ResolveContext<
   TSchema extends Record<string, unknown>,
   TCtx extends Record<string, unknown> | undefined,
   TNonVariants extends Record<string, unknown> = NonVariants<TSchema>,
-  TVariants extends Record<string, unknown> = Variants<TSchema>
+  TVariants extends Record<string, unknown> = Variants<TSchema>,
 > = As<
   IsUndefined<TCtx> extends true
     ? IsEqual<TSchema, Record<string, unknown>> extends true
-        ? EmptyObject
-        : ExpandRecursively<
+      ? EmptyObject
+      : ExpandRecursively<
             TNonVariants & UndefinedAreUndefined<TSchema>
-        >
+      >
     : TCtx extends DetectOptionalValues<TVariants>
-        ? IsEqual<TVariants, EmptyObject> extends true
-            ? ExpandDictionary<TNonVariants & TCtx & { 
-                __warning: `context was supposed to be empty as defined by the schema but context was added anyway!`
-            }>
-            : ExpandDictionary<TNonVariants & TCtx>
-        : ExpandDictionary<TNonVariants & TCtx & { 
-            __warning: `The context provided for this error had properties which were inconsistent with the schema defined by the KindErrorType!`,
-            __schema: TVariants,
-            __ctx: TCtx
-        }>,
+      ? IsEqual<TVariants, EmptyObject> extends true
+        ? ExpandDictionary<TNonVariants & TCtx & {
+          __warning: `context was supposed to be empty as defined by the schema but context was added anyway!`;
+        }>
+        : ExpandDictionary<TNonVariants & TCtx>
+      : ExpandDictionary<TNonVariants & TCtx & {
+        __warning: `The context provided for this error had properties which were inconsistent with the schema defined by the KindErrorType!`;
+        __schema: TVariants;
+        __ctx: TCtx;
+      }>,
   Record<string, unknown>
 >;

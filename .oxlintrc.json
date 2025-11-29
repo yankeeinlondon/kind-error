@@ -1,0 +1,33 @@
+{
+    "plugins": [
+        "unicorn",
+        "typescript",
+        "import",
+        "promise",
+        "oxc"
+    ],
+    "rules": {
+        "no-unused-vars": [
+            "error",
+            {
+                "varsIgnorePattern": "_|^cases$",
+                "argsIgnorePattern": "^_|^cases$",
+                "destructuredArrayIgnorePattern": "^_|^cases$"
+            }
+        ],
+        "explicit-function-return-type": ["warn",{
+            "allowDirectConstAssertionInArrowFunctions": true,
+            "allowExpressions": true,
+            "allowHigherOrderFunctions": true,
+            "allowConciseArrowFunctionExpressionsStartingWithVoid": true,
+            "allowIIFEs": true
+        }],
+        "ban-ts-comment": ["error", {
+            "allow-with-description": true,
+            "minimumDescriptionLength": 4
+        }],
+        "import/no-self-import": "error",
+        "unicorn/error-message": "warn",
+        "eslint/block-scoped-bar": "error"
+    }
+}

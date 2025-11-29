@@ -1,5 +1,6 @@
 export * from "./isAwsLambdaError";
 export * from "./isAxiosError";
+export * from "./isBaseTokenType";
 export * from "./isError";
 export * from "./isFetchError";
 export * from "./isFetchResponse";
@@ -10,4 +11,3 @@ export * from "./isSchemaApi";
 export * from "./isSchemaDictionary";
 export * from "./isSchemaTuple";
 export * from "./isStringifyable";
-export * from "./isBaseTokenType"

@@ -1,5 +1,3 @@
-import type { KindError } from "~/types";
-
 export function toJsonFn(
   err: any,
 ) {
