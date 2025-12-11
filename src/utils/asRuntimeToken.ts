@@ -1,5 +1,5 @@
 import type { AsRuntimeToken, RuntimeBaseType, RuntimeToken, RuntimeTokenCallback } from "~";
-import { createFnWithProps, EN_SPACE, narrow, Never, THIN_SPACE } from "inferred-types";
+import { createFnWithProps, EN_SPACE, narrow, Never, Scalar, THIN_SPACE } from "inferred-types";
 import { isBaseTokenType } from "../type-guards/isBaseTokenType";
 import { isRuntimeToken, isRuntimeTokenCallback } from "../type-guards/isRuntimeToken";
 
@@ -16,7 +16,7 @@ export const TOKEN_END = `${THIN_SPACE}>>` as const;
  * - will wrap a `RuntimeTypeBase` string with starting and ending token delimiters
  */
 export function asRuntimeToken<R extends RuntimeToken>(token: RuntimeTokenCallback<R>): R;
-export function asRuntimeToken<T>(token: T): AsRuntimeToken<T>;
+export function asRuntimeToken<T>(token: T): T extends Scalar | RuntimeToken ?  AsRuntimeToken<T>: never;
 export function asRuntimeToken(token: unknown): unknown {
   return (
     isRuntimeToken(token)

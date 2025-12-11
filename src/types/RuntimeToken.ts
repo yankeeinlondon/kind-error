@@ -56,7 +56,7 @@ export type RuntimeToken<
   T extends `${RuntimeBaseType}${string}` = `${RuntimeBaseType}${string}`,
 > = `${typeof TOKEN_START}${T}${typeof TOKEN_END}`;
 
-export type AsRuntimeToken<T extends Scalar | RuntimeTokens> = T extends RuntimeToken
+export type AsRuntimeToken<T extends Scalar | RuntimeToken> = T extends RuntimeToken
   ? T
   : T extends `${RuntimeBaseType}${string}`
     ? RuntimeToken<T>

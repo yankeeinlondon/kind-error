@@ -1,11 +1,12 @@
 {
+    "$schema": "./node_modules/oxfmt/configuration_schema.json",
     "plugins": [
         "unicorn",
         "typescript",
         "import",
         "promise",
         "oxc"
-    ],
+],
     "rules": {
         "no-unused-vars": [
             "error",

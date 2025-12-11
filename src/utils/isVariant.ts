@@ -1,7 +1,4 @@
-import type { Scalar } from "inferred-types";
-import type { SchemaCallback } from "~/types";
 import { isFunction, isString } from "inferred-types";
-import { asRuntimeToken } from "./asRuntimeToken";
 
 /**
  * **isVariant**`(val) -> boolean`
@@ -12,8 +9,8 @@ import { asRuntimeToken } from "./asRuntimeToken";
  *   context schema are a static value/type literal or a _variant_ type
  *   reference.
  */
-export function isVariant<const T extends Scalar | SchemaCallback>(val: T): boolean {
-  const token = asRuntimeToken(val);
+export function isVariant<const T>(val: T): boolean {
+//   const token = asRuntimeToken(val);
 
   if (isFunction(val)) {
     return true;
