@@ -7,9 +7,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   resolve: {
-    alias: {
-      "~": path.resolve(__dirname, "./src"), // Map "~/" to "./src"
-    },
+    alias: [
+      { find: /^~$/, replacement: path.resolve(__dirname, "./src/index.ts") }, // Map bare "~" to "./src/index.ts"
+      { find: /^~\/(.*)$/, replacement: path.resolve(__dirname, "./src/$1") }, // Map "~/foo" to "./src/foo"
+    ],
   },
   test: {
     // Additional Vitest configurations

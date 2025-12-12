@@ -153,7 +153,7 @@ describe("Defining Error Types", () => {
 
             type cases = [
                 Expect<AssertEqual<Kind["kind"], "my-error">>,
-                Expect<AssertExtends<Kind["schema"], { test: true; foo: "string" }>>,
+                Expect<AssertExtends<Kind["schema"], { test: true; foo: SchemaCallback }>>,
                 Expect<AssertEqual<
                     Params,
                     [msg: string, ctx: { foo: string }]

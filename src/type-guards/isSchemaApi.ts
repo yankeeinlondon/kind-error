@@ -1,4 +1,4 @@
-import type { SchemaApi } from "~";
+import type { SchemaApi } from "~/types";
 import { isDictionary } from "inferred-types";
 
 export function isSchemaApi(val: unknown): val is SchemaApi {

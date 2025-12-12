@@ -5,8 +5,7 @@ import type {
 } from "~/types";
 import type { SchemaApi__Object } from "~/types/schema-api";
 import { toJson } from "inferred-types";
-import { asRuntimeTokenCallback } from "~/utils";
-import { COMMA_DELIMITER } from "~/utils/schema";
+import { asRuntimeTokenCallback, COMMA_DELIMITER } from "../asRuntimeToken";
 
 export const SCHEMA_API_OBJECT: SchemaApi__Object = {
 

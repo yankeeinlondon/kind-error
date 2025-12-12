@@ -1,5 +1,5 @@
 import type { Err, IsEqual, Scalar } from "inferred-types";
-import type { RuntimeToken, RuntimeTokenCallback } from "~";
+import type { RuntimeToken, RuntimeTokenCallback } from "./RuntimeToken";
 
 type FromScalar<T extends Scalar>
   = [IsEqual<T, null>] extends [true]

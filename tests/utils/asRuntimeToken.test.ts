@@ -5,7 +5,7 @@ import {
 } from "inferred-types/types";
 import { asRuntimeToken, schemaProp, TOKEN_END, TOKEN_START } from "~/utils";
 import { AssertEqual, AssertExtends } from "inferred-types";
-import { isRuntimeTokenCallback, RuntimeToken, SchemaApi } from "~";
+import { isRuntimeTokenCallback, RuntimeToken, RuntimeTokenCallback, SchemaApi } from "~";
 
 describe("asRuntimeToken(val)", () => {
 
@@ -60,7 +60,7 @@ describe("asRuntimeToken(val)", () => {
             type CB = typeof cb;
             const considering = asRuntimeToken(cb);
             type cases = [
-                Expect<AssertExtends<CB, RuntimeToken>>
+                Expect<AssertExtends<CB, RuntimeTokenCallback>>
             ];
         }
 

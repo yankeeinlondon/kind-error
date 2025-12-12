@@ -1,5 +1,5 @@
 import type { SchemaApi__Atomic } from "~/types/schema-api";
-import { asRuntimeTokenCallback } from "~/utils";
+import { asRuntimeTokenCallback } from "../asRuntimeToken";
 
 export const SCHEMA_API_ATOMIC: SchemaApi__Atomic = {
   boolean() {

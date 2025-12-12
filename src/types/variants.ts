@@ -56,6 +56,25 @@ export type IsNonVariant<T>
 export type IsVariant<T> = Not<IsNonVariant<T>>;
 
 /**
+ * **IsVariantResult**`<T>`
+ *
+ * Used for function return types where we need to handle wide types gracefully.
+ *
+ * Returns:
+ * - `true` when `T` is known to be a variant type at compile time
+ * - `false` when `T` is known to be a non-variant type at compile time
+ * - `boolean` when `T` is a wide type and cannot be determined at compile time
+ */
+export type IsVariantResult<T>
+  = IsLiteralLike<T> extends true
+    ? Not<IsNonVariant<T>>
+    : T extends InputToken
+      ? FromInputToken<T> extends Error
+        ? boolean
+        : Not<IsNonVariant<T>>
+      : boolean;
+
+/**
  * tests whether the schema `T` has any literal values which are not variants,
  * in it's key/value definition.
  */

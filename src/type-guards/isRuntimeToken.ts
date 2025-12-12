@@ -1,12 +1,12 @@
 import type { RuntimeToken, RuntimeTokenCallback } from "~/types";
-import { isFunction } from "inferred-types";
+import { isFunction, isString, THIN_SPACE } from "inferred-types";
 
 /**
  * A type guard which checks whether `val` is a `RuntimeTokenCallback`.
  *
  * #### Notes:
  *
- * - a `RuntimeToken` is identifiable as a function which includes
+ * - a `RuntimeTokenCallback` is identifiable as a function which includes
  *   the key/value `{ kind: "RuntimeToken" }`.
  * - the function _never_ takes any values so can be called without
  *   any additional context
@@ -33,15 +33,18 @@ import { isFunction } from "inferred-types";
  * const wideArray = schemaProperty(t => t.array("string","number"))
  * // { foo: "foo", bar: }
  * const dictionary = schemaProperty(t => t.dictionary({ foo: "foo", bar: t => }))
- *
- * const scalar = isRuntimeToken(
- * )
  * ```
  */
 export function isRuntimeTokenCallback(val: unknown): val is RuntimeTokenCallback {
   return isFunction(val) && "kind" in val && val.kind === "RuntimeToken";
 }
 
+/**
+ * A type guard which checks whether `val` is a `RuntimeToken` string.
+ *
+ * A RuntimeToken is a string that starts with `<<` and ends with `>>`,
+ * containing a type representation.
+ */
 export function isRuntimeToken(val: unknown): val is RuntimeToken {
-  return isFunction(val) && "kind" in val && val.kind === "RuntimeToken";
+  return isString(val) && val.startsWith(`<<${THIN_SPACE}`) && val.endsWith(`${THIN_SPACE}>>`);
 }

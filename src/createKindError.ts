@@ -27,7 +27,7 @@ type Rtn<
     "invalid-name",
     `The name for a KindError must not include any of the following characters: "<", ">", "[", "]", "(", ")"`
   >
-  : KindErrorType<TName, DetectOptionalValues<FromSchema<TSchema>>>;
+  : KindErrorType<TName, DetectOptionalValues<FromSchema<TSchema>>, TSchema>;
 
 /**
  * **createKindError**`(name, context)`

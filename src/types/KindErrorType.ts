@@ -14,7 +14,7 @@ import type {
 } from "~/types";
 
 /**
- * **KindErrorType**`<TName,TContext>`
+ * **KindErrorType**`<TName,TSchema,TOriginalSchema>`
  *
  * Defines an error type, exposing:
  *   - some key/value metadata properties
@@ -25,6 +25,7 @@ import type {
 export type KindErrorType<
   TName extends string = string,
   TSchema extends Record<string, unknown> = Record<string, unknown>,
+  TOriginalSchema extends Record<string, unknown> = TSchema,
 > = {
   /** unique identifier of a `KindErrorType` */
   __kind: "KindErrorType";
@@ -43,9 +44,9 @@ export type KindErrorType<
   /** the error's name when instantiated */
   errorName: KindErrorName<TName>;
   /**
-   * the shape of the error's context properties
+   * the shape of the error's context properties (original schema with callbacks)
    */
-  schema: TSchema;
+  schema: TOriginalSchema;
 
   /**
    * **proxy**`(err, [props]) -> KindError`
@@ -89,7 +90,7 @@ export type KindErrorType<
    */
   partial: <const T extends Partial<AsContextShape<TSchema>>>(
     context: T,
-  ) => KindErrorType<TName, MergeObjects<TSchema, T>>;
+  ) => KindErrorType<TName, MergeObjects<TSchema, T>, MergeObjects<TOriginalSchema, T>>;
 
   /**
    * **is**`(val): val is KindError<TName, string, TContext>`

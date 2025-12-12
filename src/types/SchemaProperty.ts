@@ -1,5 +1,5 @@
 import type { Scalar } from "inferred-types";
-import type { SchemaCallback } from "~";
+import type { SchemaCallback } from "./SchemaCallback";
 
 /**
  * **SchemaProperty**

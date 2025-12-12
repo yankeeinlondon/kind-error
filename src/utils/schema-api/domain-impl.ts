@@ -1,8 +1,7 @@
 import type { CreateNetmask, Email, EmailDomain, Ip4Address, Netmask, SchemaApi__Domain } from "~/types/schema-api";
 
 import { isFunction } from "inferred-types";
-import { asRuntimeTokenCallback } from "~/utils";
-import { COMMA_DELIMITER } from "~/utils/schema";
+import { asRuntimeTokenCallback, COMMA_DELIMITER } from "../asRuntimeToken";
 
 let _schemaApi: any;
 

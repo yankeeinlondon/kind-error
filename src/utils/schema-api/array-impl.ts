@@ -1,7 +1,6 @@
 import type { As, FromInputToken__Tuple, InputTokenSuggestions } from "inferred-types";
 import type { SchemaApi__ArrayTuple } from "~/types/schema-api";
-import { asRuntimeTokenCallback } from "~/utils";
-import { COMMA_DELIMITER } from "~/utils/schema";
+import { asRuntimeTokenCallback, COMMA_DELIMITER } from "../asRuntimeToken";
 
 /**
  * The **array** and **tuple** definition section of the `SchemaApi`

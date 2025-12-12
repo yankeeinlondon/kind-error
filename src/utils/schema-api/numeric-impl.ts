@@ -1,6 +1,5 @@
 import type { SchemaApi__Numeric } from "~/types/schema-api";
-import { asRuntimeTokenCallback } from "~/utils";
-import { UNION_DELIMITER } from "~/utils/schema";
+import { asRuntimeTokenCallback, UNION_DELIMITER } from "../asRuntimeToken";
 
 export const SCHEMA_API_NUMERIC: SchemaApi__Numeric = {
   number<T extends readonly number[]>(...literals: T) {

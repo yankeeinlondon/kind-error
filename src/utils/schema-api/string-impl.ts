@@ -1,8 +1,7 @@
 import type { Suggest } from "inferred-types";
 
 import type { SchemaApi__String } from "~/types/schema-api";
-import { asRuntimeTokenCallback } from "~/utils";
-import { UNION_DELIMITER } from "~/utils/schema";
+import { asRuntimeTokenCallback, UNION_DELIMITER } from "../asRuntimeToken";
 
 export const SCHEMA_API_STRING: SchemaApi__String = {
   string<T extends readonly string[]>(...literals: T) {
